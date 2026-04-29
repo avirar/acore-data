@@ -79,10 +79,12 @@ def _query_dbc(
     compact = args.get("compact", True)
     info_mode = args.get("info", False)
 
+    dbc_load_name = reg_entry.get('dbc_name', name) if reg_entry else name
+
     # Info mode - return DBC metadata
     if info_mode:
         try:
-            reader = server._load_dbc(name)
+            reader = server._load_dbc(dbc_load_name)
             info = reader.get_info()
             return {
                 "result": {
@@ -100,8 +102,9 @@ def _query_dbc(
     filter_notes = []
     if filter_data and reg_entry:
         try:
+            dbc_name_for_filter = reg_entry.get('dbc_name', name) if reg_entry else name
             dbc_filter, filter_notes = _convert_filter_for_dbc(
-                server.registry, filter_data, reg_entry, name
+                server.registry, filter_data, reg_entry, dbc_name_for_filter
             )
         except ValueError as e:
             return _build_schema_error(name, str(e), reg_entry, filter_data)
@@ -111,7 +114,7 @@ def _query_dbc(
     dbc_error = None
 
     try:
-        reader = server._load_dbc(name)
+        reader = server._load_dbc(dbc_load_name)
 
         if id_value is not None:
             record = reader.get_record_by_id(id_value)
