@@ -191,7 +191,7 @@ def parse_sql_objectmgr() -> Dict[str, Any]:
             if sql_table_raw:
                 break
 
-        struct_info = _meta(section, r'Struct:\*\*\s*`([^`]+)`')
+        struct_line = _meta(section, r'Struct:\*\*\s*(.+)')
         store_info = _meta(section, r'Store:\*\*\s*`([^`]+)`')
         loader_info = _meta(section, r'Loader:\*\*\s*`([^`]+)`')
 
@@ -202,13 +202,24 @@ def parse_sql_objectmgr() -> Dict[str, Any]:
 
         c_struct = ""
         header_file = ""
-        if struct_info:
-            m = re.match(r'(\w+)', struct_info)
-            if m:
-                c_struct = m.group(1)
-            hf = re.search(r'\(([^)]+)\)', struct_info)
-            if hf:
-                header_file = hf.group(1)
+        if struct_line:
+            first_bt = re.search(r'`([^`]+)`', struct_line)
+            if first_bt:
+                raw = first_bt.group(1)
+                m = re.match(r'(\w+)', raw)
+                if m:
+                    c_struct = m.group(1)
+                hf = re.search(r'\(([^)]+)\)', raw)
+                if hf:
+                    header_file = hf.group(1)
+            if not header_file:
+                hf = re.search(r'\(`([^`]+)`\)', struct_line)
+                if hf:
+                    header_file = hf.group(1)
+            if not header_file:
+                hf = re.search(r'\(([^)]+\.h)\)', struct_line)
+                if hf:
+                    header_file = hf.group(1).strip()
 
         store_var = ""
         container_type = ""

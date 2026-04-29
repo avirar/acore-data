@@ -536,6 +536,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## Quest
 
 - **SQL Tables:** `quest_template`, `quest_template_addon`, `quest_details`, `quest_request_items`, `quest_offer_reward`
+- **Struct:** `Quest` (`src/server/game/Quests/QuestDef.h`)
 - **Class:** `Quest` (`src/server/game/Quests/QuestDef.h`)
 - **Store:** `ObjectMgr::_questTemplates` (`QuestMap` = `std::unordered_map<uint32, Quest*>`)
 - **Loader:** `ObjectMgr::LoadQuests()` (`ObjectMgr.cpp:4998`)
@@ -629,7 +630,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## QuestMoneyReward
 
 - **SQL Table:** `quest_money_reward`
-- **Struct:** `QuestMoneyRewardArray` = `std::array<uint32, 10>` (`ObjectMgr.h`)
+- **Struct:** `QuestMoneyRewardArray` = `std::array<uint32, 10>` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_questMoneyRewards` (`QuestMoneyRewardStore` = `std::unordered_map<uint32, QuestMoneyRewardArray>`)
 - **Loader:** `ObjectMgr::LoadQuestMoneyRewards()`
 
@@ -652,6 +653,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## QuestPOI
 
 - **SQL Tables:** `quest_poi`, `quest_poi_points`
+- **Struct:** `QuestPOI` (`src/server/game/Globals/ObjectMgr.h`)
 - **Structs:** `QuestPOI`, `QuestPOIPoint` (`ObjectMgr.h`)
 - **Store:** `ObjectMgr::_questPOIStore` (`QuestPOIContainer` = `std::unordered_map<uint32, QuestPOIVector>`)
 - **Loader:** `ObjectMgr::LoadQuestPOI()`
@@ -685,6 +687,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## QuestAreaTrigger
 
 - **SQL Table:** `areatrigger_involvedrelation`
+- **Struct:** `QuestAreaTrigger` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_questAreaTriggerStore` (`QuestAreaTriggerContainer` = `std::unordered_map<uint32, uint32>`)
 - **Loader:** `ObjectMgr::LoadQuestAreaTriggers()`
 
@@ -698,7 +701,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## QuestGreeting
 
 - **SQL Table:** `quest_greeting`
-- **Struct:** `QuestGreeting` (`ObjectMgr.h`)
+- **Struct:** `QuestGreeting` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_questGreetingStore` keyed by (id, type)
 
 | SQL Column | C++ Type | Field Name | Notes |
@@ -712,6 +715,7 @@ Sub-struct **_Socket**: Color uint32 (enum SocketColor), Content uint32
 ## QuestRelations
 
 - **SQL Tables:** `creature_queststarter`, `creature_questender`, `gameobject_queststarter`, `gameobject_questender`
+- **Struct:** `QuestRelations` = `std::multimap<uint32, uint32>` (`src/server/game/Globals/ObjectMgr.h`)
 - **Container:** `QuestRelations` = `std::multimap<uint32, uint32>`
 - **Stores:** `_creatureQuestRelations`, `_creatureQuestInvolvedRelations`, `_goQuestRelations`, `_goQuestInvolvedRelations`
 - **Loaders:** `LoadCreatureQuestStarters()`, `LoadCreatureQuestEnders()`, `LoadGameobjectQuestStarters()`, `LoadGameobjectQuestEnders()`
@@ -728,7 +732,7 @@ All four tables share identical schema:
 ## PageText
 
 - **SQL Table:** `page_text`
-- **Struct:** `PageText` (`ObjectMgr.h`)
+- **Struct:** `PageText` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_pageTextStore` (`PageTextContainer`)
 - **Loader:** `ObjectMgr::LoadPageTexts()`
 
@@ -742,7 +746,7 @@ All four tables share identical schema:
 ## GossipText
 
 - **SQL Table:** `npc_text`
-- **Struct:** `GossipText` (`NPCHandler.h`)
+- **Struct:** `GossipText` (`src/server/game/Handlers/NPCHandler.h`)
 - **Store:** `ObjectMgr::_gossipTextStore` (`GossipTextContainer`)
 - **Loader:** `ObjectMgr::LoadGossipText()`
 
@@ -753,7 +757,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## GossipMenus
 
 - **SQL Table:** `gossip_menu`
-- **Struct:** `GossipMenus` (`ObjectMgr.h`)
+- **Struct:** `GossipMenus` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_gossipMenusStore` (`GossipMenusContainer`)
 - **Loader:** `ObjectMgr::LoadGossipMenu()`
 
@@ -767,7 +771,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## GossipMenuItems
 
 - **SQL Table:** `gossip_menu_option`
-- **Struct:** `GossipMenuItems` (`ObjectMgr.h`)
+- **Struct:** `GossipMenuItems` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_gossipMenuItemsStore` (`GossipMenuItemsContainer`)
 - **Loader:** `ObjectMgr::LoadGossipMenuItems()`
 
@@ -792,7 +796,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## BroadcastText
 
 - **SQL Table:** `broadcast_text` (+ `broadcast_text_locale`)
-- **Struct:** `BroadcastText` (`ObjectMgr.h`)
+- **Struct:** `BroadcastText` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_broadcastTextStore` (`BroadcastTextContainer`)
 - **Loader:** `ObjectMgr::LoadBroadcastTexts()`
 
@@ -813,7 +817,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## PointOfInterest
 
 - **SQL Table:** `points_of_interest`
-- **Struct:** `PointOfInterest` (`ObjectMgr.h`)
+- **Struct:** `PointOfInterest` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_pointsOfInterestStore`
 - **Loader:** `ObjectMgr::LoadPointsOfInterest()`
 
@@ -832,7 +836,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## AreaTrigger
 
 - **SQL Table:** `areatrigger`
-- **Struct:** `AreaTrigger` (`ObjectMgr.h`)
+- **Struct:** `AreaTrigger` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_areaTriggerStore`
 - **Loader:** `ObjectMgr::LoadAreaTriggers()`
 
@@ -854,7 +858,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## AreaTriggerTeleport
 
 - **SQL Table:** `areatrigger_teleport`
-- **Struct:** `AreaTriggerTeleport` (`ObjectMgr.h`)
+- **Struct:** `AreaTriggerTeleport` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_areaTriggerTeleportStore`
 - **Loader:** `ObjectMgr::LoadAreaTriggerTeleports()`
 
@@ -871,7 +875,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## InstanceTemplate
 
 - **SQL Table:** `instance_template`
-- **Struct:** `InstanceTemplate` (`Map.h`)
+- **Struct:** `InstanceTemplate` (`src/server/game/Maps/Map.h`)
 - **Store:** `ObjectMgr::_instanceTemplateStore`
 - **Loader:** `ObjectMgr::LoadInstanceTemplate()`
 
@@ -886,7 +890,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## DungeonEncounter
 
 - **SQL Table:** `instance_encounters`
-- **Struct:** `DungeonEncounter` (`ObjectMgr.h`)
+- **Struct:** `DungeonEncounter` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_dungeonEncounterStore` (`DungeonEncounterContainer` = `std::unordered_map<uint32, DungeonEncounterList>`) keyed by `MAKE_PAIR32(mapId, difficulty)`
 - **Loader:** `ObjectMgr::LoadInstanceEncounters()`
 
@@ -903,7 +907,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## DungeonProgressionRequirements
 
 - **SQL Tables:** `dungeon_access_template`, `dungeon_access_requirements`
-- **Struct:** `DungeonProgressionRequirements` (`Player.h`)
+- **Struct:** `DungeonProgressionRequirements` (`src/server/game/Entities/Player/Player.h`)
 - **Store:** `ObjectMgr::_accessRequirementStore` keyed by [mapId][difficulty]
 - **Loader:** `ObjectMgr::LoadAccessRequirements()`
 
@@ -921,7 +925,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## ScriptInfo
 
 - **SQL Tables:** `spell_scripts`, `event_scripts`, `waypoint_scripts`
-- **Struct:** `ScriptInfo` (`ObjectMgr.h`)
+- **Struct:** `ScriptInfo` (`src/server/game/Globals/ObjectMgr.h`)
 - **Stores:** `sSpellScripts`, `sEventScripts`, `sWaypointScripts` (global `ScriptMapMap` = `std::map<uint32, ScriptMap>`)
 - **Loaders:** `LoadSpellScripts()`, `LoadEventScripts()`, `LoadWaypointScripts()`
 
@@ -944,7 +948,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## RepRewardRate
 
 - **SQL Table:** `reputation_reward_rate`
-- **Struct:** `RepRewardRate` (`ObjectMgr.h`)
+- **Struct:** `RepRewardRate` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_repRewardRateStore`
 - **Loader:** `ObjectMgr::LoadReputationRewardRate()`
 
@@ -964,7 +968,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## ReputationOnKillEntry
 
 - **SQL Table:** `creature_onkill_reputation`
-- **Struct:** `ReputationOnKillEntry` (`ObjectMgr.h`)
+- **Struct:** `ReputationOnKillEntry` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_repOnKillStore`
 - **Loader:** `ObjectMgr::LoadReputationOnKill()`
 
@@ -985,7 +989,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## RepSpilloverTemplate
 
 - **SQL Table:** `reputation_spillover_template`
-- **Struct:** `RepSpilloverTemplate` (`ObjectMgr.h`)
+- **Struct:** `RepSpilloverTemplate` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_repSpilloverTemplateStore` (`RepSpilloverTemplateContainer` = `std::unordered_map<uint32, RepSpilloverTemplate>`)
 - **Loader:** `ObjectMgr::LoadReputationSpilloverTemplate()`
 
@@ -1016,7 +1020,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## PlayerInfo
 
 - **SQL Tables:** `playercreateinfo`, `playercreateinfo_item`, `playercreateinfo_skills`, `playercreateinfo_spell_custom`, `playercreateinfo_cast_spell`, `playercreateinfo_action`, `player_race_stats`, `player_class_stats`, `player_xp_for_level`
-- **Struct:** `PlayerInfo` (`Player.h`)
+- **Struct:** `PlayerInfo` (`src/server/game/Entities/Player/Player.h`)
 - **Store:** `ObjectMgr::_playerInfo` (2D vector [race][class])
 - **Loader:** `ObjectMgr::LoadPlayerInfo()`
 
@@ -1040,7 +1044,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## PetLevelInfo
 
 - **SQL Table:** `pet_levelstats`
-- **Struct:** `PetLevelInfo` (`ObjectMgr.h`)
+- **Struct:** `PetLevelInfo` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_petInfoStore` (`PetLevelInfoContainer` = `std::map<uint32, PetLevelInfo*>`) indexed by `[creature_entry][level - 1]`
 - **Loader:** `ObjectMgr::LoadPetLevelInfo()`
 
@@ -1064,7 +1068,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## SpellClickInfo
 
 - **SQL Table:** `npc_spellclick_spells`
-- **Struct:** `SpellClickInfo` (`ObjectMgr.h`)
+- **Struct:** `SpellClickInfo` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_spellClickInfoStore`
 - **Loader:** `ObjectMgr::LoadNPCSpellClickSpells()`
 
@@ -1079,7 +1083,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## VehicleAccessory
 
 - **SQL Tables:** `vehicle_template_accessory`, `vehicle_accessory`
-- **Struct:** `VehicleAccessory` (`VehicleDefines.h`)
+- **Struct:** `VehicleAccessory` (`src/server/game/Entities/Vehicle/VehicleDefines.h`)
 - **Stores:** `_vehicleTemplateAccessoryStore` (per-entry), `_vehicleAccessoryStore` (per-guid)
   - Both are `VehicleAccessoryContainer` = `std::map<uint32, VehicleAccessoryList>`
 - **Loaders:** `LoadVehicleTemplateAccessories()`, `LoadVehicleAccessories()`
@@ -1099,7 +1103,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## VehicleSeatAddon
 
 - **SQL Table:** `vehicle_seat_addon`
-- **Struct:** `VehicleSeatAddon` (`VehicleDefines.h`)
+- **Struct:** `VehicleSeatAddon` (`src/server/game/Entities/Vehicle/VehicleDefines.h`)
 - **Store:** `ObjectMgr::_vehicleSeatAddonStore` (`VehicleSeatAddonContainer` = `std::unordered_map<uint32, VehicleSeatAddon>`)
 - **Loader:** `ObjectMgr::LoadVehicleSeatAddon()`
 
@@ -1118,7 +1122,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## GameTele
 
 - **SQL Table:** `game_tele`
-- **Struct:** `GameTele` (`ObjectMgr.h`)
+- **Struct:** `GameTele` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_gameTeleStore`
 - **Loader:** `ObjectMgr::LoadGameTele()`
 
@@ -1136,7 +1140,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## MailLevelReward
 
 - **SQL Table:** `mail_level_reward`
-- **Struct:** `MailLevelReward` (`ObjectMgr.h`)
+- **Struct:** `MailLevelReward` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_mailLevelRewardStore` (`MailLevelRewardContainer` = `std::unordered_map<uint8, MailLevelRewardList>`)
 - **Loader:** `ObjectMgr::LoadMailLevelRewards()`
 
@@ -1152,7 +1156,7 @@ Contains `GossipTextOption[8]`, each with: Text_0 string, Text_1 string, Broadca
 ## TempSummonData
 
 - **SQL Table:** `creature_summon_groups`
-- **Struct:** `TempSummonData` (`TemporarySummon.h`)
+- **Struct:** `TempSummonData` (`src/server/game/Entities/Creature/TemporarySummon.h`)
 - **Store:** `ObjectMgr::_tempSummonDataStore` (`TempSummonDataContainer` = `std::map<TempSummonGroupKey, std::vector<TempSummonData>>`)
 - **Loader:** `ObjectMgr::LoadTempSummons()`
 
@@ -1177,6 +1181,7 @@ Key composite: `TempSummonGroupKey` (summonerEntry uint32, summonerType Summoner
 ## LinkedRespawn
 
 - **SQL Table:** `linked_respawn`
+- **Struct:** `LinkedRespawn` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_linkedRespawnStore` (`LinkedRespawnContainer` = `std::map<ObjectGuid, ObjectGuid>`)
 - **Loader:** `ObjectMgr::LoadLinkedRespawn()`
 
@@ -1191,7 +1196,7 @@ Key composite: `TempSummonGroupKey` (summonerEntry uint32, summonerType Summoner
 ## AcoreString
 
 - **SQL Table:** `acore_string`
-- **Struct:** `AcoreString` (`ObjectMgr.h`)
+- **Struct:** `AcoreString` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_acoreStringStore` (`AcoreStringContainer` = `std::unordered_map<int32, AcoreString>`)
 - **Loader:** `ObjectMgr::LoadAcoreStrings()`
 
@@ -1213,7 +1218,7 @@ Key composite: `TempSummonGroupKey` (summonerEntry uint32, summonerType Summoner
 ## ModuleString
 
 - **SQL Tables:** `module_string`, `module_string_locale`
-- **Struct:** `ModuleString` (`ObjectMgr.h`)
+- **Struct:** `ModuleString` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_moduleStringStore` (`ModuleStringContainer` = `std::map<std::pair<std::string, uint32>, ModuleString>`)
 - **Loaders:** `LoadModuleStrings()`, `LoadModuleStringsLocale()`
 
@@ -1299,6 +1304,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## TavernAreaTrigger
 
 - **SQL Table:** `areatrigger_tavern`
+- **Struct:** `TavernAreaTrigger` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_tavernAreaTriggerStore` (`TavernAreaTriggerContainer` = `std::unordered_map<uint32, uint32>`)
 - **Loader:** `ObjectMgr::LoadTavernAreaTriggers()`
 
@@ -1313,6 +1319,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## AreaTriggerScript
 
 - **SQL Table:** `areatrigger_scripts`
+- **Struct:** `AreaTriggerScript` (`src/server/game/Scripting/ScriptDefines/AreaTriggerScript.h`)
 - **Store:** `ObjectMgr::_areaTriggerScriptStore` (`AreaTriggerScriptContainer` = `std::unordered_map<uint32, uint32>`)
 - **Loader:** `ObjectMgr::LoadAreaTriggerScripts()`
 
@@ -1326,6 +1333,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## CreatureSparring
 
 - **SQL Table:** `creature_sparring`
+- **Struct:** `CreatureSparring` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_creatureSparringStore` (`CreatureSparringContainer` = `std::unordered_map<ObjectGuid::LowType, std::vector<float>>`)
 - **Loader:** `ObjectMgr::LoadCreatureSparring()`
 
@@ -1339,6 +1347,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## ExplorationBaseXP
 
 - **SQL Table:** `exploration_basexp`
+- **Struct:** `ExplorationBaseXP` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_baseXPTable` (`BaseXPContainer` = `std::map<uint32, uint32>`)
 - **Loader:** `ObjectMgr::LoadExplorationBaseXP()`
 
@@ -1352,6 +1361,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## PlayerXPperLevel
 
 - **SQL Table:** `player_xp_for_level`
+- **Struct:** `PlayerXPperLevel` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_playerXPperLevel` (`PlayerXPperLevel` = `std::vector<uint32>`)
 - **Loader:** Loaded inside `ObjectMgr::LoadPlayerInfo()`
 
@@ -1365,6 +1375,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## PetNameGeneration
 
 - **SQL Table:** `pet_name_generation`
+- **Struct:** `PetNameGeneration` (`src/server/game/Globals/ObjectMgr.h`)
 - **Stores:** `ObjectMgr::_petHalfName0` (prefix), `ObjectMgr::_petHalfName1` (suffix) — both `HalfNameContainer` = `std::map<uint32, std::vector<std::string>>`
 - **Loader:** `ObjectMgr::LoadPetNames()`
 
@@ -1379,6 +1390,7 @@ Both use `std::set<std::wstring>` containers. DBC and SQL sources are merged int
 ## CreatureCustomIDs
 
 - **Source:** Config key `Creatures.CustomIDs` (comma-separated list)
+- **Struct:** `CreatureCustomIDs` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_creatureCustomIDsStore` (`CreatureCustomIDsContainer` = `std::vector<uint32>`)
 - **Loader:** `ObjectMgr::LoadCreatureCustomIDs()`
 
@@ -1389,7 +1401,7 @@ No SQL table. Parsed from worldserver.conf at startup.
 ## CreatureMovementOverride
 
 - **SQL Tables:** `creature_movement_override` (COALESCE with `creature_template_movement`)
-- **Struct:** `CreatureMovementData` (`CreatureData.h`)
+- **Struct:** `CreatureMovementData` (`src/server/game/Entities/Creature/CreatureData.h`)
 - **Store:** `ObjectMgr::_creatureMovementOverrides` (`std::unordered_map<ObjectGuid::LowType, CreatureMovementData>`)
 - **Loader:** `ObjectMgr::LoadCreatureMovementOverrides()`
 
@@ -1409,6 +1421,7 @@ No SQL table. Parsed from worldserver.conf at startup.
 ## GameObjectQuestItem
 
 - **SQL Table:** `gameobject_questitem`
+- **Struct:** `GameObjectQuestItem` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_gameObjectQuestItemStore` (`GameObjectQuestItemMap` = `std::unordered_map<uint32, std::vector<uint32>>`)
 - **Loader:** `ObjectMgr::LoadGameObjectQuestItems()`
 
@@ -1424,6 +1437,7 @@ No SQL table. Parsed from worldserver.conf at startup.
 ## CreatureQuestItem
 
 - **SQL Table:** `creature_questitem`
+- **Struct:** `CreatureQuestItem` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_creatureQuestItemStore` (`CreatureQuestItemMap` = `std::unordered_map<uint32, std::vector<uint32>>`)
 - **Loader:** `ObjectMgr::LoadCreatureQuestItems()`
 
@@ -1439,7 +1453,7 @@ No SQL table. Parsed from worldserver.conf at startup.
 ## GameObjectSummonData
 
 - **SQL Table:** `gameobject_summon_groups`
-- **Struct:** `GameObjectSummonData` (`ObjectMgr.h`), `TempSummonGroupKey` (`ObjectMgr.h`)
+- **Struct:** `GameObjectSummonData` (`src/server/game/Globals/ObjectMgr.h`), `TempSummonGroupKey` (`ObjectMgr.h`)
 - **Store:** `ObjectMgr::_goSummonDataStore` (`GameObjectSummonDataContainer` = `std::map<TempSummonGroupKey, std::vector<GameObjectSummonData>>`)
 - **Loader:** `ObjectMgr::LoadGameObjectSummons()`
 
@@ -1467,7 +1481,7 @@ Key composite: `TempSummonGroupKey` (summonerEntry, summonerType, summonGroup)
 ## SpawnGroupData
 
 - **Source:** Hardcoded default (no SQL table in base schema)
-- **Struct:** `SpawnGroupTemplateData` (`ObjectMgr.h`)
+- **Struct:** `SpawnGroupTemplateData` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_spawnGroupDataStore` (`SpawnGroupDataContainer` = `std::unordered_map<uint32, SpawnGroupTemplateData>`)
 - **Loader:** Initialized in ObjectMgr constructor
 
@@ -1485,6 +1499,7 @@ Default entry: `{0, "Default Group", 0, SPAWNGROUP_FLAG_SYSTEM}`
 ## PlayerTotemModel
 
 - **SQL Table:** `player_totem_model`
+- **Struct:** `PlayerTotemModel` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_playerTotemModel` (`PlayerTotemModelMap` = `std::map<std::pair<SummonSlot, Races>, uint32>`)
 - **Loader:** `ObjectMgr::LoadPlayerTotemModels()`
 
@@ -1499,6 +1514,7 @@ Default entry: `{0, "Default Group", 0, SPAWNGROUP_FLAG_SYSTEM}`
 ## PlayerShapeshiftModel
 
 - **SQL Table:** `player_shapeshift_model`
+- **Struct:** `PlayerShapeshiftModel` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_playerShapeshiftModel` (`PlayerShapeshiftModelMap` = `std::map<std::tuple<ShapeshiftForm, uint8, uint8, uint8>, uint32>`)
 - **Loader:** `ObjectMgr::LoadPlayerShapeshiftModels()`
 
@@ -1515,6 +1531,7 @@ Default entry: `{0, "Default Group", 0, SPAWNGROUP_FLAG_SYSTEM}`
 ## ScriptNameStore
 
 - **Source:** UNION of DISTINCT ScriptName from multiple tables
+- **Struct:** `ScriptNameStore` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_scriptNamesStore` (`ScriptNameContainer` = `std::vector<std::string>`)
 - **Loader:** `ObjectMgr::LoadScriptNames()`
 
@@ -1527,7 +1544,7 @@ Index 0 is always empty (dummy "no script"). Each unique name gets a numeric ID 
 ## MapObjectGuids
 
 - **Source:** Derived from `creature` and `gameobject` spawn data
-- **Struct:** `CellObjectGuids` (`ObjectMgr.h`)
+- **Struct:** `CellObjectGuids` (`src/server/game/Globals/ObjectMgr.h`)
 - **Store:** `ObjectMgr::_mapObjectGuidsStore` (`MapObjectGuids` = nested `std::unordered_map`)
 - **Loader:** Populated during `LoadCreatures()` / `LoadGameobjects()` via `AddCreatureToGrid()` / `AddGameobjectToGrid()`
 
