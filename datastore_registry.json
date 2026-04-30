@@ -2852,6 +2852,13 @@
       "format_variable": "FactionEntryfmt",
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "FactionEntry",
+      "referenced_by": [
+        {"source": "CreatureTemplate", "field": "faction"},
+        {"source": "ItemTemplate", "field": "RequiredReputationFaction"},
+        {"source": "Quest", "field": "RequiredFactionId1, RequiredFactionId2"},
+        {"source": "Quest", "field": "RewardFactionId1..5"},
+        {"source": "Quest", "field": "RequiredMinRepFaction, RequiredMaxRepFaction"}
+      ],
       "fields": {
         "0": {
           "name": "ID",
@@ -5264,6 +5271,10 @@
       "format_variable": "LockEntryfmt",
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "LockEntry",
+      "referenced_by": [
+        {"source": "ItemTemplate", "field": "LockID"},
+        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=0,1,2,3,6,10,12,13,24,25,26"}
+      ],
       "fields": {
         "0": {
           "name": "ID",
@@ -7004,6 +7015,15 @@
       "format_variable": "SpellEntryfmt",
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "SpellEntry",
+      "referenced_by": [
+        {"source": "ItemTemplate", "field": "spellid_1..5"},
+        {"source": "ItemTemplate", "field": "RequiredSpell, spellclickspellspecifier, socketspell"},
+        {"source": "Quest", "field": "RewardSpell, RewardDisplaySpell, SourceSpellid"},
+        {"source": "CreatureTemplate", "field": "spell1..8"},
+        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=6,10,18,22,24,26,29,30"},
+        {"source": "SpellEntry", "field": "CasterAuraSpell, TargetAuraSpell, ExcludeCasterAuraSpell, ExcludeTargetAuraSpell"},
+        {"source": "SpellEntry", "field": "EffectTriggerSpell[0..2]"}
+      ],
       "fields": {
         "0": {
           "name": "Id",
@@ -7141,31 +7161,66 @@
           "name": "CasterAuraSpell",
           "type": "uint32",
           "sql_column": "CasterAuraSpell",
-          "notes": "-"
+          "notes": "Requires spell as aura on caster",
+          "references": [
+            {
+              "type": "self",
+              "target": "SpellEntry",
+              "description": "Prerequisite aura spell required to be active on caster"
+            }
+          ]
         },
         "25": {
           "name": "TargetAuraSpell",
           "type": "uint32",
           "sql_column": "TargetAuraSpell",
-          "notes": "-"
+          "notes": "Requires spell as aura on target",
+          "references": [
+            {
+              "type": "self",
+              "target": "SpellEntry",
+              "description": "Prerequisite aura spell required to be active on target"
+            }
+          ]
         },
         "26": {
           "name": "ExcludeCasterAuraSpell",
           "type": "uint32",
           "sql_column": "ExcludeCasterAuraSpell",
-          "notes": "-"
+          "notes": "Prevents cast if spell is active on caster",
+          "references": [
+            {
+              "type": "self",
+              "target": "SpellEntry",
+              "description": "Spell aura that must NOT be active on caster (prevents cast)"
+            }
+          ]
         },
         "27": {
           "name": "ExcludeTargetAuraSpell",
           "type": "uint32",
           "sql_column": "ExcludeTargetAuraSpell",
-          "notes": "-"
+          "notes": "Prevents cast if spell is active on target",
+          "references": [
+            {
+              "type": "self",
+              "target": "SpellEntry",
+              "description": "Spell aura that must NOT be active on target (prevents cast)"
+            }
+          ]
         },
         "28": {
           "name": "CastingTimeIndex",
           "type": "uint32",
           "sql_column": "CastingTimeIndex",
-          "notes": "-"
+          "notes": "Index into SpellCastTimes.dbc for base casting time",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellCastTimesEntry",
+              "description": "Lookup index for spell cast time calculations"
+            }
+          ]
         },
         "29": {
           "name": "RecoveryTime",
@@ -7417,7 +7472,21 @@
           "name": "Effect[0]",
           "type": "uint32",
           "sql_column": "Effect",
-          "notes": "-"
+          "notes": "enum SpellEffect. Affects meaning of EffectMiscValue, EffectItemType, ImplicitTarget",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "condition": "Effect=46(SPELL_EFFECT_SEND_TARGET)",
+              "description": "EffectMiscValue=Spell ID to cast on target; other effects have spell-specific cross-refs"
+            },
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "condition": "Effect=40(SPELL_EFFECT_SUMMON_ITEMS)",
+              "description": "Summoned item entry ID in EffectMiscValue"
+            }
+          ]
         },
         "72": {
           "name": "Effect[1]",
@@ -7651,7 +7720,27 @@
           "name": "EffectMiscValue[0]",
           "type": "int32",
           "sql_column": "EffectMiscValue",
-          "notes": "-"
+          "notes": "Meaning depends on Effect[0] type",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "condition": "Effect=46(SPELL_EFFECT_SEND_TARGET),31(SHIELD)",
+              "description": "Target spell ID for SEND_TARGET or shield spell for SCHOOL_DAMAGE"
+            },
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "condition": "Effect=40(SPELL_EFFECT_SUMMON_ITEMS)",
+              "description": "Summoned item entry"
+            },
+            {
+              "type": "dbc",
+              "target": "LanguageEntry",
+              "condition": "Effect=15(SPELL_EFFECT_SPELLEFFECT_TEXT)",
+              "description": "Chat language ID for spell text effect"
+            }
+          ]
         },
         "111": {
           "name": "EffectMiscValue[1]",
@@ -7677,11 +7766,18 @@
           "sql_column": "EffectMiscValueB",
           "notes": "-"
         },
-        "115": {
-          "name": "EffectMiscValueB[2]",
-          "type": "int32",
-          "sql_column": "EffectMiscValueB",
-          "notes": "-"
+"115": {
+          "name": "EffectTriggerSpell[0]",
+          "type": "uint32",
+          "sql_column": "EffectTriggerSpell",
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "SpellEntry",
+              "description": "Spell that triggers from this effect (aura, proc, chain)"
+            }
+          ]
         },
         "116": {
           "name": "EffectTriggerSpell[0]",
@@ -10031,6 +10127,12 @@
       "loader_function": "ObjectMgr::LoadCreatureTemplates()",
       "header_file": "src/server/game/Entities/Creature/CreatureData.h",
       "c_struct": "CreatureTemplate",
+      "referenced_by": [
+        {"source": "Quest", "field": "RequiredNpcOrGo1..4", "condition": "value>0"},
+        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=21"},
+        {"source": "CreatureTemplate", "field": "KillCredit1, KillCredit2"},
+        {"source": "CreatureTemplate", "field": "DifficultyEntry1..3"}
+      ],
       "fields": {
         "entry": {
           "name": "Entry",
@@ -10042,31 +10144,66 @@
           "name": "DifficultyEntry[0]",
           "type": "uint32",
           "sql_column": "DifficultyEntry1",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "CreatureTemplate",
+              "description": "Normal difficulty creature template entry ID"
+            }
+          ]
         },
         "DifficultyEntry2": {
           "name": "DifficultyEntry[1]",
           "type": "uint32",
           "sql_column": "DifficultyEntry2",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "CreatureTemplate",
+              "description": "Heroic difficulty creature template entry ID"
+            }
+          ]
         },
         "DifficultyEntry3": {
           "name": "DifficultyEntry[2]",
           "type": "uint32",
           "sql_column": "DifficultyEntry3",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "CreatureTemplate",
+              "description": "LFR difficulty creature template entry ID"
+            }
+          ]
         },
         "KillCredit1": {
           "name": "KillCredit[0]",
           "type": "uint32",
           "sql_column": "KillCredit1",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "CreatureTemplate",
+              "description": "Alternate creature entry credited on kill (for quest credit)"
+            }
+          ]
         },
         "KillCredit2": {
           "name": "KillCredit[1]",
           "type": "uint32",
           "sql_column": "KillCredit2",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "CreatureTemplate",
+              "description": "Second alternate creature entry credited on kill (for quest credit)"
+            }
+          ]
         },
         "name": {
           "name": "Name",
@@ -10090,7 +10227,14 @@
           "name": "GossipMenuId",
           "type": "uint32",
           "sql_column": "gossip_menu_id",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "gossip_menu",
+              "description": "Gossip menu entry ID for NPC interaction options"
+            }
+          ]
         },
         "minlevel": {
           "name": "minlevel",
@@ -10240,19 +10384,40 @@
           "name": "lootid",
           "type": "uint32",
           "sql_column": "lootid",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "creature_loot_template",
+              "description": "Creature loot template ID for item drops"
+            }
+          ]
         },
         "pickpocketloot": {
           "name": "pickpocketLootId",
           "type": "uint32",
           "sql_column": "pickpocketloot",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "pickpocketing_loot_template",
+              "description": "Pickpocket loot template ID for thieves"
+            }
+          ]
         },
         "skinloot": {
           "name": "SkinLootId",
           "type": "uint32",
           "sql_column": "skinloot",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "skinning_loot_template",
+              "description": "Skinning loot template ID"
+            }
+          ]
         },
         "resistance1..7": {
           "name": "resistance",
@@ -10264,19 +10429,40 @@
           "name": "spells",
           "type": "uint32[8]",
           "sql_column": "spell1..8",
-          "notes": "Loaded separately via LoadCreatureTemplateSpells()"
+          "notes": "Loaded separately via LoadCreatureTemplateSpells()",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Creature's equipped spells (stored in creature_template_spell table)"
+            }
+          ]
         },
         "PetSpellDataId": {
           "name": "PetSpellDataId",
           "type": "uint32",
           "sql_column": "PetSpellDataId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "creature_template_spell",
+              "description": "Pet spell data template ID for summon pet spells"
+            }
+          ]
         },
         "VehicleId": {
           "name": "VehicleId",
           "type": "uint32",
           "sql_column": "VehicleId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "VehicleEntry",
+              "description": "Vehicle data entry for mountable/rideable creatures"
+            }
+          ]
         },
         "mingold": {
           "name": "mingold",
@@ -10342,7 +10528,14 @@
           "name": "movementId",
           "type": "uint32",
           "sql_column": "movementId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "creature_template_movement",
+              "description": "Movement template ID for creature pathing/flying configuration"
+            }
+          ]
         },
         "RegenHealth": {
           "name": "RegenHealth",
@@ -10883,7 +11076,14 @@
           "name": "displayId",
           "type": "uint32",
           "sql_column": "displayId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "GameObjectDisplayInfoEntry",
+              "description": "Visual model for the game object"
+            }
+          ]
         },
         "name": {
           "name": "name",
@@ -10919,7 +11119,81 @@
           "name": "data[]",
           "type": "uint32[]",
           "sql_column": "data0..23",
-          "notes": "Type-specific (see below)"
+          "notes": "Type-specific (see below)",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "LockEntry",
+              "condition": "type=0,1,2,3,6,10,12,13,24,25,26",
+              "description": "lockId - Lock template reference. Position varies by type: data1(T0,1), data0(T2,3,6,10,25), data0(T12,24,26), data1(T13)"
+            },
+            {
+              "type": "sql_table",
+              "target": "Quest",
+              "condition": "type=2,5,8,10",
+              "description": "questId/questList - Quest reference. Position: data1(T2=questList), data5(T5), data4(T8), data1(T10)"
+            },
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "condition": "type=6,10,18,22,24,26,29,30",
+              "description": "spellId - Spell reference. Position: data3(T6), data10(T10), data1,2,4(T18), data0(T22), data1(T24), data2(T26), data1(T29), data2,4(T30)"
+            },
+            {
+              "type": "sql_table",
+              "target": "page_text",
+              "condition": "type=9,10",
+              "description": "pageId - PageText reference. Position: data0(T9), data7(T10)"
+            },
+            {
+              "type": "sql_table",
+              "target": "creature_template",
+              "condition": "type=21",
+              "description": "creatureID - Creature entry to summon at guard post. Position: data0"
+            },
+            {
+              "type": "dbc",
+              "target": "TaxiPathEntry",
+              "condition": "type=15",
+              "description": "taxiPathId - Taxi path for flying machine transport. Position: data0"
+            },
+            {
+              "type": "sql_table",
+              "target": "Quest",
+              "condition": "type=3",
+              "description": "questId - Quest required for chest activation. Position: data8"
+            },
+            {
+              "type": "dbc",
+              "target": "CinematicSequenceEntry",
+              "condition": "type=13",
+              "description": "cinematicId - Cinematic sequence ID for camera. Position: data1"
+            },
+            {
+              "type": "sql_table",
+              "target": "gossip_menu",
+              "condition": "type=2,10",
+              "description": "gossipID - Gossip menu ID. Position: data3(T2), data19(T10)"
+            },
+            {
+              "type": "dbc",
+              "target": "DestructibleBuildingsEntry",
+              "condition": "type=33",
+              "description": "destructibleData - Destructible building data reference. Position: data18"
+            },
+            {
+              "type": "sql_table",
+              "target": "AreaTable",
+              "condition": "type=23",
+              "description": "areaID - Area ID for LFG teleport destination. Position: data2"
+            },
+            {
+              "type": "dbc",
+              "target": "MapEntry",
+              "condition": "type=15,31",
+              "description": "mapID - Map reference. Position: data6(T15), data0(T31)"
+            }
+          ]
         },
         "AIName": {
           "name": "AIName",
@@ -11068,6 +11342,11 @@
       "loader_function": "ObjectMgr::LoadItemTemplates()",
       "header_file": "src/server/game/Entities/Item/ItemTemplate.h",
       "c_struct": "ItemTemplate",
+      "referenced_by": [
+        {"source": "Quest", "field": "SrcItemId"},
+        {"source": "Quest", "field": "RequiredItemId1..6"},
+        {"source": "Quest", "field": "RewardItemId1..4, RewardChoiceItemId1..6, ItemDrop1..4"}
+      ],
       "fields": {
         "entry": {
           "name": "ItemId",
@@ -11175,7 +11454,14 @@
           "name": "RequiredSkill",
           "type": "uint32",
           "sql_column": "RequiredSkill",
-          "notes": "SkillLine.dbc"
+          "notes": "SkillLine.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SkillLineEntry",
+              "description": "Skill required for item usage"
+            }
+          ]
         },
         "RequiredSkillRank": {
           "name": "RequiredSkillRank",
@@ -11187,7 +11473,14 @@
           "name": "RequiredSpell",
           "type": "uint32",
           "sql_column": "RequiredSpell",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Spell required to equip/use"
+            }
+          ]
         },
         "RequiredHonorRank": {
           "name": "RequiredHonorRank",
@@ -11205,7 +11498,14 @@
           "name": "RequiredReputationFaction",
           "type": "uint32",
           "sql_column": "RequiredReputationFaction",
-          "notes": "Faction.dbc"
+          "notes": "Faction.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Faction reputation requirement"
+            }
+          ]
         },
         "RequiredReputationRank": {
           "name": "RequiredReputationRank",
@@ -11241,7 +11541,14 @@
           "name": "ScalingStatDistribution",
           "type": "uint32",
           "sql_column": "ScalingStatDistribution",
-          "notes": "ScalingStatDistribution.dbc"
+          "notes": "ScalingStatDistribution.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "ScalingStatDistributionEntry",
+              "description": "Stat scaling configuration"
+            }
+          ]
         },
         "ScalingStatValue": {
           "name": "ScalingStatValue",
@@ -11319,7 +11626,14 @@
           "name": "Spells",
           "type": "_Spell[5]",
           "sql_column": "spellid_1..5",
-          "notes": "See sub-struct below"
+          "notes": "See sub-struct below",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Item equipped/use/cast spells"
+            }
+          ]
         },
         "bonding": {
           "name": "Bonding",
@@ -11337,7 +11651,14 @@
           "name": "PageText",
           "type": "uint32",
           "sql_column": "PageText",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "page_text",
+              "description": "Readable text content"
+            }
+          ]
         },
         "LanguageID": {
           "name": "LanguageID",
@@ -11355,13 +11676,27 @@
           "name": "StartQuest",
           "type": "uint32",
           "sql_column": "startquest",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "Quest",
+              "description": "Quest ID started by using this item"
+            }
+          ]
         },
         "LockID": {
           "name": "LockID",
           "type": "uint32",
           "sql_column": "LockID",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "LockEntry",
+              "description": "Lock requirement for containers/weapons"
+            }
+          ]
         },
         "Material": {
           "name": "Material",
@@ -11379,13 +11714,27 @@
           "name": "RandomProperty",
           "type": "int32",
           "sql_column": "RandomProperty",
-          "notes": "ItemRandomProperties.dbc"
+          "notes": "ItemRandomProperties.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "ItemRandomPropertiesEntry",
+              "description": "Enchantment suffix (+X) stats"
+            }
+          ]
         },
         "RandomSuffix": {
           "name": "RandomSuffix",
           "type": "int32",
           "sql_column": "RandomSuffix",
-          "notes": "ItemRandomSuffix.dbc"
+          "notes": "ItemRandomSuffix.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "ItemRandomSuffixEntry",
+              "description": "Set bonus suffix (+X set pieces)"
+            }
+          ]
         },
         "block": {
           "name": "Block",
@@ -11397,7 +11746,14 @@
           "name": "ItemSet",
           "type": "uint32",
           "sql_column": "itemset",
-          "notes": "ItemSet.dbc"
+          "notes": "ItemSet.dbc",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemSetNameEntry",
+              "description": "Equipment set for bonus effects"
+            }
+          ]
         },
         "MaxDurability": {
           "name": "MaxDurability",
@@ -11409,13 +11765,27 @@
           "name": "Area",
           "type": "uint32",
           "sql_column": "area",
-          "notes": "AreaTable.dbc"
+          "notes": "AreaTable.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "AreaTableEntry",
+              "description": "Area requirement for item usage"
+            }
+          ]
         },
         "map": {
           "name": "Map",
           "type": "uint32",
           "sql_column": "map",
-          "notes": "Map.dbc"
+          "notes": "Map.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "MapEntry",
+              "description": "Required map/zone for usage"
+            }
+          ]
         },
         "BagFamily": {
           "name": "BagFamily",
@@ -11427,7 +11797,14 @@
           "name": "TotemCategory",
           "type": "uint32",
           "sql_column": "TotemCategory",
-          "notes": "TotemCategory.dbc"
+          "notes": "TotemCategory.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "TotemCategoryEntry",
+              "description": "Totem category for shaman totems"
+            }
+          ]
         },
         "socketColor_1..3": {
           "name": "Socket",
@@ -11439,13 +11816,27 @@
           "name": "socketBonus",
           "type": "uint32",
           "sql_column": "socketBonus",
-          "notes": "SpellItemEnchantment.dbc"
+          "notes": "SpellItemEnchantment.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellItemEnchantmentEntry",
+              "description": "Socket bonus enchantment when all sockets filled"
+            }
+          ]
         },
         "GemProperties": {
           "name": "GemProperties",
           "type": "uint32",
           "sql_column": "GemProperties",
-          "notes": "GemProperties.dbc"
+          "notes": "GemProperties.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "GemPropertiesEntry",
+              "description": "Prismatic socket gem restriction"
+            }
+          ]
         },
         "RequiredDisenchantSkill": {
           "name": "RequiredDisenchantSkill",
@@ -11469,13 +11860,27 @@
           "name": "ItemLimitCategory",
           "type": "uint32",
           "sql_column": "ItemLimitCategory",
-          "notes": "ItemLimitCategory.dbc"
+          "notes": "ItemLimitCategory.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "ItemLimitCategoryEntry",
+              "description": "Stack limit category for similar items"
+            }
+          ]
         },
         "HolidayId": {
           "name": "HolidayId",
           "type": "uint32",
           "sql_column": "HolidayId",
-          "notes": "Holidays.dbc"
+          "notes": "Holidays.dbc",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "HolidaysEntry",
+              "description": "Holiday requirement for item usage"
+            }
+          ]
         },
         "ScriptName": {
           "name": "ScriptId",
@@ -11487,7 +11892,14 @@
           "name": "DisenchantID",
           "type": "uint32",
           "sql_column": "DisenchantID",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "disenchant_loot_template",
+              "description": "Loot template for disenchantment"
+            }
+          ]
         },
         "FoodType": {
           "name": "FoodType",
@@ -11556,6 +11968,13 @@
       "loader_function": "ObjectMgr::LoadQuests()",
       "header_file": "src/server/game/Quests/QuestDef.h",
       "c_struct": "Quest",
+      "referenced_by": [
+        {"source": "ItemTemplate", "field": "startquest"},
+        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=2,3,5,8,10"},
+        {"source": "Quest", "field": "PrevQuestId, NextQuestId, NextQuestInChain, BreadcrumbForQuestId"},
+        {"source": "creature_questitem", "field": "id"},
+        {"source": "creature_onkill_reputation", "field": "quest_identifier"}
+      ],
       "fields": {
         "ID": {
           "name": "Id",
@@ -11573,7 +11992,21 @@
           "name": "ZoneOrSort",
           "type": "int32",
           "sql_column": "ZoneOrSort",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "QuestSortEntry",
+              "condition": "value<0",
+              "description": "Negative = QuestSort ID for quest category grouping"
+            },
+            {
+              "type": "dbc",
+              "target": "AreaTable",
+              "condition": "value>0",
+              "description": "Positive = AreaID for zone-restricted quests"
+            }
+          ]
         },
         "MinLevel": {
           "name": "MinLevel",
@@ -11603,7 +12036,14 @@
           "name": "RequiredFactionId1",
           "type": "uint32",
           "sql_column": "RequiredFactionId1",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Faction required to accept quest (use with RequiredFactionValue1)"
+            }
+          ]
         },
         "RequiredFactionValue1": {
           "name": "RequiredFactionValue1",
@@ -11615,7 +12055,14 @@
           "name": "RequiredFactionId2",
           "type": "uint32",
           "sql_column": "RequiredFactionId2",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Secondary faction required to accept quest (use with RequiredFactionValue2)"
+            }
+          ]
         },
         "RequiredFactionValue2": {
           "name": "RequiredFactionValue2",
@@ -11645,7 +12092,14 @@
           "name": "RewardTitleId",
           "type": "uint32",
           "sql_column": "RewardTitle",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "CharacterTitlesEntry",
+              "description": "Character title granted as quest reward"
+            }
+          ]
         },
         "RequiredPlayerKillCount": {
           "name": "RequiredPlayerKills",
@@ -11669,7 +12123,14 @@
           "name": "RewardNextQuest",
           "type": "uint32",
           "sql_column": "NextQuestInChain",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "Quest",
+              "description": "Next quest ID in chain (follow-up quest)"
+            }
+          ]
         },
         "RewardXPDifficulty": {
           "name": "RewardXPDifficulty",
@@ -11681,7 +12142,14 @@
           "name": "StartItem",
           "type": "uint32",
           "sql_column": "SrcItemId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "description": "Item required to start quest (quest item)"
+            }
+          ]
         },
         "LogTitle": {
           "name": "Title",
@@ -11753,13 +12221,27 @@
           "name": "RewardDisplaySpell",
           "type": "uint32",
           "sql_column": "RewardDisplaySpell",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Spell displayed on quest completion (visual effect)"
+            }
+          ]
         },
         "RewardSpell": {
           "name": "RewardSpell",
           "type": "int32",
           "sql_column": "RewardSpell",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Spell granted as quest reward (can be negative for spell removal)"
+            }
+          ]
         },
         "POIContinent": {
           "name": "POIContinent",
@@ -11807,7 +12289,14 @@
           "name": "RequiredItemId",
           "type": "uint32[6]",
           "sql_column": "RequiredItemId1..6",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "description": "Items required to complete quest turn-in"
+            }
+          ]
         },
         "RequiredItemCount1..6": {
           "name": "RequiredItemCount",
@@ -11819,7 +12308,14 @@
           "name": "ItemDrop",
           "type": "uint32[4]",
           "sql_column": "ItemDrop1..4",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "description": "Items rewarded automatically (non-choosable)"
+            }
+          ]
         },
         "ItemDropQuantity1..4": {
           "name": "ItemDropQuantity",
@@ -11831,7 +12327,19 @@
           "name": "RequiredNpcOrGo",
           "type": "int32[4]",
           "sql_column": "RequiredNpcOrGo1..4",
-          "notes": ">0 creature, <0 gameobject"
+          "notes": ">0 creature, <0 gameobject",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "CreatureTemplate",
+              "description": "Creature entries for turn-in/interact (positive values)"
+            },
+            {
+              "type": "sql_table",
+              "target": "GameObjectTemplate",
+              "description": "GameObject entries for turn-in/interact (negative values = abs(ID))"
+            }
+          ]
         },
         "RequiredNpcOrGoCount1..4": {
           "name": "RequiredNpcOrGoCount",
@@ -11843,7 +12351,14 @@
           "name": "RewardChoiceItemId",
           "type": "uint32[6]",
           "sql_column": "RewardChoiceItemId1..6",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "description": "Items player can choose as quest reward"
+            }
+          ]
         },
         "RewardChoiceItemCount1..6": {
           "name": "RewardChoiceItemCount",
@@ -11855,7 +12370,14 @@
           "name": "RewardItemId",
           "type": "uint32[4]",
           "sql_column": "RewardItemId1..4",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "ItemTemplate",
+              "description": "Items rewarded automatically (guaranteed, non-choosable)"
+            }
+          ]
         },
         "RewardItemIdCount1..4": {
           "name": "RewardItemIdCount",
@@ -11867,7 +12389,14 @@
           "name": "RewardFactionId",
           "type": "uint32[5]",
           "sql_column": "RewardFactionId1..5",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Factions that receive reputation on quest turn-in (use with RewardFactionValueId1..5)"
+            }
+          ]
         },
         "RewardFactionValueId1..5": {
           "name": "RewardFactionValueId",
@@ -11897,19 +12426,40 @@
           "name": "SourceSpellid",
           "type": "uint32",
           "sql_column": "SourceSpellid",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SpellEntry",
+              "description": "Spell that generates this quest"
+            }
+          ]
         },
         "PrevQuestId": {
           "name": "PrevQuestId",
           "type": "int32",
           "sql_column": "PrevQuestId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "Quest",
+              "description": "Previous quest ID in chain (prerequisite quest)"
+            }
+          ]
         },
         "NextQuestId": {
           "name": "NextQuestId",
           "type": "uint32",
           "sql_column": "NextQuestId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "Quest",
+              "description": "Next quest ID in chain (follow-up recommendation)"
+            }
+          ]
         },
         "ExclusiveGroup": {
           "name": "ExclusiveGroup",
@@ -11921,7 +12471,14 @@
           "name": "BreadcrumbForQuestId",
           "type": "uint32",
           "sql_column": "BreadcrumbForQuestId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "self",
+              "target": "Quest",
+              "description": "Quest ID this object is a breadcrumb for (quest tracker arrow)"
+            }
+          ]
         },
         "RewardMailTemplateId": {
           "name": "RewardMailTemplateId",
@@ -11939,7 +12496,14 @@
           "name": "RequiredSkillId",
           "type": "uint32",
           "sql_column": "RequiredSkillId",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "SkillLineEntry",
+              "description": "Skill required to accept quest (use with RequiredSkillPoints)"
+            }
+          ]
         },
         "RequiredSkillPoints": {
           "name": "RequiredSkillPoints",
@@ -11951,7 +12515,14 @@
           "name": "RequiredMinRepFaction",
           "type": "uint32",
           "sql_column": "RequiredMinRepFaction",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Minimum reputation faction required (use with RequiredMinRepValue)"
+            }
+          ]
         },
         "RequiredMinRepValue": {
           "name": "RequiredMinRepValue",
@@ -11963,7 +12534,14 @@
           "name": "RequiredMaxRepFaction",
           "type": "uint32",
           "sql_column": "RequiredMaxRepFaction",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Maximum reputation faction required (use with RequiredMaxRepValue)"
+            }
+          ]
         },
         "RequiredMaxRepValue": {
           "name": "RequiredMaxRepValue",
@@ -11981,7 +12559,14 @@
           "name": "RewardMailSenderEntry",
           "type": "uint32",
           "sql_column": "RewardMailSenderEntry",
-          "notes": ""
+          "notes": "",
+          "references": [
+            {
+              "type": "sql_table",
+              "target": "npc_text",
+              "description": "NPC text entry for mail sender name and subject"
+            }
+          ]
         },
         "SpecialFlags": {
           "name": "SpecialFlags",
@@ -12846,11 +13431,18 @@
       "header_file": "src/server/game/Globals/ObjectMgr.h",
       "c_struct": "RepRewardRate",
       "fields": {
-        "faction": {
-          "name": "map key",
+   "faction": {
+          "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": "Primary key, Faction.dbc ID"
+          "notes": "",
+          "references": [
+            {
+              "type": "dbc",
+              "target": "FactionEntry",
+              "description": "Faction template for creature hostility/interaction behavior"
+            }
+          ]
         },
         "quest_rate": {
           "name": "questRate",

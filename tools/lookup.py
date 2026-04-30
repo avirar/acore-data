@@ -93,6 +93,10 @@ def _build_lookup_result(
         "hints": _build_hints(category, entry),
     }
 
+    # Add cross-references at entry level if present
+    if entry.get("referenced_by"):
+        result["referenced_by"] = entry["referenced_by"]
+
     # DBC-backed specific
     if category == "dbc_backed":
         result["dbc_file"] = entry.get("dbc_file", "")
@@ -117,9 +121,15 @@ def _build_lookup_result(
     if detail == "schema":
         # Full field list with all metadata
         all_fields = []
-        for idx_str, info in sorted(fields.items(), key=lambda x: int(x[0])):
+        def _sort_key(item):
+            try:
+                return int(item[0])
+            except (ValueError, TypeError):
+                return 999999  # String keys (SQL fields) sort after numeric
+
+        for idx_str, info in sorted(fields.items(), key=_sort_key):
             field_entry = {
-                "index": int(idx_str),
+                "index": int(idx_str) if idx_str.isdigit() else idx_str,
                 "name": info.get("name", ""),
                 "type": info.get("type", ""),
                 "sql_column": info.get("sql_column", ""),
@@ -127,6 +137,8 @@ def _build_lookup_result(
             }
             if info.get("notes"):
                 field_entry["notes"] = info.get("notes", "")
+            if info.get("references"):
+                field_entry["references"] = info["references"]
             all_fields.append(field_entry)
         result["fields"] = all_fields
 
