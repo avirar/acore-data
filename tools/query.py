@@ -168,6 +168,11 @@ def _query_dbc(
         metadata["c_struct"] = reg_entry.get("c_struct", "")
         metadata["sql_table"] = sql_table
         metadata["store_variable"] = reg_entry.get("store_variable", "")
+        refs = _extract_field_references(reg_entry)
+        if refs:
+            metadata["field_references"] = refs
+        if reg_entry.get("referenced_by"):
+            metadata["referenced_by"] = reg_entry["referenced_by"]
 
     if filter_notes:
         metadata["filter_notes"] = filter_notes
@@ -249,6 +254,13 @@ def _query_sql(
         "store_variable": reg_entry.get("store_variable", ""),
         "primary_key": server.database._find_primary_key(reg_entry, sql_table),
     }
+
+    # Add cross-reference hints
+    refs = _extract_field_references(reg_entry)
+    if refs:
+        metadata["field_references"] = refs
+    if reg_entry.get("referenced_by"):
+        metadata["referenced_by"] = reg_entry["referenced_by"]
 
     if rows:
         metadata["columns"] = list(rows[0].keys())
@@ -373,6 +385,20 @@ def _annotate_dbc_result(
     return annotate_func(result, reg_entry, db_result, actual_fields, compact).get(
         "result", []
     )
+
+
+def _extract_field_references(reg_entry: Optional[Dict]) -> Optional[Dict[str, List]]:
+    """Extract field-level references from registry entry for metadata hints."""
+    if not reg_entry or "fields" not in reg_entry:
+        return None
+
+    refs = {}
+    for field_key, field_info in reg_entry["fields"].items():
+        if field_info.get("references"):
+            field_name = field_info.get("name", field_key)
+            refs[field_name] = field_info["references"]
+
+    return refs if refs else None
 
 
 def _build_schema_error(
