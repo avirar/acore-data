@@ -64,9 +64,11 @@ def _parse_filter_value(value: Any) -> Tuple[str, str]:
 
 
 def _escape_like_pattern(pattern: str) -> str:
-    """Escape special characters in LIKE pattern and wrap with quotes."""
-    escaped = pattern.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-    return f"'%{escaped}%'"
+    """Escape special characters in LIKE pattern and wrap with quotes.
+
+    Preserves user-provided % and _ wildcards. Only escapes backslashes."""
+    escaped = pattern.replace("\\", "\\\\")
+    return f"'{escaped}'"
 
 
 def _dbc_filter_to_sql_where(
@@ -91,7 +93,7 @@ def _dbc_filter_to_sql_where(
         operator, escaped_value = _parse_filter_value(value)
 
         if operator == "LIKE":
-            where_clauses.append(f"{sql_col} LIKE {escaped_value} ESCAPE '\\\\'")
+            where_clauses.append(f"{sql_col} LIKE {escaped_value}")
         elif operator == "LIKE_CI":
             # Case-insensitive LIKE in MySQL
             where_clauses.append(f"LOWER({sql_col}) LIKE LOWER({escaped_value})")

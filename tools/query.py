@@ -7,8 +7,106 @@ Unified entry point for ALL data: DBC binary, SQL tables, overlays, auxiliary.
 Parameters renamed: dbc_name -> name
 """
 
+import difflib
+import re
 import sys
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
+
+
+def _resolve_sql_column(
+    reg_entry: Dict, key: str, sql_table: str
+) -> Tuple[Optional[str], Optional[str]]:
+    """Resolve a filter key to the actual SQL column name.
+
+    Checks registry field definitions for both C++ struct field names
+    and SQL column names with case-insensitive matching. Falls back
+    to fuzzy matching suggestions.
+
+    Returns:
+        (resolved_sql_col, suggestion_or_error) -- if resolved_sql_col is None,
+        the suggestion string contains available field hints.
+    """
+    fields = reg_entry.get("fields", {})
+    key_lower = str(key).lower()
+
+    # Exact match (case-insensitive) on sql_column first
+    for idx_str, info in fields.items():
+        sql_col = info.get("sql_column", "")
+        if sql_col and sql_col.lower() == key_lower:
+            return sql_col, None
+
+        # Also match against the field key itself (registry may use sql_column as key)
+        if str(idx_str).lower() == key_lower and sql_col:
+            return sql_col, None
+
+    # Match on C++ struct name -> resolve to SQL column
+    for idx_str, info in fields.items():
+        c_name = info.get("name", "")
+        if c_name and c_name.lower() == key_lower:
+            sql_col = info.get("sql_column", c_name)
+            return sql_col or c_name, None
+
+    # Fuzzy match — build deduplicated list of (display_name, lower_name)
+    seen = set()
+    all_names = []
+    for idx_str, info in fields.items():
+        for n in [info.get("sql_column", ""), info.get("name", ""), str(idx_str)]:
+            if n:
+                n_lower = n.lower()
+                if n_lower not in seen:
+                    seen.add(n_lower)
+                    all_names.append((n, n_lower))
+
+    suggestions_lower = difflib.get_close_matches(key_lower, [n[1] for n in all_names], n=5, cutoff=0.4)
+    # Map back to original casing
+    suggestion_map = {n[1]: n[0] for n in all_names}
+    if not suggestions_lower and len(key_lower) >= 3:
+        start_matches = [(n[0], n[1]) for n in all_names if n[1].startswith(key_lower[:3])][:5]
+        suggestions_lower = [s[1] for s in start_matches]
+
+    if suggestions_lower:
+        display = [suggestion_map.get(s, s) for s in suggestions_lower[:5]]
+        return None, f"Did you mean: {', '.join(display)}? "
+    display_all = [n[0] for n in all_names[:10]]
+    return None, f"Available fields ({min(len(all_names), 10)}): {', '.join(display_all)} "
+
+
+def _build_sql_filter_clause(
+    col_name: str, val: Any
+) -> Tuple[Optional[str], bool]:
+    """Build a single SQL WHERE clause from a column name and value.
+
+    Handles $like / $ilike dict operators and exact match values.
+
+    Returns:
+        (clause_string, is_error) -- clause_string is None on error.
+    """
+    if isinstance(val, dict):
+        if "$like" in val:
+            pattern = _escape_like_pattern(val["$like"])
+            return f"{col_name} LIKE {pattern}", False
+        elif "$ilike" in val:
+            pattern = _escape_like_pattern(val["$ilike"])
+            # MySQL case-insensitive: use LOWER() wrapper
+            return f"LOWER({col_name}) LIKE LOWER({pattern})", False
+        return None, True
+
+    if isinstance(val, str):
+        escaped = val.replace("'", "''")
+        return f"{col_name} = '{escaped}'", False
+
+    # Numeric / boolean values
+    return f"{col_name} = {val}", False
+
+
+def _escape_like_pattern(pattern: str) -> str:
+    """Escape SQL LIKE special characters and wrap with quotes.
+
+    Preserves user-provided % and _ wildcards. Only escapes backslashes
+    (the ESCAPE character). For exact match, use a plain string value
+    instead of $like/$ilike operators."""
+    escaped = pattern.replace("\\", "\\\\")
+    return f"'{escaped}'"
 
 
 def query_tools(server):
@@ -145,7 +243,7 @@ def _query_dbc(
 
     if sql_table and server.database.db_available:
         db_result, db_error = _query_sql_overlay(
-            server, sql_table, id_value, dbc_filter, limit
+            server, sql_table, id_value, dbc_filter, limit, reg_entry
         )
 
     # Merge results
@@ -222,12 +320,19 @@ def _query_sql(
 
     if filter_data:
         for col, val in filter_data.items():
-            if isinstance(val, str):
-                # Escape single quotes
-                escaped_val = val.replace("'", "''")
-                where_clauses.append(f"{col} = '{escaped_val}'")
-            else:
-                where_clauses.append(f"{col} = {val}")
+            resolved_col, err_msg = _resolve_sql_column(reg_entry, col, sql_table)
+            if resolved_col is None:
+                return {
+                    "error": f"Unknown field '{col}' for table '{sql_table}'. {err_msg}",
+                    "isError": True,
+                }
+            clause, is_err = _build_sql_filter_clause(resolved_col, val)
+            if is_err:
+                return {
+                    "error": f"Unsupported filter operator for '{col}'",
+                    "isError": True,
+                }
+            where_clauses.append(clause)
 
     if where_clauses:
         sql += " WHERE " + " AND ".join(where_clauses)
@@ -277,7 +382,7 @@ def _query_sql(
 
 
 def _query_sql_overlay(
-    server, sql_table: str, id_value: Optional[int], dbc_filter: Dict, limit: int
+    server, sql_table: str, id_value: Optional[int], dbc_filter: Dict, limit: int, reg_entry: Optional[Dict] = None
 ) -> tuple:
     """Query SQL overlay for DBC-backed store."""
     sql = f"SELECT * FROM {sql_table}"
@@ -290,7 +395,7 @@ def _query_sql_overlay(
 
     if dbc_filter:
         where_clauses.extend(
-            _dbc_filter_to_sql_where_server(server, dbc_filter, None)
+            _dbc_filter_to_sql_where_server(server, dbc_filter, reg_entry)
         )
 
     if where_clauses:
