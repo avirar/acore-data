@@ -2853,11 +2853,26 @@
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "FactionEntry",
       "referenced_by": [
-        {"source": "CreatureTemplate", "field": "faction"},
-        {"source": "ItemTemplate", "field": "RequiredReputationFaction"},
-        {"source": "Quest", "field": "RequiredFactionId1, RequiredFactionId2"},
-        {"source": "Quest", "field": "RewardFactionId1..5"},
-        {"source": "Quest", "field": "RequiredMinRepFaction, RequiredMaxRepFaction"}
+        {
+          "source": "CreatureTemplate",
+          "field": "faction"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "RequiredReputationFaction"
+        },
+        {
+          "source": "Quest",
+          "field": "RequiredFactionId1, RequiredFactionId2"
+        },
+        {
+          "source": "Quest",
+          "field": "RewardFactionId1..5"
+        },
+        {
+          "source": "Quest",
+          "field": "RequiredMinRepFaction, RequiredMaxRepFaction"
+        }
       ],
       "fields": {
         "0": {
@@ -5272,8 +5287,15 @@
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "LockEntry",
       "referenced_by": [
-        {"source": "ItemTemplate", "field": "LockID"},
-        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=0,1,2,3,6,10,12,13,24,25,26"}
+        {
+          "source": "ItemTemplate",
+          "field": "LockID"
+        },
+        {
+          "source": "GameObjectTemplate",
+          "field": "data[]",
+          "condition": "type=0,1,2,3,6,10,12,13,24,25,26"
+        }
       ],
       "fields": {
         "0": {
@@ -7016,13 +7038,35 @@
       "header_file": "src/server/shared/DataStores/DBCStructure.h",
       "c_struct": "SpellEntry",
       "referenced_by": [
-        {"source": "ItemTemplate", "field": "spellid_1..5"},
-        {"source": "ItemTemplate", "field": "RequiredSpell, spellclickspellspecifier, socketspell"},
-        {"source": "Quest", "field": "RewardSpell, RewardDisplaySpell, SourceSpellid"},
-        {"source": "CreatureTemplate", "field": "spell1..8"},
-        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=6,10,18,22,24,26,29,30"},
-        {"source": "SpellEntry", "field": "CasterAuraSpell, TargetAuraSpell, ExcludeCasterAuraSpell, ExcludeTargetAuraSpell"},
-        {"source": "SpellEntry", "field": "EffectTriggerSpell[0..2]"}
+        {
+          "source": "ItemTemplate",
+          "field": "spellid_1..5"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "RequiredSpell, spellclickspellspecifier, socketspell"
+        },
+        {
+          "source": "Quest",
+          "field": "RewardSpell, RewardDisplaySpell, SourceSpellid"
+        },
+        {
+          "source": "CreatureTemplate",
+          "field": "spell1..8"
+        },
+        {
+          "source": "GameObjectTemplate",
+          "field": "data[]",
+          "condition": "type=6,10,18,22,24,26,29,30"
+        },
+        {
+          "source": "SpellEntry",
+          "field": "CasterAuraSpell, TargetAuraSpell, ExcludeCasterAuraSpell, ExcludeTargetAuraSpell"
+        },
+        {
+          "source": "SpellEntry",
+          "field": "EffectTriggerSpell[0..2]"
+        }
       ],
       "fields": {
         "0": {
@@ -7766,7 +7810,7 @@
           "sql_column": "EffectMiscValueB",
           "notes": "-"
         },
-"115": {
+        "115": {
           "name": "EffectTriggerSpell[0]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
@@ -10128,10 +10172,24 @@
       "header_file": "src/server/game/Entities/Creature/CreatureData.h",
       "c_struct": "CreatureTemplate",
       "referenced_by": [
-        {"source": "Quest", "field": "RequiredNpcOrGo1..4", "condition": "value>0"},
-        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=21"},
-        {"source": "CreatureTemplate", "field": "KillCredit1, KillCredit2"},
-        {"source": "CreatureTemplate", "field": "DifficultyEntry1..3"}
+        {
+          "source": "Quest",
+          "field": "RequiredNpcOrGo1..4",
+          "condition": "value>0"
+        },
+        {
+          "source": "GameObjectTemplate",
+          "field": "data[]",
+          "condition": "type=21"
+        },
+        {
+          "source": "CreatureTemplate",
+          "field": "KillCredit1, KillCredit2"
+        },
+        {
+          "source": "CreatureTemplate",
+          "field": "DifficultyEntry1..3"
+        }
       ],
       "fields": {
         "entry": {
@@ -11343,9 +11401,18 @@
       "header_file": "src/server/game/Entities/Item/ItemTemplate.h",
       "c_struct": "ItemTemplate",
       "referenced_by": [
-        {"source": "Quest", "field": "SrcItemId"},
-        {"source": "Quest", "field": "RequiredItemId1..6"},
-        {"source": "Quest", "field": "RewardItemId1..4, RewardChoiceItemId1..6, ItemDrop1..4"}
+        {
+          "source": "Quest",
+          "field": "SrcItemId"
+        },
+        {
+          "source": "Quest",
+          "field": "RequiredItemId1..6"
+        },
+        {
+          "source": "Quest",
+          "field": "RewardItemId1..4, RewardChoiceItemId1..6, ItemDrop1..4"
+        }
       ],
       "fields": {
         "entry": {
@@ -11969,11 +12036,27 @@
       "header_file": "src/server/game/Quests/QuestDef.h",
       "c_struct": "Quest",
       "referenced_by": [
-        {"source": "ItemTemplate", "field": "startquest"},
-        {"source": "GameObjectTemplate", "field": "data[]", "condition": "type=2,3,5,8,10"},
-        {"source": "Quest", "field": "PrevQuestId, NextQuestId, NextQuestInChain, BreadcrumbForQuestId"},
-        {"source": "creature_questitem", "field": "id"},
-        {"source": "creature_onkill_reputation", "field": "quest_identifier"}
+        {
+          "source": "ItemTemplate",
+          "field": "startquest"
+        },
+        {
+          "source": "GameObjectTemplate",
+          "field": "data[]",
+          "condition": "type=2,3,5,8,10"
+        },
+        {
+          "source": "Quest",
+          "field": "PrevQuestId, NextQuestId, NextQuestInChain, BreadcrumbForQuestId"
+        },
+        {
+          "source": "creature_questitem",
+          "field": "id"
+        },
+        {
+          "source": "creature_onkill_reputation",
+          "field": "quest_identifier"
+        }
       ],
       "fields": {
         "ID": {
@@ -13431,7 +13514,7 @@
       "header_file": "src/server/game/Globals/ObjectMgr.h",
       "c_struct": "RepRewardRate",
       "fields": {
-   "faction": {
+        "faction": {
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
@@ -14853,67 +14936,80 @@
         "SchoolMask": {
           "name": "SchoolMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SchoolMask"
         },
         "SpellFamilyName": {
           "name": "SpellFamilyName",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SpellFamilyName"
         },
         "SpellFamilyMask": {
           "name": "SpellFamilyMask",
           "type": "`flag96`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SpellFamilyMask0"
         },
         "ProcFlags": {
           "name": "ProcFlags",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ProcFlags"
         },
         "SpellTypeMask": {
           "name": "SpellTypeMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SpellTypeMask"
         },
         "SpellPhaseMask": {
           "name": "SpellPhaseMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SpellPhaseMask"
         },
         "HitMask": {
           "name": "HitMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "HitMask"
         },
         "AttributesMask": {
           "name": "AttributesMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "AttributesMask"
         },
         "DisableEffectsMask": {
           "name": "DisableEffectsMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "DisableEffectsMask"
         },
         "ProcsPerMinute": {
           "name": "ProcsPerMinute",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ProcsPerMinute"
         },
         "Chance": {
           "name": "Chance",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Chance"
         },
         "Cooldown": {
           "name": "Cooldown",
           "type": "`Milliseconds`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Cooldown"
         },
         "Charges": {
           "name": "Charges",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Charges"
         }
       }
     },
@@ -14931,22 +15027,26 @@
         "customChance": {
           "name": "customChance",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "customChance"
         },
         "PPMChance": {
           "name": "PPMChance",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "PPMChance"
         },
         "procEx": {
           "name": "procEx",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "procEx"
         },
         "attributeMask": {
           "name": "attributeMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "attributeMask"
         }
       }
     },
@@ -14964,22 +15064,26 @@
         "direct_damage": {
           "name": "direct_damage",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "direct_bonus"
         },
         "dot_damage": {
           "name": "dot_damage",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "dot_bonus"
         },
         "ap_bonus": {
           "name": "ap_bonus",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ap_bonus"
         },
         "ap_dot_bonus": {
           "name": "ap_dot_bonus",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ap_dot_bonus"
         }
       }
     },
@@ -14997,17 +15101,20 @@
         "flatMod": {
           "name": "flatMod",
           "type": "`int32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "flatMod"
         },
         "pctMod": {
           "name": "pctMod",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "pctMod"
         },
         "apPctMod": {
           "name": "apPctMod",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "apPctMod"
         }
       }
     },
@@ -15025,27 +15132,32 @@
         "target_mapId": {
           "name": "target_mapId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TargetMapID"
         },
         "target_X": {
           "name": "target_X",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TargetX"
         },
         "target_Y": {
           "name": "target_Y",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TargetY"
         },
         "target_Z": {
           "name": "target_Z",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TargetZ"
         },
         "target_Orientation": {
           "name": "target_Orientation",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TargetOrientation"
         }
       }
     },
@@ -15150,52 +15262,62 @@
         "spellId": {
           "name": "spellId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "spell"
         },
         "areaId": {
           "name": "areaId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "area"
         },
         "questStart": {
           "name": "questStart",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "quest_start"
         },
         "questEnd": {
           "name": "questEnd",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "quest_end"
         },
         "auraSpell": {
           "name": "auraSpell",
           "type": "`int32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "aura_spell"
         },
         "raceMask": {
           "name": "raceMask",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "racemask"
         },
         "gender": {
           "name": "gender",
           "type": "`Gender`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "gender"
         },
         "questStartStatus": {
           "name": "questStartStatus",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "quest_start_status"
         },
         "questEndStatus": {
           "name": "questEndStatus",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "quest_end_status"
         },
         "autocast": {
           "name": "autocast",
           "type": "`bool`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "autocast"
         }
       }
     },
@@ -15225,22 +15347,26 @@
         "RecoveryTime": {
           "name": "RecoveryTime",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "RecoveryTime"
         },
         "CategoryRecoveryTime": {
           "name": "CategoryRecoveryTime",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "CategoryRecoveryTime"
         },
         "StartRecoveryTime": {
           "name": "StartRecoveryTime",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "StartRecoveryTime"
         },
         "StartRecoveryCategory": {
           "name": "StartRecoveryCategory",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "StartRecoveryCategory"
         }
       }
     },
@@ -15258,37 +15384,44 @@
         "School": {
           "name": "School",
           "type": "`std::bitset<MAX_SPELL_SCHOOL>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SchoolMask"
         },
         "DispelType": {
           "name": "DispelType",
           "type": "`std::bitset<DISPEL_MAX>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "DispelTypeMask"
         },
         "Mechanic": {
           "name": "Mechanic",
           "type": "`std::bitset<MAX_MECHANIC>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MechanicsMask"
         },
         "Effect": {
           "name": "Effect",
           "type": "`std::vector<SpellEffects>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Effects"
         },
         "Aura": {
           "name": "Aura",
           "type": "`std::vector<AuraType>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Auras"
         },
         "ImmuneAoE": {
           "name": "ImmuneAoE",
           "type": "`bool`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ImmuneAoE"
         },
         "ImmuneChain": {
           "name": "ImmuneChain",
           "type": "`bool`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ImmuneChain"
         }
       }
     },
@@ -15364,22 +15497,26 @@
         "entryOrGuid": {
           "name": "entryOrGuid",
           "type": "`int32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "entryorguid"
         },
         "source_type": {
           "name": "source_type",
           "type": "`SmartScriptType`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "source_type"
         },
         "event_id": {
           "name": "event_id",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "id"
         },
         "link": {
           "name": "link",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "link"
         },
         "event": {
           "name": "event",
@@ -15437,67 +15574,80 @@
         "SourceType": {
           "name": "SourceType",
           "type": "`ConditionSourceType`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SourceTypeOrReferenceId"
         },
         "SourceGroup": {
           "name": "SourceGroup",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SourceGroup"
         },
         "SourceEntry": {
           "name": "SourceEntry",
           "type": "`int32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SourceEntry"
         },
         "SourceId": {
           "name": "SourceId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "SourceId"
         },
         "ElseGroup": {
           "name": "ElseGroup",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ElseGroup"
         },
         "ConditionType": {
           "name": "ConditionType",
           "type": "`ConditionTypes`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ConditionTypeOrReference"
         },
         "ConditionTarget": {
           "name": "ConditionTarget",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ConditionTarget"
         },
         "ConditionValue1": {
           "name": "ConditionValue1",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ConditionValue1"
         },
         "ConditionValue2": {
           "name": "ConditionValue2",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ConditionValue2"
         },
         "ConditionValue3": {
           "name": "ConditionValue3",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ConditionValue3"
         },
         "NegativeCondition": {
           "name": "NegativeCondition",
           "type": "`bool`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "NegativeCondition"
         },
         "ErrorType": {
           "name": "ErrorType",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ErrorType"
         },
         "ErrorTextId": {
           "name": "ErrorTextId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ErrorTextId"
         },
         "ReferenceId": {
           "name": "ReferenceId",
@@ -15525,17 +15675,20 @@
         "EventId": {
           "name": "EventId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "eventEntry"
         },
         "Start": {
           "name": "Start",
           "type": "`time_t`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "start_time"
         },
         "End": {
           "name": "End",
           "type": "`time_t`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "end_time"
         },
         "NextStart": {
           "name": "NextStart",
@@ -15545,22 +15698,26 @@
         "Occurence": {
           "name": "Occurence",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "occurence"
         },
         "Length": {
           "name": "Length",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "length"
         },
         "HolidayId": {
           "name": "HolidayId",
           "type": "`HolidayIds`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "holiday"
         },
         "HolidayStage": {
           "name": "HolidayStage",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "holidayStage"
         },
         "State": {
           "name": "State",
@@ -15580,12 +15737,14 @@
         "Description": {
           "name": "Description",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "description"
         },
         "Announce": {
           "name": "Announce",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "announce"
         }
       }
     },
@@ -15603,22 +15762,26 @@
         "ReqNum": {
           "name": "ReqNum",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "req_num"
         },
         "Done": {
           "name": "Done",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "done_world_state_field"
         },
         "MaxWorldState": {
           "name": "MaxWorldState",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "max_world_state_field"
         },
         "DoneWorldState": {
           "name": "DoneWorldState",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "done_world_state_field"
         }
       }
     },
@@ -15636,7 +15799,8 @@
         "ModelId": {
           "name": "ModelId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "modelid"
         },
         "ModelIdPrev": {
           "name": "ModelIdPrev",
@@ -15646,7 +15810,8 @@
         "EquipmentId": {
           "name": "EquipmentId",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "equipment_id"
         },
         "EquipementIdPrev": {
           "name": "EquipementIdPrev",
@@ -15674,22 +15839,26 @@
         "Item": {
           "name": "Item",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "item"
         },
         "MaxCount": {
           "name": "MaxCount",
           "type": "`int32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "maxcount"
         },
         "Incrtime": {
           "name": "Incrtime",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "incrtime"
         },
         "ExtendedCost": {
           "name": "ExtendedCost",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ExtendedCost"
         }
       }
     },
@@ -15707,7 +15876,8 @@
         "MaxLimit": {
           "name": "MaxLimit",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "max_limit"
         }
       }
     },
@@ -15725,7 +15895,8 @@
         "Id": {
           "name": "Id",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "id"
         },
         "Nodes": {
           "name": "Nodes",
@@ -15748,17 +15919,20 @@
         "dataType": {
           "name": "dataType",
           "type": "`AchievementCriteriaDataType`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "type"
         },
         "raw.value1": {
           "name": "raw.value1",
           "type": "`uint32` (union of type-specific data)",
-          "notes": ""
+          "notes": "",
+          "sql_column": "value1"
         },
         "raw.value2": {
           "name": "raw.value2",
           "type": "`uint32` (union of type-specific data)",
-          "notes": ""
+          "notes": "",
+          "sql_column": "value2"
         },
         "ScriptId": {
           "name": "ScriptId",
@@ -15781,32 +15955,38 @@
         "titleId": {
           "name": "titleId",
           "type": "`uint32[2]`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TitleA"
         },
         "itemId": {
           "name": "itemId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ItemID"
         },
         "sender": {
           "name": "sender",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Sender"
         },
         "subject": {
           "name": "subject",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Subject"
         },
         "text": {
           "name": "text",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Body"
         },
         "mailTemplate": {
           "name": "mailTemplate",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MailTemplateID"
         }
       }
     },
@@ -15824,12 +16004,14 @@
         "Subject": {
           "name": "Subject",
           "type": "`std::vector<std::string>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Subject"
         },
         "Text": {
           "name": "Text",
           "type": "`std::vector<std::string>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Text"
         }
       }
     },
@@ -15847,17 +16029,20 @@
         "maxLevel": {
           "name": "maxLevel",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "maxLevel"
         },
         "firstQuest": {
           "name": "firstQuest",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "firstQuestId"
         },
         "otherQuest": {
           "name": "otherQuest",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "otherQuestId"
         }
       }
     },
@@ -15875,27 +16060,32 @@
         "Id": {
           "name": "Id",
           "type": "`BattlegroundTypeId`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ID"
         },
         "MinPlayersPerTeam": {
           "name": "MinPlayersPerTeam",
           "type": "`uint16`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MinPlayersPerTeam"
         },
         "MaxPlayersPerTeam": {
           "name": "MaxPlayersPerTeam",
           "type": "`uint16`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MaxPlayersPerTeam"
         },
         "MinLevel": {
           "name": "MinLevel",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MinLvl"
         },
         "MaxLevel": {
           "name": "MaxLevel",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "MaxLvl"
         },
         "StartLocation": {
           "name": "StartLocation",
@@ -15910,7 +16100,8 @@
         "Weight": {
           "name": "Weight",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Weight"
         },
         "ScriptId": {
           "name": "ScriptId",
@@ -15938,7 +16129,8 @@
         "flags": {
           "name": "flags",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "flag1"
         },
         "params[0]": {
           "name": "params[0]",
@@ -15966,32 +16158,38 @@
         "leaderGUID": {
           "name": "leaderGUID",
           "type": "`ObjectGuid::LowType`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "leaderGUID"
         },
         "follow_dist": {
           "name": "follow_dist",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "dist"
         },
         "follow_angle": {
           "name": "follow_angle",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "angle"
         },
         "groupAI": {
           "name": "groupAI",
           "type": "`uint16`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "groupAI"
         },
         "point_1": {
           "name": "point_1",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "point_1"
         },
         "point_2": {
           "name": "point_2",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "point_2"
         }
       }
     },
@@ -16009,62 +16207,74 @@
         "entry": {
           "name": "entry",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "CreatureID"
         },
         "group": {
           "name": "group",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "GroupID"
         },
         "id": {
           "name": "id",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ID"
         },
         "text": {
           "name": "text",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Text"
         },
         "type": {
           "name": "type",
           "type": "`ChatMsg`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Type"
         },
         "lang": {
           "name": "lang",
           "type": "`Language`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Language"
         },
         "probability": {
           "name": "probability",
           "type": "`float`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Probability"
         },
         "emote": {
           "name": "emote",
           "type": "`Emote`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Emote"
         },
         "duration": {
           "name": "duration",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Duration"
         },
         "sound": {
           "name": "sound",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Sound"
         },
         "TextRange": {
           "name": "TextRange",
           "type": "`CreatureTextRange`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TextRange"
         },
         "BroadcastTextId": {
           "name": "BroadcastTextId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "BroadcastTextId"
         }
       }
     },
@@ -16082,7 +16292,8 @@
         "Text": {
           "name": "Text",
           "type": "`std::vector<std::string>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "Text_loc"
         }
       }
     },
@@ -16100,47 +16311,56 @@
         "Type": {
           "name": "Type",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "type"
         },
         "Data": {
           "name": "Data",
           "type": "`BigNumber`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "data"
         },
         "Address": {
           "name": "Address",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "address"
         },
         "Length": {
           "name": "Length",
           "type": "`uint8`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "length"
         },
         "Str": {
           "name": "Str",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "str"
         },
         "Comment": {
           "name": "Comment",
           "type": "`std::string`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "comment"
         },
         "CheckId": {
           "name": "CheckId",
           "type": "`uint16`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "check_id"
         },
         "IdStr": {
           "name": "IdStr",
           "type": "`std::array<char, 4>`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "id_str"
         },
         "Action": {
           "name": "Action",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "action"
         }
       }
     },
@@ -16158,7 +16378,8 @@
         "Result": {
           "name": "Result",
           "type": "`BigNumber`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "result"
         }
       }
     },
@@ -16181,7 +16402,8 @@
         "ScriptId": {
           "name": "ScriptId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "script_name"
         }
       }
     },
@@ -16199,12 +16421,14 @@
         "TypeId": {
           "name": "TypeId",
           "type": "`OutdoorPvPTypes`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "TypeId"
         },
         "ScriptId": {
           "name": "ScriptId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "sql_column": "ScriptName"
         }
       }
     },
@@ -16754,27 +16978,32 @@
         "EmblemStyle": {
           "name": "EmblemStyle",
           "type": "m_emblemInfo.GetStyle()",
-          "notes": "uint8"
+          "notes": "uint8",
+          "sql_column": "EmblemStyle"
         },
         "EmblemColor": {
           "name": "EmblemColor",
           "type": "m_emblemInfo.GetColor()",
-          "notes": "uint8"
+          "notes": "uint8",
+          "sql_column": "EmblemColor"
         },
         "BorderStyle": {
           "name": "BorderStyle",
           "type": "m_emblemInfo.GetBorderStyle()",
-          "notes": "uint8"
+          "notes": "uint8",
+          "sql_column": "BorderStyle"
         },
         "BorderColor": {
           "name": "BorderColor",
           "type": "m_emblemInfo.GetBorderColor()",
-          "notes": "uint8"
+          "notes": "uint8",
+          "sql_column": "BorderColor"
         },
         "BackgroundColor": {
           "name": "BackgroundColor",
           "type": "m_emblemInfo.GetBackgroundColor()",
-          "notes": "uint8"
+          "notes": "uint8",
+          "sql_column": "BackgroundColor"
         },
         "info": {
           "name": "std::string",
@@ -16797,7 +17026,8 @@
         "BankMoney": {
           "name": "BankMoney",
           "type": "m_bankMoney",
-          "notes": "uint64"
+          "notes": "uint64",
+          "sql_column": "BankMoney"
         }
       }
     },
@@ -17211,22 +17441,26 @@
         "Id": {
           "name": "Id",
           "type": "Id",
-          "notes": "uint32"
+          "notes": "uint32",
+          "sql_column": "Id"
         },
         "Name": {
           "name": "Name",
           "type": "NameMD5",
-          "notes": "std::array&lt;uint8, 16&gt;"
+          "notes": "std::array&lt;uint8, 16&gt;",
+          "sql_column": "NameMD5"
         },
         "Version": {
           "name": "Version",
           "type": "VersionMD5",
-          "notes": "std::array&lt;uint8, 16&gt;"
+          "notes": "std::array&lt;uint8, 16&gt;",
+          "sql_column": "VersionMD5"
         },
         "Timestamp": {
           "name": "Timestamp",
           "type": "Timestamp",
-          "notes": "time_t"
+          "notes": "time_t",
+          "sql_column": "Timestamp"
         }
       }
     },
