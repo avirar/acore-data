@@ -249,7 +249,8 @@ class Registry:
             elif m.endswith("_dbc"):
                 category = "dbc_overlay"
             elif "_dbc" not in m and any(
-                m == e["c_struct"].lower() for e in self.registry.get("entries", {}).values()
+                m == e.get("c_struct", "").lower()
+                for e in self.registry.get("entries", {}).values()
             ):
                 category = "struct"
             else:

@@ -8,7 +8,7 @@
       "sql_manager",
       "sql_objectmgr"
     ],
-    "total_entries": 464
+    "total_entries": 462
   },
   "entries": {
     "AchievementEntry": {
@@ -12945,7 +12945,542 @@
       "loader_function": "ObjectMgr::LoadGossipText()",
       "header_file": "src/server/game/Handlers/NPCHandler.h",
       "c_struct": "GossipText",
-      "fields": {}
+      "fields": {
+        "0": {
+          "name": "ID",
+          "type": "uint32",
+          "sql_column": "ID",
+          "notes": "Primary key"
+        },
+        "1": {
+          "name": "Options[0].Text_0",
+          "type": "std::string",
+          "sql_column": "text0_0",
+          "notes": "Gossip text option 0, primary text"
+        },
+        "2": {
+          "name": "Options[0].Text_1",
+          "type": "std::string",
+          "sql_column": "text0_1",
+          "notes": "Gossip text option 0, alternative text"
+        },
+        "3": {
+          "name": "Options[0].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID0",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 0"
+        },
+        "4": {
+          "name": "Options[0].Language",
+          "type": "uint8",
+          "sql_column": "lang0",
+          "notes": "Language enum, option 0"
+        },
+        "5": {
+          "name": "Options[0].Probability",
+          "type": "float",
+          "sql_column": "Probability0",
+          "notes": "Weighting for random selection (0.0-1.0), option 0"
+        },
+        "6": {
+          "name": "Options[0].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em0_0",
+          "notes": "Emote delay (ms) for option 0, slot 0"
+        },
+        "7": {
+          "name": "Options[0].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em0_1",
+          "notes": "Emote ID for option 0, slot 0"
+        },
+        "8": {
+          "name": "Options[0].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em0_2",
+          "notes": "Emote delay (ms) for option 0, slot 1"
+        },
+        "9": {
+          "name": "Options[0].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em0_3",
+          "notes": "Emote ID for option 0, slot 1"
+        },
+        "10": {
+          "name": "Options[0].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em0_4",
+          "notes": "Emote delay (ms) for option 0, slot 2"
+        },
+        "11": {
+          "name": "Options[0].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em0_5",
+          "notes": "Emote ID for option 0, slot 2"
+        },
+        "12": {
+          "name": "Options[1].Text_0",
+          "type": "std::string",
+          "sql_column": "text1_0",
+          "notes": "Gossip text option 1, primary text"
+        },
+        "13": {
+          "name": "Options[1].Text_1",
+          "type": "std::string",
+          "sql_column": "text1_1",
+          "notes": "Gossip text option 1, alternative text"
+        },
+        "14": {
+          "name": "Options[1].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID1",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 1"
+        },
+        "15": {
+          "name": "Options[1].Language",
+          "type": "uint8",
+          "sql_column": "lang1",
+          "notes": "Language enum, option 1"
+        },
+        "16": {
+          "name": "Options[1].Probability",
+          "type": "float",
+          "sql_column": "Probability1",
+          "notes": "Weighting for random selection (0.0-1.0), option 1"
+        },
+        "17": {
+          "name": "Options[1].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em1_0",
+          "notes": "Emote delay (ms) for option 1, slot 0"
+        },
+        "18": {
+          "name": "Options[1].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em1_1",
+          "notes": "Emote ID for option 1, slot 0"
+        },
+        "19": {
+          "name": "Options[1].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em1_2",
+          "notes": "Emote delay (ms) for option 1, slot 1"
+        },
+        "20": {
+          "name": "Options[1].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em1_3",
+          "notes": "Emote ID for option 1, slot 1"
+        },
+        "21": {
+          "name": "Options[1].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em1_4",
+          "notes": "Emote delay (ms) for option 1, slot 2"
+        },
+        "22": {
+          "name": "Options[1].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em1_5",
+          "notes": "Emote ID for option 1, slot 2"
+        },
+        "23": {
+          "name": "Options[2].Text_0",
+          "type": "std::string",
+          "sql_column": "text2_0",
+          "notes": "Gossip text option 2, primary text"
+        },
+        "24": {
+          "name": "Options[2].Text_1",
+          "type": "std::string",
+          "sql_column": "text2_1",
+          "notes": "Gossip text option 2, alternative text"
+        },
+        "25": {
+          "name": "Options[2].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID2",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 2"
+        },
+        "26": {
+          "name": "Options[2].Language",
+          "type": "uint8",
+          "sql_column": "lang2",
+          "notes": "Language enum, option 2"
+        },
+        "27": {
+          "name": "Options[2].Probability",
+          "type": "float",
+          "sql_column": "Probability2",
+          "notes": "Weighting for random selection (0.0-1.0), option 2"
+        },
+        "28": {
+          "name": "Options[2].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em2_0",
+          "notes": "Emote delay (ms) for option 2, slot 0"
+        },
+        "29": {
+          "name": "Options[2].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em2_1",
+          "notes": "Emote ID for option 2, slot 0"
+        },
+        "30": {
+          "name": "Options[2].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em2_2",
+          "notes": "Emote delay (ms) for option 2, slot 1"
+        },
+        "31": {
+          "name": "Options[2].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em2_3",
+          "notes": "Emote ID for option 2, slot 1"
+        },
+        "32": {
+          "name": "Options[2].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em2_4",
+          "notes": "Emote delay (ms) for option 2, slot 2"
+        },
+        "33": {
+          "name": "Options[2].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em2_5",
+          "notes": "Emote ID for option 2, slot 2"
+        },
+        "34": {
+          "name": "Options[3].Text_0",
+          "type": "std::string",
+          "sql_column": "text3_0",
+          "notes": "Gossip text option 3, primary text"
+        },
+        "35": {
+          "name": "Options[3].Text_1",
+          "type": "std::string",
+          "sql_column": "text3_1",
+          "notes": "Gossip text option 3, alternative text"
+        },
+        "36": {
+          "name": "Options[3].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID3",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 3"
+        },
+        "37": {
+          "name": "Options[3].Language",
+          "type": "uint8",
+          "sql_column": "lang3",
+          "notes": "Language enum, option 3"
+        },
+        "38": {
+          "name": "Options[3].Probability",
+          "type": "float",
+          "sql_column": "Probability3",
+          "notes": "Weighting for random selection (0.0-1.0), option 3"
+        },
+        "39": {
+          "name": "Options[3].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em3_0",
+          "notes": "Emote delay (ms) for option 3, slot 0"
+        },
+        "40": {
+          "name": "Options[3].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em3_1",
+          "notes": "Emote ID for option 3, slot 0"
+        },
+        "41": {
+          "name": "Options[3].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em3_2",
+          "notes": "Emote delay (ms) for option 3, slot 1"
+        },
+        "42": {
+          "name": "Options[3].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em3_3",
+          "notes": "Emote ID for option 3, slot 1"
+        },
+        "43": {
+          "name": "Options[3].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em3_4",
+          "notes": "Emote delay (ms) for option 3, slot 2"
+        },
+        "44": {
+          "name": "Options[3].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em3_5",
+          "notes": "Emote ID for option 3, slot 2"
+        },
+        "45": {
+          "name": "Options[4].Text_0",
+          "type": "std::string",
+          "sql_column": "text4_0",
+          "notes": "Gossip text option 4, primary text"
+        },
+        "46": {
+          "name": "Options[4].Text_1",
+          "type": "std::string",
+          "sql_column": "text4_1",
+          "notes": "Gossip text option 4, alternative text"
+        },
+        "47": {
+          "name": "Options[4].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID4",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 4"
+        },
+        "48": {
+          "name": "Options[4].Language",
+          "type": "uint8",
+          "sql_column": "lang4",
+          "notes": "Language enum, option 4"
+        },
+        "49": {
+          "name": "Options[4].Probability",
+          "type": "float",
+          "sql_column": "Probability4",
+          "notes": "Weighting for random selection (0.0-1.0), option 4"
+        },
+        "50": {
+          "name": "Options[4].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em4_0",
+          "notes": "Emote delay (ms) for option 4, slot 0"
+        },
+        "51": {
+          "name": "Options[4].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em4_1",
+          "notes": "Emote ID for option 4, slot 0"
+        },
+        "52": {
+          "name": "Options[4].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em4_2",
+          "notes": "Emote delay (ms) for option 4, slot 1"
+        },
+        "53": {
+          "name": "Options[4].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em4_3",
+          "notes": "Emote ID for option 4, slot 1"
+        },
+        "54": {
+          "name": "Options[4].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em4_4",
+          "notes": "Emote delay (ms) for option 4, slot 2"
+        },
+        "55": {
+          "name": "Options[4].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em4_5",
+          "notes": "Emote ID for option 4, slot 2"
+        },
+        "56": {
+          "name": "Options[5].Text_0",
+          "type": "std::string",
+          "sql_column": "text5_0",
+          "notes": "Gossip text option 5, primary text"
+        },
+        "57": {
+          "name": "Options[5].Text_1",
+          "type": "std::string",
+          "sql_column": "text5_1",
+          "notes": "Gossip text option 5, alternative text"
+        },
+        "58": {
+          "name": "Options[5].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID5",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 5"
+        },
+        "59": {
+          "name": "Options[5].Language",
+          "type": "uint8",
+          "sql_column": "lang5",
+          "notes": "Language enum, option 5"
+        },
+        "60": {
+          "name": "Options[5].Probability",
+          "type": "float",
+          "sql_column": "Probability5",
+          "notes": "Weighting for random selection (0.0-1.0), option 5"
+        },
+        "61": {
+          "name": "Options[5].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em5_0",
+          "notes": "Emote delay (ms) for option 5, slot 0"
+        },
+        "62": {
+          "name": "Options[5].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em5_1",
+          "notes": "Emote ID for option 5, slot 0"
+        },
+        "63": {
+          "name": "Options[5].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em5_2",
+          "notes": "Emote delay (ms) for option 5, slot 1"
+        },
+        "64": {
+          "name": "Options[5].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em5_3",
+          "notes": "Emote ID for option 5, slot 1"
+        },
+        "65": {
+          "name": "Options[5].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em5_4",
+          "notes": "Emote delay (ms) for option 5, slot 2"
+        },
+        "66": {
+          "name": "Options[5].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em5_5",
+          "notes": "Emote ID for option 5, slot 2"
+        },
+        "67": {
+          "name": "Options[6].Text_0",
+          "type": "std::string",
+          "sql_column": "text6_0",
+          "notes": "Gossip text option 6, primary text"
+        },
+        "68": {
+          "name": "Options[6].Text_1",
+          "type": "std::string",
+          "sql_column": "text6_1",
+          "notes": "Gossip text option 6, alternative text"
+        },
+        "69": {
+          "name": "Options[6].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID6",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 6"
+        },
+        "70": {
+          "name": "Options[6].Language",
+          "type": "uint8",
+          "sql_column": "lang6",
+          "notes": "Language enum, option 6"
+        },
+        "71": {
+          "name": "Options[6].Probability",
+          "type": "float",
+          "sql_column": "Probability6",
+          "notes": "Weighting for random selection (0.0-1.0), option 6"
+        },
+        "72": {
+          "name": "Options[6].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em6_0",
+          "notes": "Emote delay (ms) for option 6, slot 0"
+        },
+        "73": {
+          "name": "Options[6].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em6_1",
+          "notes": "Emote ID for option 6, slot 0"
+        },
+        "74": {
+          "name": "Options[6].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em6_2",
+          "notes": "Emote delay (ms) for option 6, slot 1"
+        },
+        "75": {
+          "name": "Options[6].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em6_3",
+          "notes": "Emote ID for option 6, slot 1"
+        },
+        "76": {
+          "name": "Options[6].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em6_4",
+          "notes": "Emote delay (ms) for option 6, slot 2"
+        },
+        "77": {
+          "name": "Options[6].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em6_5",
+          "notes": "Emote ID for option 6, slot 2"
+        },
+        "78": {
+          "name": "Options[7].Text_0",
+          "type": "std::string",
+          "sql_column": "text7_0",
+          "notes": "Gossip text option 7, primary text"
+        },
+        "79": {
+          "name": "Options[7].Text_1",
+          "type": "std::string",
+          "sql_column": "text7_1",
+          "notes": "Gossip text option 7, alternative text"
+        },
+        "80": {
+          "name": "Options[7].BroadcastTextID",
+          "type": "uint32",
+          "sql_column": "BroadcastTextID7",
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 7"
+        },
+        "81": {
+          "name": "Options[7].Language",
+          "type": "uint8",
+          "sql_column": "lang7",
+          "notes": "Language enum, option 7"
+        },
+        "82": {
+          "name": "Options[7].Probability",
+          "type": "float",
+          "sql_column": "Probability7",
+          "notes": "Weighting for random selection (0.0-1.0), option 7"
+        },
+        "83": {
+          "name": "Options[7].Emotes[0]._Delay",
+          "type": "uint16",
+          "sql_column": "em7_0",
+          "notes": "Emote delay (ms) for option 7, slot 0"
+        },
+        "84": {
+          "name": "Options[7].Emotes[0]._Emote",
+          "type": "uint16",
+          "sql_column": "em7_1",
+          "notes": "Emote ID for option 7, slot 0"
+        },
+        "85": {
+          "name": "Options[7].Emotes[1]._Delay",
+          "type": "uint16",
+          "sql_column": "em7_2",
+          "notes": "Emote delay (ms) for option 7, slot 1"
+        },
+        "86": {
+          "name": "Options[7].Emotes[1]._Emote",
+          "type": "uint16",
+          "sql_column": "em7_3",
+          "notes": "Emote ID for option 7, slot 1"
+        },
+        "87": {
+          "name": "Options[7].Emotes[2]._Delay",
+          "type": "uint16",
+          "sql_column": "em7_4",
+          "notes": "Emote delay (ms) for option 7, slot 2"
+        },
+        "88": {
+          "name": "Options[7].Emotes[2]._Emote",
+          "type": "uint16",
+          "sql_column": "em7_5",
+          "notes": "Emote ID for option 7, slot 2"
+        }
+      }
     },
     "GossipMenus": {
       "category": "sql_objectmgr",
@@ -14530,18 +15065,6 @@
         }
       }
     },
-    "CreatureCustomIDs": {
-      "category": "sql_objectmgr",
-      "sql_table": "",
-      "sql_database": "db_world",
-      "store_variable": "ObjectMgr::_creatureCustomIDsStore",
-      "store_type": "",
-      "container_type": "",
-      "loader_function": "ObjectMgr::LoadCreatureCustomIDs()",
-      "header_file": "src/server/game/Globals/ObjectMgr.h",
-      "c_struct": "CreatureCustomIDs",
-      "fields": {}
-    },
     "CreatureMovementData": {
       "category": "sql_objectmgr",
       "sql_table": "creature_movement_override",
@@ -14884,18 +15407,6 @@
           "notes": "Creature display ID"
         }
       }
-    },
-    "ScriptNameStore": {
-      "category": "sql_objectmgr",
-      "sql_table": "",
-      "sql_database": "db_world",
-      "store_variable": "ObjectMgr::_scriptNamesStore",
-      "store_type": "",
-      "container_type": "",
-      "loader_function": "ObjectMgr::LoadScriptNames()",
-      "header_file": "src/server/game/Globals/ObjectMgr.h",
-      "c_struct": "ScriptNameStore",
-      "fields": {}
     },
     "CellObjectGuids": {
       "category": "sql_objectmgr",
@@ -15331,7 +15842,20 @@
       "container_type": "std::multimap<uint32, uint32>",
       "header_file": "src/server/game/Spells/SpellMgr.h",
       "c_struct": "SpellRequired",
-      "fields": {}
+      "fields": {
+        "0": {
+          "name": "spell_id",
+          "type": "uint32",
+          "sql_column": "spell_id",
+          "notes": "The spell being looked up"
+        },
+        "1": {
+          "name": "req_spell",
+          "type": "uint32",
+          "sql_column": "req_spell",
+          "notes": "Prerequisite spell required for spell_id"
+        }
+      }
     },
     "SpellCooldownOverride": {
       "category": "sql_manager",
@@ -16597,16 +17121,48 @@
       }
     },
     "gm_survey": {
-      "category": "sql_manager",
-      "sql_table": "",
-      "sql_database": "db_world",
-      "manager_singleton": "sTicketMgr",
-      "manager_class": "TicketMgr",
-      "store_variable": "",
-      "container_type": "",
-      "header_file": "src/server/game/Tickets/TicketMgr.h",
+      "category": "sql_auxiliary",
+      "sql_table": "gm_survey",
+      "sql_database": "db_characters",
       "c_struct": "gm_survey",
-      "fields": {}
+      "fields": {
+        "0": {
+          "name": "surveyId",
+          "type": "uint32",
+          "sql_column": "surveyId",
+          "notes": "Primary key, auto-increment"
+        },
+        "1": {
+          "name": "guid",
+          "type": "uint32",
+          "sql_column": "guid",
+          "notes": "Player GUID"
+        },
+        "2": {
+          "name": "mainSurvey",
+          "type": "uint32",
+          "sql_column": "mainSurvey",
+          "notes": "Reference to GMSurveyCurrentSurvey.dbc"
+        },
+        "3": {
+          "name": "comment",
+          "type": "std::string",
+          "sql_column": "comment",
+          "notes": "Free-form player comment"
+        },
+        "4": {
+          "name": "createTime",
+          "type": "uint32",
+          "sql_column": "createTime",
+          "notes": "UNIX timestamp of submission"
+        },
+        "5": {
+          "name": "maxMMR",
+          "type": "int16",
+          "sql_column": "maxMMR",
+          "notes": "Max MMR (present in schema, not populated by INSERT)"
+        }
+      }
     },
     "Petition": {
       "category": "sql_manager",
