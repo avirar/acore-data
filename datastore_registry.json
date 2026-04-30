@@ -497,37 +497,55 @@
           "name": "AreaId[0]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "AreaId[1]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "AreaId[2]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "AreaId[3]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "AreaId[4]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "AreaId[5]",
           "type": "uint32",
           "sql_column": "AreaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "nextGroup",
@@ -643,7 +661,10 @@
           "name": "mapId",
           "type": "uint32",
           "sql_column": "mapId",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "17": {
           "name": "zoneId",
@@ -681,7 +702,10 @@
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "depositPercent",
@@ -751,7 +775,10 @@
           "name": "race",
           "type": "uint32",
           "sql_column": "race",
-          "notes": "-"
+          "notes": "-",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "38": {
           "name": "gender",
@@ -971,13 +998,19 @@
           "name": "Race",
           "type": "uint8",
           "sql_column": "Race",
-          "notes": "-"
+          "notes": "-",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Class",
           "type": "uint8",
           "sql_column": "Class",
-          "notes": "-"
+          "notes": "-",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Gender",
@@ -989,145 +1022,217 @@
           "name": "ItemId[0]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "ItemId[1]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "ItemId[2]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "ItemId[3]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "9": {
           "name": "ItemId[4]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "10": {
           "name": "ItemId[5]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "11": {
           "name": "ItemId[6]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "12": {
           "name": "ItemId[7]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "13": {
           "name": "ItemId[8]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "14": {
           "name": "ItemId[9]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "15": {
           "name": "ItemId[10]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "16": {
           "name": "ItemId[11]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "17": {
           "name": "ItemId[12]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "18": {
           "name": "ItemId[13]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "19": {
           "name": "ItemId[14]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "20": {
           "name": "ItemId[15]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "21": {
           "name": "ItemId[16]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "22": {
           "name": "ItemId[17]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "23": {
           "name": "ItemId[18]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "24": {
           "name": "ItemId[19]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "25": {
           "name": "ItemId[20]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "26": {
           "name": "ItemId[21]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "27": {
           "name": "ItemId[22]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "28": {
           "name": "ItemId[23]",
           "type": "int32",
           "sql_column": "ItemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -1153,7 +1258,10 @@
           "name": "Race",
           "type": "uint32",
           "sql_column": "Race",
-          "notes": "Race ID"
+          "notes": "Race ID",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Gender",
@@ -2069,25 +2177,37 @@
           "name": "spellId[0]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "spellId[1]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "spellId[2]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "spellId[3]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -2133,7 +2253,10 @@
           "name": "ItemId",
           "type": "uint32",
           "sql_column": "ItemId",
-          "notes": "Used as real index"
+          "notes": "Used as real index",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "BitIndex",
@@ -2293,7 +2416,10 @@
           "name": "mapId",
           "type": "uint32",
           "sql_column": "mapId",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "difficulty",
@@ -2825,7 +2951,10 @@
           "name": "RaceId",
           "type": "uint32",
           "sql_column": "RaceId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "SexId",
@@ -3031,7 +3160,10 @@
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "factionFlags",
@@ -4557,61 +4689,91 @@
           "name": "itemId[0]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "19": {
           "name": "itemId[1]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "20": {
           "name": "itemId[2]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "21": {
           "name": "itemId[3]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "22": {
           "name": "itemId[4]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "23": {
           "name": "itemId[5]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "24": {
           "name": "itemId[6]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "25": {
           "name": "itemId[7]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "26": {
           "name": "itemId[8]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "27": {
           "name": "itemId[9]",
           "type": "uint32",
           "sql_column": "itemId",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "35": {
           "name": "spells[0]",
@@ -5404,49 +5566,73 @@
           "name": "Skill[0]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "18": {
           "name": "Skill[1]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "19": {
           "name": "Skill[2]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "20": {
           "name": "Skill[3]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "21": {
           "name": "Skill[4]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "22": {
           "name": "Skill[5]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "23": {
           "name": "Skill[6]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "24": {
           "name": "Skill[7]",
           "type": "uint32",
           "sql_column": "Skill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -5752,7 +5938,10 @@
           "name": "MapId",
           "type": "uint32",
           "sql_column": "MapId",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Difficulty",
@@ -5958,61 +6147,91 @@
           "name": "spellId[0]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "spellId[1]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "spellId[2]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "spellId[3]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "spellId[4]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "spellId[5]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "spellId[6]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "spellId[7]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "9": {
           "name": "spellId[8]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "10": {
           "name": "spellId[9]",
           "type": "uint32",
           "sql_column": "spellId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -6058,7 +6277,10 @@
           "name": "mapId",
           "type": "uint32",
           "sql_column": "mapId",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "bracketId",
@@ -6800,7 +7022,10 @@
           "name": "Spell",
           "type": "uint32",
           "sql_column": "Spell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "RaceMask",
@@ -7205,66 +7430,46 @@
           "name": "CasterAuraSpell",
           "type": "uint32",
           "sql_column": "CasterAuraSpell",
-          "notes": "Requires spell as aura on caster",
-          "references": [
-            {
-              "type": "self",
-              "target": "SpellEntry",
-              "description": "Prerequisite aura spell required to be active on caster"
-            }
-          ]
+          "notes": "Requires spell as aura on caster (Prerequisite aura spell required to be active on caster)",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "25": {
           "name": "TargetAuraSpell",
           "type": "uint32",
           "sql_column": "TargetAuraSpell",
-          "notes": "Requires spell as aura on target",
-          "references": [
-            {
-              "type": "self",
-              "target": "SpellEntry",
-              "description": "Prerequisite aura spell required to be active on target"
-            }
-          ]
+          "notes": "Requires spell as aura on target (Prerequisite aura spell required to be active on target)",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "26": {
           "name": "ExcludeCasterAuraSpell",
           "type": "uint32",
           "sql_column": "ExcludeCasterAuraSpell",
-          "notes": "Prevents cast if spell is active on caster",
-          "references": [
-            {
-              "type": "self",
-              "target": "SpellEntry",
-              "description": "Spell aura that must NOT be active on caster (prevents cast)"
-            }
-          ]
+          "notes": "Prevents cast if spell is active on caster (Spell aura that must NOT be active on caster (prevents cast))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "27": {
           "name": "ExcludeTargetAuraSpell",
           "type": "uint32",
           "sql_column": "ExcludeTargetAuraSpell",
-          "notes": "Prevents cast if spell is active on target",
-          "references": [
-            {
-              "type": "self",
-              "target": "SpellEntry",
-              "description": "Spell aura that must NOT be active on target (prevents cast)"
-            }
-          ]
+          "notes": "Prevents cast if spell is active on target (Spell aura that must NOT be active on target (prevents cast))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "28": {
           "name": "CastingTimeIndex",
           "type": "uint32",
           "sql_column": "CastingTimeIndex",
-          "notes": "Index into SpellCastTimes.dbc for base casting time",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellCastTimesEntry",
-              "description": "Lookup index for spell cast time calculations"
-            }
-          ]
+          "notes": "Index into SpellCastTimes.dbc for base casting time (Lookup index for spell cast time calculations)",
+          "references": "SpellCastTimesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "29": {
           "name": "RecoveryTime",
@@ -7814,14 +8019,10 @@
           "name": "EffectTriggerSpell[0]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "SpellEntry",
-              "description": "Spell that triggers from this effect (aura, proc, chain)"
-            }
-          ]
+          "notes": " (Spell that triggers from this effect (aura, proc, chain))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "116": {
           "name": "EffectTriggerSpell[0]",
@@ -8211,7 +8412,10 @@
           "name": "AreaGroupId",
           "type": "int32",
           "sql_column": "AreaGroupId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaGroupEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "225": {
           "name": "SchoolMask",
@@ -9217,7 +9421,10 @@
           "name": "Faction",
           "type": "uint32",
           "sql_column": "Faction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Type",
@@ -10057,7 +10264,10 @@
           "name": "areaId",
           "type": "uint32",
           "sql_column": "areaId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -10202,66 +10412,46 @@
           "name": "DifficultyEntry[0]",
           "type": "uint32",
           "sql_column": "DifficultyEntry1",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "CreatureTemplate",
-              "description": "Normal difficulty creature template entry ID"
-            }
-          ]
+          "notes": " (Normal difficulty creature template entry ID)",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "DifficultyEntry2": {
           "name": "DifficultyEntry[1]",
           "type": "uint32",
           "sql_column": "DifficultyEntry2",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "CreatureTemplate",
-              "description": "Heroic difficulty creature template entry ID"
-            }
-          ]
+          "notes": " (Heroic difficulty creature template entry ID)",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "DifficultyEntry3": {
           "name": "DifficultyEntry[2]",
           "type": "uint32",
           "sql_column": "DifficultyEntry3",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "CreatureTemplate",
-              "description": "LFR difficulty creature template entry ID"
-            }
-          ]
+          "notes": " (LFR difficulty creature template entry ID)",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "KillCredit1": {
           "name": "KillCredit[0]",
           "type": "uint32",
           "sql_column": "KillCredit1",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "CreatureTemplate",
-              "description": "Alternate creature entry credited on kill (for quest credit)"
-            }
-          ]
+          "notes": " (Alternate creature entry credited on kill (for quest credit))",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "KillCredit2": {
           "name": "KillCredit[1]",
           "type": "uint32",
           "sql_column": "KillCredit2",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "CreatureTemplate",
-              "description": "Second alternate creature entry credited on kill (for quest credit)"
-            }
-          ]
+          "notes": " (Second alternate creature entry credited on kill (for quest credit))",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "name": {
           "name": "Name",
@@ -10285,14 +10475,10 @@
           "name": "GossipMenuId",
           "type": "uint32",
           "sql_column": "gossip_menu_id",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "gossip_menu",
-              "description": "Gossip menu entry ID for NPC interaction options"
-            }
-          ]
+          "notes": " (Gossip menu entry ID for NPC interaction options)",
+          "references": "gossip_menu",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "minlevel": {
           "name": "minlevel",
@@ -10316,7 +10502,10 @@
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": ""
+          "notes": "",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "npcflag": {
           "name": "npcflag",
@@ -10442,40 +10631,28 @@
           "name": "lootid",
           "type": "uint32",
           "sql_column": "lootid",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "creature_loot_template",
-              "description": "Creature loot template ID for item drops"
-            }
-          ]
+          "notes": " (Creature loot template ID for item drops)",
+          "references": "creature_loot_template",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "pickpocketloot": {
           "name": "pickpocketLootId",
           "type": "uint32",
           "sql_column": "pickpocketloot",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "pickpocketing_loot_template",
-              "description": "Pickpocket loot template ID for thieves"
-            }
-          ]
+          "notes": " (Pickpocket loot template ID for thieves)",
+          "references": "pickpocketing_loot_template",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "skinloot": {
           "name": "SkinLootId",
           "type": "uint32",
           "sql_column": "skinloot",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "skinning_loot_template",
-              "description": "Skinning loot template ID"
-            }
-          ]
+          "notes": " (Skinning loot template ID)",
+          "references": "skinning_loot_template",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "resistance1..7": {
           "name": "resistance",
@@ -10487,40 +10664,28 @@
           "name": "spells",
           "type": "uint32[8]",
           "sql_column": "spell1..8",
-          "notes": "Loaded separately via LoadCreatureTemplateSpells()",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Creature's equipped spells (stored in creature_template_spell table)"
-            }
-          ]
+          "notes": "Loaded separately via LoadCreatureTemplateSpells() (Creature's equipped spells (stored in creature_template_spell table))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "PetSpellDataId": {
           "name": "PetSpellDataId",
           "type": "uint32",
           "sql_column": "PetSpellDataId",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "creature_template_spell",
-              "description": "Pet spell data template ID for summon pet spells"
-            }
-          ]
+          "notes": " (Pet spell data template ID for summon pet spells)",
+          "references": "creature_template_spell",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "VehicleId": {
           "name": "VehicleId",
           "type": "uint32",
           "sql_column": "VehicleId",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "VehicleEntry",
-              "description": "Vehicle data entry for mountable/rideable creatures"
-            }
-          ]
+          "notes": " (Vehicle data entry for mountable/rideable creatures)",
+          "references": "VehicleEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "mingold": {
           "name": "mingold",
@@ -10586,14 +10751,10 @@
           "name": "movementId",
           "type": "uint32",
           "sql_column": "movementId",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "creature_template_movement",
-              "description": "Movement template ID for creature pathing/flying configuration"
-            }
-          ]
+          "notes": " (Movement template ID for creature pathing/flying configuration)",
+          "references": "creature_template_movement",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "RegenHealth": {
           "name": "RegenHealth",
@@ -10980,7 +11141,10 @@
           "name": "emote",
           "type": "uint32",
           "sql_column": "emote",
-          "notes": ""
+          "notes": "",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "auras": {
           "name": "auras",
@@ -11085,7 +11249,10 @@
           "name": "item",
           "type": "uint32",
           "sql_column": "item",
-          "notes": ""
+          "notes": "",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "maxcount": {
           "name": "maxcount",
@@ -11134,14 +11301,10 @@
           "name": "displayId",
           "type": "uint32",
           "sql_column": "displayId",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "GameObjectDisplayInfoEntry",
-              "description": "Visual model for the game object"
-            }
-          ]
+          "notes": " (Visual model for the game object)",
+          "references": "GameObjectDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "name": {
           "name": "name",
@@ -11288,7 +11451,10 @@
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": ""
+          "notes": "",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "flags": {
           "name": "flags",
@@ -11419,13 +11585,19 @@
           "name": "ItemId",
           "type": "uint32",
           "sql_column": "entry",
-          "notes": "Primary key"
+          "notes": "Primary key",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "class": {
           "name": "Class",
           "type": "uint32",
           "sql_column": "class",
-          "notes": "enum ItemClass"
+          "notes": "enum ItemClass",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "subclass": {
           "name": "SubClass",
@@ -11521,14 +11693,10 @@
           "name": "RequiredSkill",
           "type": "uint32",
           "sql_column": "RequiredSkill",
-          "notes": "SkillLine.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SkillLineEntry",
-              "description": "Skill required for item usage"
-            }
-          ]
+          "notes": "SkillLine.dbc (Skill required for item usage)",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredSkillRank": {
           "name": "RequiredSkillRank",
@@ -11540,14 +11708,10 @@
           "name": "RequiredSpell",
           "type": "uint32",
           "sql_column": "RequiredSpell",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Spell required to equip/use"
-            }
-          ]
+          "notes": " (Spell required to equip/use)",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredHonorRank": {
           "name": "RequiredHonorRank",
@@ -11565,14 +11729,10 @@
           "name": "RequiredReputationFaction",
           "type": "uint32",
           "sql_column": "RequiredReputationFaction",
-          "notes": "Faction.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Faction reputation requirement"
-            }
-          ]
+          "notes": "Faction.dbc (Faction reputation requirement)",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredReputationRank": {
           "name": "RequiredReputationRank",
@@ -11608,14 +11768,10 @@
           "name": "ScalingStatDistribution",
           "type": "uint32",
           "sql_column": "ScalingStatDistribution",
-          "notes": "ScalingStatDistribution.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "ScalingStatDistributionEntry",
-              "description": "Stat scaling configuration"
-            }
-          ]
+          "notes": "ScalingStatDistribution.dbc (Stat scaling configuration)",
+          "references": "ScalingStatDistributionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "ScalingStatValue": {
           "name": "ScalingStatValue",
@@ -11693,14 +11849,10 @@
           "name": "Spells",
           "type": "_Spell[5]",
           "sql_column": "spellid_1..5",
-          "notes": "See sub-struct below",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Item equipped/use/cast spells"
-            }
-          ]
+          "notes": "See sub-struct below (Item equipped/use/cast spells)",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "bonding": {
           "name": "Bonding",
@@ -11718,14 +11870,10 @@
           "name": "PageText",
           "type": "uint32",
           "sql_column": "PageText",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "page_text",
-              "description": "Readable text content"
-            }
-          ]
+          "notes": " (Readable text content)",
+          "references": "page_text",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "LanguageID": {
           "name": "LanguageID",
@@ -11743,27 +11891,19 @@
           "name": "StartQuest",
           "type": "uint32",
           "sql_column": "startquest",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "Quest",
-              "description": "Quest ID started by using this item"
-            }
-          ]
+          "notes": " (Quest ID started by using this item)",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "LockID": {
           "name": "LockID",
           "type": "uint32",
           "sql_column": "LockID",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "LockEntry",
-              "description": "Lock requirement for containers/weapons"
-            }
-          ]
+          "notes": " (Lock requirement for containers/weapons)",
+          "references": "LockEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "Material": {
           "name": "Material",
@@ -11781,27 +11921,19 @@
           "name": "RandomProperty",
           "type": "int32",
           "sql_column": "RandomProperty",
-          "notes": "ItemRandomProperties.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "ItemRandomPropertiesEntry",
-              "description": "Enchantment suffix (+X) stats"
-            }
-          ]
+          "notes": "ItemRandomProperties.dbc (Enchantment suffix (+X) stats)",
+          "references": "ItemRandomPropertiesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RandomSuffix": {
           "name": "RandomSuffix",
           "type": "int32",
           "sql_column": "RandomSuffix",
-          "notes": "ItemRandomSuffix.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "ItemRandomSuffixEntry",
-              "description": "Set bonus suffix (+X set pieces)"
-            }
-          ]
+          "notes": "ItemRandomSuffix.dbc (Set bonus suffix (+X set pieces))",
+          "references": "ItemRandomSuffixEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "block": {
           "name": "Block",
@@ -11813,14 +11945,10 @@
           "name": "ItemSet",
           "type": "uint32",
           "sql_column": "itemset",
-          "notes": "ItemSet.dbc",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemSetNameEntry",
-              "description": "Equipment set for bonus effects"
-            }
-          ]
+          "notes": "ItemSet.dbc (Equipment set for bonus effects)",
+          "references": "ItemSetNameEntry",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "MaxDurability": {
           "name": "MaxDurability",
@@ -11832,27 +11960,19 @@
           "name": "Area",
           "type": "uint32",
           "sql_column": "area",
-          "notes": "AreaTable.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "AreaTableEntry",
-              "description": "Area requirement for item usage"
-            }
-          ]
+          "notes": "AreaTable.dbc (Area requirement for item usage)",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "map": {
           "name": "Map",
           "type": "uint32",
           "sql_column": "map",
-          "notes": "Map.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "MapEntry",
-              "description": "Required map/zone for usage"
-            }
-          ]
+          "notes": "Map.dbc (Required map/zone for usage)",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "BagFamily": {
           "name": "BagFamily",
@@ -11864,14 +11984,10 @@
           "name": "TotemCategory",
           "type": "uint32",
           "sql_column": "TotemCategory",
-          "notes": "TotemCategory.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "TotemCategoryEntry",
-              "description": "Totem category for shaman totems"
-            }
-          ]
+          "notes": "TotemCategory.dbc (Totem category for shaman totems)",
+          "references": "TotemCategoryEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "socketColor_1..3": {
           "name": "Socket",
@@ -11883,27 +11999,19 @@
           "name": "socketBonus",
           "type": "uint32",
           "sql_column": "socketBonus",
-          "notes": "SpellItemEnchantment.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellItemEnchantmentEntry",
-              "description": "Socket bonus enchantment when all sockets filled"
-            }
-          ]
+          "notes": "SpellItemEnchantment.dbc (Socket bonus enchantment when all sockets filled)",
+          "references": "SpellItemEnchantmentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "GemProperties": {
           "name": "GemProperties",
           "type": "uint32",
           "sql_column": "GemProperties",
-          "notes": "GemProperties.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "GemPropertiesEntry",
-              "description": "Prismatic socket gem restriction"
-            }
-          ]
+          "notes": "GemProperties.dbc (Prismatic socket gem restriction)",
+          "references": "GemPropertiesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredDisenchantSkill": {
           "name": "RequiredDisenchantSkill",
@@ -11927,27 +12035,19 @@
           "name": "ItemLimitCategory",
           "type": "uint32",
           "sql_column": "ItemLimitCategory",
-          "notes": "ItemLimitCategory.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "ItemLimitCategoryEntry",
-              "description": "Stack limit category for similar items"
-            }
-          ]
+          "notes": "ItemLimitCategory.dbc (Stack limit category for similar items)",
+          "references": "ItemLimitCategoryEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "HolidayId": {
           "name": "HolidayId",
           "type": "uint32",
           "sql_column": "HolidayId",
-          "notes": "Holidays.dbc",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "HolidaysEntry",
-              "description": "Holiday requirement for item usage"
-            }
-          ]
+          "notes": "Holidays.dbc (Holiday requirement for item usage)",
+          "references": "HolidaysEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "ScriptName": {
           "name": "ScriptId",
@@ -11959,14 +12059,10 @@
           "name": "DisenchantID",
           "type": "uint32",
           "sql_column": "DisenchantID",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "disenchant_loot_template",
-              "description": "Loot template for disenchantment"
-            }
-          ]
+          "notes": " (Loot template for disenchantment)",
+          "references": "disenchant_loot_template",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "FoodType": {
           "name": "FoodType",
@@ -12119,14 +12215,10 @@
           "name": "RequiredFactionId1",
           "type": "uint32",
           "sql_column": "RequiredFactionId1",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Faction required to accept quest (use with RequiredFactionValue1)"
-            }
-          ]
+          "notes": " (Faction required to accept quest (use with RequiredFactionValue1))",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredFactionValue1": {
           "name": "RequiredFactionValue1",
@@ -12138,14 +12230,10 @@
           "name": "RequiredFactionId2",
           "type": "uint32",
           "sql_column": "RequiredFactionId2",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Secondary faction required to accept quest (use with RequiredFactionValue2)"
-            }
-          ]
+          "notes": " (Secondary faction required to accept quest (use with RequiredFactionValue2))",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredFactionValue2": {
           "name": "RequiredFactionValue2",
@@ -12175,14 +12263,10 @@
           "name": "RewardTitleId",
           "type": "uint32",
           "sql_column": "RewardTitle",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "CharacterTitlesEntry",
-              "description": "Character title granted as quest reward"
-            }
-          ]
+          "notes": " (Character title granted as quest reward)",
+          "references": "CharacterTitlesEntry",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "RequiredPlayerKillCount": {
           "name": "RequiredPlayerKills",
@@ -12206,14 +12290,10 @@
           "name": "RewardNextQuest",
           "type": "uint32",
           "sql_column": "NextQuestInChain",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "Quest",
-              "description": "Next quest ID in chain (follow-up quest)"
-            }
-          ]
+          "notes": " (Next quest ID in chain (follow-up quest))",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "RewardXPDifficulty": {
           "name": "RewardXPDifficulty",
@@ -12225,14 +12305,10 @@
           "name": "StartItem",
           "type": "uint32",
           "sql_column": "SrcItemId",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemTemplate",
-              "description": "Item required to start quest (quest item)"
-            }
-          ]
+          "notes": " (Item required to start quest (quest item))",
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "LogTitle": {
           "name": "Title",
@@ -12304,27 +12380,19 @@
           "name": "RewardDisplaySpell",
           "type": "uint32",
           "sql_column": "RewardDisplaySpell",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Spell displayed on quest completion (visual effect)"
-            }
-          ]
+          "notes": " (Spell displayed on quest completion (visual effect))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RewardSpell": {
           "name": "RewardSpell",
           "type": "int32",
           "sql_column": "RewardSpell",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Spell granted as quest reward (can be negative for spell removal)"
-            }
-          ]
+          "notes": " (Spell granted as quest reward (can be negative for spell removal))",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "POIContinent": {
           "name": "POIContinent",
@@ -12372,14 +12440,10 @@
           "name": "RequiredItemId",
           "type": "uint32[6]",
           "sql_column": "RequiredItemId1..6",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemTemplate",
-              "description": "Items required to complete quest turn-in"
-            }
-          ]
+          "notes": " (Items required to complete quest turn-in)",
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "RequiredItemCount1..6": {
           "name": "RequiredItemCount",
@@ -12391,14 +12455,10 @@
           "name": "ItemDrop",
           "type": "uint32[4]",
           "sql_column": "ItemDrop1..4",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemTemplate",
-              "description": "Items rewarded automatically (non-choosable)"
-            }
-          ]
+          "notes": " (Items rewarded automatically (non-choosable))",
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "ItemDropQuantity1..4": {
           "name": "ItemDropQuantity",
@@ -12434,14 +12494,10 @@
           "name": "RewardChoiceItemId",
           "type": "uint32[6]",
           "sql_column": "RewardChoiceItemId1..6",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemTemplate",
-              "description": "Items player can choose as quest reward"
-            }
-          ]
+          "notes": " (Items player can choose as quest reward)",
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "RewardChoiceItemCount1..6": {
           "name": "RewardChoiceItemCount",
@@ -12453,14 +12509,10 @@
           "name": "RewardItemId",
           "type": "uint32[4]",
           "sql_column": "RewardItemId1..4",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "ItemTemplate",
-              "description": "Items rewarded automatically (guaranteed, non-choosable)"
-            }
-          ]
+          "notes": " (Items rewarded automatically (guaranteed, non-choosable))",
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "RewardItemIdCount1..4": {
           "name": "RewardItemIdCount",
@@ -12472,14 +12524,10 @@
           "name": "RewardFactionId",
           "type": "uint32[5]",
           "sql_column": "RewardFactionId1..5",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Factions that receive reputation on quest turn-in (use with RewardFactionValueId1..5)"
-            }
-          ]
+          "notes": " (Factions that receive reputation on quest turn-in (use with RewardFactionValueId1..5))",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RewardFactionValueId1..5": {
           "name": "RewardFactionValueId",
@@ -12509,40 +12557,28 @@
           "name": "SourceSpellid",
           "type": "uint32",
           "sql_column": "SourceSpellid",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SpellEntry",
-              "description": "Spell that generates this quest"
-            }
-          ]
+          "notes": " (Spell that generates this quest)",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "PrevQuestId": {
           "name": "PrevQuestId",
           "type": "int32",
           "sql_column": "PrevQuestId",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "Quest",
-              "description": "Previous quest ID in chain (prerequisite quest)"
-            }
-          ]
+          "notes": " (Previous quest ID in chain (prerequisite quest))",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "NextQuestId": {
           "name": "NextQuestId",
           "type": "uint32",
           "sql_column": "NextQuestId",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "Quest",
-              "description": "Next quest ID in chain (follow-up recommendation)"
-            }
-          ]
+          "notes": " (Next quest ID in chain (follow-up recommendation))",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "ExclusiveGroup": {
           "name": "ExclusiveGroup",
@@ -12554,14 +12590,10 @@
           "name": "BreadcrumbForQuestId",
           "type": "uint32",
           "sql_column": "BreadcrumbForQuestId",
-          "notes": "",
-          "references": [
-            {
-              "type": "self",
-              "target": "Quest",
-              "description": "Quest ID this object is a breadcrumb for (quest tracker arrow)"
-            }
-          ]
+          "notes": " (Quest ID this object is a breadcrumb for (quest tracker arrow))",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "RewardMailTemplateId": {
           "name": "RewardMailTemplateId",
@@ -12579,14 +12611,10 @@
           "name": "RequiredSkillId",
           "type": "uint32",
           "sql_column": "RequiredSkillId",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "SkillLineEntry",
-              "description": "Skill required to accept quest (use with RequiredSkillPoints)"
-            }
-          ]
+          "notes": " (Skill required to accept quest (use with RequiredSkillPoints))",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredSkillPoints": {
           "name": "RequiredSkillPoints",
@@ -12598,14 +12626,10 @@
           "name": "RequiredMinRepFaction",
           "type": "uint32",
           "sql_column": "RequiredMinRepFaction",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Minimum reputation faction required (use with RequiredMinRepValue)"
-            }
-          ]
+          "notes": " (Minimum reputation faction required (use with RequiredMinRepValue))",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredMinRepValue": {
           "name": "RequiredMinRepValue",
@@ -12617,14 +12641,10 @@
           "name": "RequiredMaxRepFaction",
           "type": "uint32",
           "sql_column": "RequiredMaxRepFaction",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Maximum reputation faction required (use with RequiredMaxRepValue)"
-            }
-          ]
+          "notes": " (Maximum reputation faction required (use with RequiredMaxRepValue))",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "RequiredMaxRepValue": {
           "name": "RequiredMaxRepValue",
@@ -12642,14 +12662,10 @@
           "name": "RewardMailSenderEntry",
           "type": "uint32",
           "sql_column": "RewardMailSenderEntry",
-          "notes": "",
-          "references": [
-            {
-              "type": "sql_table",
-              "target": "npc_text",
-              "description": "NPC text entry for mail sender name and subject"
-            }
-          ]
+          "notes": " (NPC text entry for mail sender name and subject)",
+          "references": "npc_text",
+          "reference_type": "unknown",
+          "reference_column": "ID"
         },
         "SpecialFlags": {
           "name": "SpecialFlags",
@@ -13741,7 +13757,10 @@
           "name": "map",
           "type": "uint32",
           "sql_column": "map",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "x": {
           "name": "x",
@@ -14053,14 +14072,10 @@
           "name": "faction",
           "type": "uint32",
           "sql_column": "faction",
-          "notes": "",
-          "references": [
-            {
-              "type": "dbc",
-              "target": "FactionEntry",
-              "description": "Faction template for creature hostility/interaction behavior"
-            }
-          ]
+          "notes": " (Faction template for creature hostility/interaction behavior)",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "quest_rate": {
           "name": "questRate",
@@ -14315,13 +14330,19 @@
           "name": "",
           "type": "uint32",
           "sql_column": "mapId",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "areaId": {
           "name": "",
           "type": "uint32",
           "sql_column": "areaId",
-          "notes": ""
+          "notes": "",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "positionX/Y/Z": {
           "name": "",
@@ -14351,7 +14372,10 @@
           "name": "From playercreateinfo_item",
           "type": "PlayerCreateInfoItems",
           "sql_column": "item",
-          "notes": ""
+          "notes": "",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "customSpells": {
           "name": "From playercreateinfo_spell_custom",
@@ -14642,7 +14666,10 @@
           "name": "mapId",
           "type": "uint32",
           "sql_column": "map",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "name": {
           "name": "name",
@@ -14924,7 +14951,10 @@
           "name": "uint32",
           "type": "map value",
           "sql_column": "faction",
-          "notes": "Faction bitmask"
+          "notes": "Faction bitmask",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "name": {
           "name": "",
@@ -15147,7 +15177,10 @@
           "name": "uint32",
           "type": "vector element",
           "sql_column": "ItemId",
-          "notes": "Item entry"
+          "notes": "Item entry",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "Idx": {
           "name": "uint32",
@@ -15184,7 +15217,10 @@
           "name": "uint32",
           "type": "vector element",
           "sql_column": "ItemId",
-          "notes": "Item entry"
+          "notes": "Item entry",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "Idx": {
           "name": "uint32",
@@ -15691,7 +15727,10 @@
         "2": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "effectMask",
@@ -15774,13 +15813,19 @@
           "name": "spellId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "areaId": {
           "name": "areaId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "area"
+          "sql_column": "area",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "questStart": {
           "name": "questStart",
@@ -16364,7 +16409,10 @@
           "name": "Item",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "MaxCount": {
           "name": "MaxCount",
@@ -16635,7 +16683,10 @@
         "BattlemasterEntry": {
           "name": "BattlemasterEntry",
           "type": "`BattlemasterListEntry const*`",
-          "notes": ""
+          "notes": "",
+          "references": "BattlemasterListEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -16774,7 +16825,10 @@
           "name": "emote",
           "type": "`Emote`",
           "notes": "",
-          "sql_column": "Emote"
+          "sql_column": "Emote",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "duration": {
           "name": "duration",
@@ -17038,7 +17092,10 @@
           "name": "uint16",
           "type": "_mapId",
           "sql_column": "mapId",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "posX": {
           "name": "float",
@@ -17259,7 +17316,10 @@
           "name": "uint32",
           "type": "m_mapid",
           "sql_column": "map",
-          "notes": "Map ID"
+          "notes": "Map ID",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "resettime": {
           "name": "time_t",
@@ -17790,7 +17850,10 @@
           "name": "int32",
           "type": "_dungeonId",
           "sql_column": "dungeon",
-          "notes": ""
+          "notes": "",
+          "references": "DungeonEncounter",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "eventtime": {
           "name": "time_t",
@@ -18253,7 +18316,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -18357,7 +18423,10 @@
         "5": {
           "name": "emote",
           "type": "int32",
-          "sql_column": "emote"
+          "sql_column": "emote",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "visibilityDistanceType",
@@ -18557,7 +18626,10 @@
         "2": {
           "name": "Spell",
           "type": "int32",
-          "sql_column": "Spell"
+          "sql_column": "Spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "VerifiedBuild",
@@ -18584,7 +18656,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -18661,7 +18736,10 @@
         "4": {
           "name": "faction",
           "type": "int8",
-          "sql_column": "faction"
+          "sql_column": "faction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "priority",
@@ -18760,7 +18838,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19089,7 +19170,10 @@
         "1": {
           "name": "Map",
           "type": "int32",
-          "sql_column": "Map"
+          "sql_column": "Map",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "x",
@@ -19131,7 +19215,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19316,7 +19403,10 @@
         "2": {
           "name": "Faction",
           "type": "int32",
-          "sql_column": "Faction"
+          "sql_column": "Faction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Comment",
@@ -19375,7 +19465,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19501,7 +19594,10 @@
         "0": {
           "name": "dungeonId",
           "type": "int32",
-          "sql_column": "dungeonId"
+          "sql_column": "dungeonId",
+          "references": "DungeonEncounter",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "1": {
           "name": "name",
@@ -19553,7 +19649,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19615,7 +19714,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19927,7 +20029,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -19984,7 +20089,10 @@
         "0": {
           "name": "Class",
           "type": "int8",
-          "sql_column": "Class"
+          "sql_column": "Class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "Level",
@@ -20228,7 +20336,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -20285,7 +20396,10 @@
         "0": {
           "name": "Race",
           "type": "int8",
-          "sql_column": "Race"
+          "sql_column": "Race",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "Strength",
@@ -20337,7 +20451,10 @@
         "2": {
           "name": "race",
           "type": "int32",
-          "sql_column": "race"
+          "sql_column": "race",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "minl",
@@ -20364,12 +20481,18 @@
         "0": {
           "name": "race",
           "type": "int8",
-          "sql_column": "race"
+          "sql_column": "race",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "class",
           "type": "int8",
-          "sql_column": "class"
+          "sql_column": "class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "button",
@@ -20411,7 +20534,10 @@
         "2": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "note",
@@ -20433,12 +20559,18 @@
         "0": {
           "name": "race",
           "type": "int8",
-          "sql_column": "race"
+          "sql_column": "race",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "class",
           "type": "int8",
-          "sql_column": "class"
+          "sql_column": "class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "itemid",
@@ -20480,7 +20612,10 @@
         "2": {
           "name": "skill",
           "type": "int32",
-          "sql_column": "skill"
+          "sql_column": "skill",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "rank",
@@ -20517,7 +20652,10 @@
         "2": {
           "name": "Spell",
           "type": "int32",
-          "sql_column": "Spell"
+          "sql_column": "Spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Note",
@@ -20699,7 +20837,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -21266,7 +21407,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -21370,7 +21514,10 @@
         "0": {
           "name": "spellId",
           "type": "int32",
-          "sql_column": "spellId"
+          "sql_column": "spellId",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "reqSpell",
@@ -21402,7 +21549,10 @@
         "0": {
           "name": "spellId",
           "type": "int32",
-          "sql_column": "spellId"
+          "sql_column": "spellId",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "requiredSpecialization",
@@ -21439,7 +21589,10 @@
         "1": {
           "name": "skill",
           "type": "int32",
-          "sql_column": "skill"
+          "sql_column": "skill",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -21456,7 +21609,10 @@
         "0": {
           "name": "spellId",
           "type": "int32",
-          "sql_column": "spellId"
+          "sql_column": "spellId",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "requiredSpecialization",
@@ -21493,7 +21649,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -21680,7 +21839,10 @@
         "1": {
           "name": "Item",
           "type": "int32",
-          "sql_column": "Item"
+          "sql_column": "Item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Reference",
@@ -21759,7 +21921,10 @@
         "0": {
           "name": "SpellId",
           "type": "int32",
-          "sql_column": "SpellId"
+          "sql_column": "SpellId",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "SchoolMask",
@@ -21974,7 +22139,10 @@
         "1": {
           "name": "SpellId",
           "type": "int32",
-          "sql_column": "SpellId"
+          "sql_column": "SpellId",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "MoneyCost",
@@ -22661,7 +22829,10 @@
         "1": {
           "name": "achievement",
           "type": "int32",
-          "sql_column": "achievement"
+          "sql_column": "achievement",
+          "references": "AchievementEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "date",
@@ -22725,7 +22896,10 @@
         "1": {
           "name": "criteria",
           "type": "int32",
-          "sql_column": "criteria"
+          "sql_column": "criteria",
+          "references": "AchievementCriteriaEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "counter",
@@ -22836,7 +23010,10 @@
         "3": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "effectMask",
@@ -23319,7 +23496,10 @@
         "1": {
           "name": "mapId",
           "type": "int32",
-          "sql_column": "mapId"
+          "sql_column": "mapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "zoneId",
@@ -23371,7 +23551,10 @@
         "3": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -23754,7 +23937,10 @@
         "1": {
           "name": "faction",
           "type": "int32",
-          "sql_column": "faction"
+          "sql_column": "faction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "standing",
@@ -23813,7 +23999,10 @@
         "1": {
           "name": "skill",
           "type": "int32",
-          "sql_column": "skill"
+          "sql_column": "skill",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "value",
@@ -23877,7 +24066,10 @@
         "1": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "specMask",
@@ -23904,7 +24096,10 @@
         "1": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "category",
@@ -23914,7 +24109,10 @@
         "3": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "time",
@@ -24113,7 +24311,10 @@
         "1": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "specMask",
@@ -24150,12 +24351,18 @@
         "3": {
           "name": "race",
           "type": "int8",
-          "sql_column": "race"
+          "sql_column": "race",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "class",
           "type": "int8",
-          "sql_column": "class"
+          "sql_column": "class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "gender",
@@ -24235,7 +24442,10 @@
         "20": {
           "name": "map",
           "type": "int32",
-          "sql_column": "map"
+          "sql_column": "map",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "21": {
           "name": "instance_id",
@@ -24572,7 +24782,10 @@
         "5": {
           "name": "mapId",
           "type": "int32",
-          "sql_column": "mapId"
+          "sql_column": "mapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "phaseMask",
@@ -24582,7 +24795,10 @@
         "7": {
           "name": "displayId",
           "type": "int32",
-          "sql_column": "displayId"
+          "sql_column": "displayId",
+          "references": "ItemDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "itemCache",
@@ -24654,7 +24870,10 @@
         "2": {
           "name": "mapId",
           "type": "int32",
-          "sql_column": "mapId"
+          "sql_column": "mapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "instanceId",
@@ -24740,7 +24959,10 @@
         "2": {
           "name": "mapId",
           "type": "int32",
-          "sql_column": "mapId"
+          "sql_column": "mapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "instanceId",
@@ -25204,7 +25426,10 @@
         "1": {
           "name": "itemEntry",
           "type": "int32",
-          "sql_column": "itemEntry"
+          "sql_column": "itemEntry",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "owner_guid",
@@ -25427,7 +25652,10 @@
         "3": {
           "name": "mapId",
           "type": "int32",
-          "sql_column": "mapId"
+          "sql_column": "mapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "posX",
@@ -25613,7 +25841,10 @@
         "1": {
           "name": "map",
           "type": "int32",
-          "sql_column": "map"
+          "sql_column": "map",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "difficulty",
@@ -25932,12 +26163,18 @@
         "2": {
           "name": "faction",
           "type": "enum",
-          "sql_column": "faction"
+          "sql_column": "faction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "itemCount",
@@ -25964,7 +26201,10 @@
         "1": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "active",
@@ -25991,7 +26231,10 @@
         "1": {
           "name": "spell",
           "type": "int32",
-          "sql_column": "spell"
+          "sql_column": "spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "category",
@@ -26314,7 +26557,10 @@
         "2": {
           "name": "ItemEntry",
           "type": "int32",
-          "sql_column": "ItemEntry"
+          "sql_column": "ItemEntry",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Count",
@@ -27546,7 +27792,10 @@
         "0": {
           "name": "class",
           "type": "int8",
-          "sql_column": "class"
+          "sql_column": "class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "spec",
@@ -27608,7 +27857,10 @@
         "5": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -27707,7 +27959,10 @@
         "6": {
           "name": "faction",
           "type": "int64",
-          "sql_column": "faction"
+          "sql_column": "faction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "factionRepRank",
@@ -27983,7 +28238,10 @@
         "1": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "rarity",
@@ -28020,7 +28278,10 @@
         "3": {
           "name": "item",
           "type": "int32",
-          "sql_column": "item"
+          "sql_column": "item",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -28336,7 +28597,10 @@
         "2": {
           "name": "class",
           "type": "int8",
-          "sql_column": "class"
+          "sql_column": "class",
+          "references": "ChrClassesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -28447,7 +28711,10 @@
           "name": "spell",
           "type": "uint32",
           "sql_column": "spell",
-          "notes": "Spell ID"
+          "notes": "Spell ID",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "effectMask",
