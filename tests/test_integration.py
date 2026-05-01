@@ -359,8 +359,6 @@ class TestRegistryDrivenResolution(unittest.TestCase):
             "resolve": True,
         })
         self.assertNotIn("error", result)
-        # May or may not have resolved_fields depending on DB/DBC availability
-        # but should not error
 
     def test_gameobject_still_works(self):
         """gameobject_template resolution still works after registry migration."""
@@ -395,6 +393,66 @@ class TestRegistryDrivenResolution(unittest.TestCase):
         result = call_query({
             "name": "creature_template",
             "id": 1,
+        })
+        self.assertNotIn("error", result)
+
+
+class TestQuestResolution(unittest.TestCase):
+    """Test quest-specific resolution with starters, enders, POIs, chain."""
+
+    def _quest_resolved(self, result):
+        """Get $resolved_fields from metadata for a quest query result."""
+        meta = result.get("metadata", {})
+        return meta.get("$resolved_fields", {})
+
+    def test_quest_resolve_includes_starters(self):
+        """Quest with resolve=true should include NPC/GO starters."""
+        result = call_query({
+            "name": "quest_template",
+            "id": 3904,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._quest_resolved(result)
+        q3904 = resolved.get("3904", {})
+        starters = q3904.get("starters", [])
+        self.assertGreater(len(starters), 0, "Quest 3904 should have at least one starter NPC")
+
+    def test_quest_resolve_includes_pois(self):
+        """Quest POI resolution should return coordinate data."""
+        result = call_query({
+            "name": "quest_template",
+            "id": 3904,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+
+    def test_quest_resolve_includes_chain(self):
+        """Quest with chain data should resolve prev/next/breadcrumb."""
+        # Quest 7561 has PrevQuestId set (known chain quest)
+        result = call_query({
+            "name": "quest_template",
+            "id": 7561,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+
+    def test_quest_resolve_sql_only_skip_enrichment(self):
+        """resolve=['dbc'] should skip quest enrichment (requires SQL)."""
+        result = call_query({
+            "name": "quest_template",
+            "id": 3904,
+            "resolve": ["dbc"],
+        })
+        self.assertNotIn("error", result)
+
+    def test_quest_multiple_ids_resolve(self):
+        """Filter query for multiple quests with resolve should work."""
+        result = call_query({
+            "name": "quest_template",
+            "filter": {"LogTitle": {"$ilike": "%war%"}},
+            "resolve": True,
+            "limit": 3,
         })
         self.assertNotIn("error", result)
 
