@@ -175,7 +175,25 @@
           "sql_column": "refAchievement",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "AchievementCriteriaEntry",
+          "field": "referredAchievement"
+        },
+        {
+          "source": "ArenaSeasonRewardGroup",
+          "field": "criteria_type"
+        },
+        {
+          "source": "CharacterAchievement",
+          "field": "achievement"
+        },
+        {
+          "source": "PlayerFactionchangeAchievement",
+          "field": "alliance_id, horde_id"
+        }
+      ]
     },
     "AchievementCategoryEntry": {
       "category": "dbc_backed",
@@ -209,7 +227,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "AchievementEntry",
+          "field": "categoryId"
+        }
+      ]
     },
     "AchievementCriteriaEntry": {
       "category": "dbc_backed",
@@ -310,7 +334,17 @@
           "sql_column": "showOrder",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "AchievementCriteriaData",
+          "field": "ScriptId"
+        },
+        {
+          "source": "CharacterAchievementProgress",
+          "field": "criteria"
+        }
+      ]
     },
     "AreaTableEntry": {
       "category": "dbc_backed",
@@ -489,7 +523,37 @@
           "sql_column": "LiquidTypeOverride",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "AreaGroupEntry",
+          "field": "AreaId[0..5]"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "Area"
+        },
+        {
+          "source": "PlayerInfo",
+          "field": ""
+        },
+        {
+          "source": "SpellArea",
+          "field": "areaId"
+        },
+        {
+          "source": "WMOAreaTableEntry",
+          "field": "areaId"
+        },
+        {
+          "source": "WorldMapAreaEntry",
+          "field": "area_id"
+        },
+        {
+          "source": "WorldMapOverlayEntry",
+          "field": "areatableID[0..3]"
+        }
+      ]
     },
     "AreaGroupEntry": {
       "category": "dbc_backed",
@@ -569,7 +633,13 @@
           "sql_column": "nextGroup",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "AreaGroupId"
+        }
+      ]
     },
     "AreaPOIEntry": {
       "category": "dbc_backed",
@@ -735,7 +805,13 @@
           "sql_column": "cutPercent",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "AuctionEntry",
+          "field": "AuctionHouseId"
+        }
+      ]
     },
     "BankBagSlotPricesEntry": {
       "category": "dbc_backed",
@@ -1016,7 +1092,17 @@
           "sql_column": "HolidayWorldStateId",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "BattlegroundTemplate",
+          "field": "BattlemasterEntry"
+        },
+        {
+          "source": "BattlemasterEntry",
+          "field": "bg_template"
+        }
+      ]
     },
     "CharStartOutfitEntry": {
       "category": "dbc_backed",
@@ -1573,7 +1659,17 @@
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
-      "is_leaf": true
+      "is_leaf": true,
+      "referenced_by": [
+        {
+          "source": "PlayerFactionchangeTitles",
+          "field": "alliance_id, horde_id"
+        },
+        {
+          "source": "Quest",
+          "field": "RewardTitleId"
+        }
+      ]
     },
     "ChatChannelsEntry": {
       "category": "dbc_backed",
@@ -1699,7 +1795,13 @@
           "notes": "Localized"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "ChatChannelsEntry",
+          "field": "ChannelID"
+        }
+      ]
     },
     "ChrClassesEntry": {
       "category": "dbc_backed",
@@ -1747,7 +1849,41 @@
           "notes": "-"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "CharStartOutfitEntry",
+          "field": "Class"
+        },
+        {
+          "source": "Characters",
+          "field": "class"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "Class"
+        },
+        {
+          "source": "PlayerClassStats",
+          "field": "Class"
+        },
+        {
+          "source": "PlayerbotsEnchants",
+          "field": "class"
+        },
+        {
+          "source": "PlayerbotsWeightscales",
+          "field": "class"
+        },
+        {
+          "source": "PlayercreateinfoAction",
+          "field": "class"
+        },
+        {
+          "source": "PlayercreateinfoItem",
+          "field": "class"
+        }
+      ]
     },
     "ChrRacesEntry": {
       "category": "dbc_backed",
@@ -1818,7 +1954,49 @@
           "sql_column": "expansion",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "BarberShopStyleEntry",
+          "field": "race"
+        },
+        {
+          "source": "CharSectionsEntry",
+          "field": "Race"
+        },
+        {
+          "source": "CharStartOutfitEntry",
+          "field": "Race"
+        },
+        {
+          "source": "Characters",
+          "field": "race"
+        },
+        {
+          "source": "CreatureDisplayInfoExtraEntry",
+          "field": "DisplayRaceID"
+        },
+        {
+          "source": "EmotesTextSoundEntry",
+          "field": "RaceId"
+        },
+        {
+          "source": "PlayerRaceStats",
+          "field": "Race"
+        },
+        {
+          "source": "PlayerbotsRpgRaces",
+          "field": "race"
+        },
+        {
+          "source": "PlayercreateinfoAction",
+          "field": "race"
+        },
+        {
+          "source": "PlayercreateinfoItem",
+          "field": "race"
+        }
+      ]
     },
     "CinematicCameraEntry": {
       "category": "dbc_backed",
@@ -2227,7 +2405,17 @@
           "sql_column": "MissileCollisionRaise",
           "notes": "Skipped in struct"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "CreatureDisplayInfoEntry",
+          "field": "ModelId"
+        },
+        {
+          "source": "CreatureModelInfo",
+          "field": "modelid_other_gender"
+        }
+      ]
     },
     "CreatureSpellDataEntry": {
       "category": "dbc_backed",
@@ -2311,7 +2499,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellShapeshiftFormEntry",
+          "field": "creatureType"
+        }
+      ]
     },
     "CurrencyTypesEntry": {
       "category": "dbc_backed",
@@ -2871,7 +3065,21 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "CreatureAddon",
+          "field": "emote"
+        },
+        {
+          "source": "CreatureTemplateAddon",
+          "field": "emote"
+        },
+        {
+          "source": "CreatureTextEntry",
+          "field": "emote"
+        }
+      ]
     },
     "EmotesTextEntry": {
       "category": "dbc_backed",
@@ -3087,6 +3295,54 @@
         {
           "source": "Quest",
           "field": "RequiredMinRepFaction, RequiredMaxRepFaction"
+        },
+        {
+          "source": "AuctionHouseEntry",
+          "field": "faction"
+        },
+        {
+          "source": "CharacterReputation",
+          "field": "faction"
+        },
+        {
+          "source": "DungeonAccessRequirements",
+          "field": "faction"
+        },
+        {
+          "source": "FactionEntry",
+          "field": "team"
+        },
+        {
+          "source": "FactionTemplateEntry",
+          "field": "faction"
+        },
+        {
+          "source": "GameObjectTemplateAddon",
+          "field": "faction"
+        },
+        {
+          "source": "GraveyardZone",
+          "field": "Faction"
+        },
+        {
+          "source": "MailServerTemplateItems",
+          "field": "faction"
+        },
+        {
+          "source": "PlayerbotsItemInfoCache",
+          "field": "faction"
+        },
+        {
+          "source": "RepRewardRate",
+          "field": "faction"
+        },
+        {
+          "source": "SummonPropertiesEntry",
+          "field": "Faction"
+        },
+        {
+          "source": "TavernAreaTrigger",
+          "field": "uint32"
         }
       ],
       "fields": {
@@ -3326,7 +3582,17 @@
           "sql_column": "friendFaction",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "ChrRacesEntry",
+          "field": "FactionID"
+        },
+        {
+          "source": "PlayerFactionchangeReputations",
+          "field": "alliance_id, horde_id"
+        }
+      ]
     },
     "GameObjectArtKitEntry": {
       "category": "dbc_backed",
@@ -3378,7 +3644,13 @@
           "notes": "-"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "GameObjectTemplate",
+          "field": "displayId"
+        }
+      ]
     },
     "GemPropertiesEntry": {
       "category": "dbc_backed",
@@ -3424,7 +3696,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "GemProperties"
+        }
+      ]
     },
     "GlyphPropertiesEntry": {
       "category": "dbc_backed",
@@ -4135,7 +4413,17 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "HolidayDates",
+          "field": "holiday_duration"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "HolidayId"
+        }
+      ]
     },
     "ItemEntry": {
       "category": "dbc_backed",
@@ -4200,7 +4488,133 @@
           "sql_column": "SheatheType",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "CharStartOutfitEntry",
+          "field": "ItemId[0..23]"
+        },
+        {
+          "source": "CharacterInventory",
+          "field": "item"
+        },
+        {
+          "source": "CharacterSpellCooldown",
+          "field": "item"
+        },
+        {
+          "source": "CreatureLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "CreatureQuestItem",
+          "field": "uint32"
+        },
+        {
+          "source": "CurrencyTypesEntry",
+          "field": "ItemId"
+        },
+        {
+          "source": "DisenchantLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "EquipmentInfo",
+          "field": "ItemEntry[0]"
+        },
+        {
+          "source": "FishingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "GameObjectQuestItem",
+          "field": "uint32"
+        },
+        {
+          "source": "GameobjectLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "ItemInstance",
+          "field": "itemEntry"
+        },
+        {
+          "source": "ItemLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "ItemSetEntry",
+          "field": "itemId[0..9]"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "ItemId"
+        },
+        {
+          "source": "MailLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "MailServerTemplateItems",
+          "field": "item"
+        },
+        {
+          "source": "MillingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "NPCVendorEntry",
+          "field": "Item"
+        },
+        {
+          "source": "PickpocketingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "PlayerInfo",
+          "field": "From playercreateinfo_item"
+        },
+        {
+          "source": "PlayerLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "PlayerbotsEquipCache",
+          "field": "item"
+        },
+        {
+          "source": "PlayerbotsRarityCache",
+          "field": "item"
+        },
+        {
+          "source": "PlayerbotsRnditemCache",
+          "field": "item"
+        },
+        {
+          "source": "ProspectingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "RecoveryItem",
+          "field": "ItemEntry"
+        },
+        {
+          "source": "ReferenceLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "SkinningLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "SpellLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "VendorItem",
+          "field": "item"
+        }
+      ]
     },
     "ItemBagFamilyEntry": {
       "category": "dbc_backed",
@@ -4250,7 +4664,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "Corpse",
+          "field": "displayId"
+        }
+      ]
     },
     "ItemExtendedCostEntry": {
       "category": "dbc_backed",
@@ -4390,7 +4810,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "ItemLimitCategory"
+        }
+      ]
     },
     "ItemRandomPropertiesEntry": {
       "category": "dbc_backed",
@@ -4538,7 +4964,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "RandomProperty"
+        }
+      ]
     },
     "ItemRandomSuffixEntry": {
       "category": "dbc_backed",
@@ -4716,7 +5148,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "RandomSuffix"
+        }
+      ]
     },
     "ItemSetEntry": {
       "category": "dbc_backed",
@@ -5905,7 +6343,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "Mail",
+          "field": "mailTemplateId"
+        }
+      ]
     },
     "MapEntry": {
       "category": "dbc_backed",
@@ -6078,7 +6522,149 @@
           "sql_column": "maxPlayers",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "AreaPOIEntry",
+          "field": "mapId"
+        },
+        {
+          "source": "AreaTableEntry",
+          "field": "mapid"
+        },
+        {
+          "source": "AreaTrigger",
+          "field": "map"
+        },
+        {
+          "source": "AreaTriggerTeleport",
+          "field": "target_mapId"
+        },
+        {
+          "source": "BattlemasterListEntry",
+          "field": "mapid[0..7]"
+        },
+        {
+          "source": "CharacterEntryPoint",
+          "field": "joinMapId"
+        },
+        {
+          "source": "CharacterHomebind",
+          "field": "mapId"
+        },
+        {
+          "source": "Characters",
+          "field": "map"
+        },
+        {
+          "source": "Corpse",
+          "field": "mapId"
+        },
+        {
+          "source": "CreatureData",
+          "field": "mapid"
+        },
+        {
+          "source": "CreatureRespawn",
+          "field": "mapId"
+        },
+        {
+          "source": "DungeonEncounter",
+          "field": "EncounterCreditType"
+        },
+        {
+          "source": "DungeonEncounterEntry",
+          "field": "mapId"
+        },
+        {
+          "source": "GameGraveyard",
+          "field": "Map"
+        },
+        {
+          "source": "GameTele",
+          "field": "mapId"
+        },
+        {
+          "source": "GameobjectRespawn",
+          "field": "mapId"
+        },
+        {
+          "source": "GmTicket",
+          "field": "uint16"
+        },
+        {
+          "source": "InstanceSave",
+          "field": "uint32"
+        },
+        {
+          "source": "InstanceTemplate",
+          "field": "Parent"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "Map"
+        },
+        {
+          "source": "LFGDungeonEntry",
+          "field": "MapID"
+        },
+        {
+          "source": "LagReports",
+          "field": "mapId"
+        },
+        {
+          "source": "LightEntry",
+          "field": "MapId"
+        },
+        {
+          "source": "LogEncounter",
+          "field": "map"
+        },
+        {
+          "source": "MapDifficultyEntry",
+          "field": "MapId"
+        },
+        {
+          "source": "MapEntry",
+          "field": "entrance_map"
+        },
+        {
+          "source": "PlayerInfo",
+          "field": ""
+        },
+        {
+          "source": "PlayerbotsTeleCache",
+          "field": "map_id"
+        },
+        {
+          "source": "PlayerbotsTravelnode",
+          "field": "map_id"
+        },
+        {
+          "source": "PlayerbotsTravelnodePath",
+          "field": "map_id"
+        },
+        {
+          "source": "PvPDifficultyEntry",
+          "field": "mapId"
+        },
+        {
+          "source": "SpellTargetPosition",
+          "field": "target_mapId"
+        },
+        {
+          "source": "TaxiNodesEntry",
+          "field": "map_id"
+        },
+        {
+          "source": "TaxiPathNodeEntry",
+          "field": "mapid"
+        },
+        {
+          "source": "WorldMapAreaEntry",
+          "field": "map_id, virtual_map_id"
+        }
+      ]
     },
     "MapDifficultyEntry": {
       "category": "dbc_backed",
@@ -6918,7 +7504,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "ScalingStatDistribution"
+        }
+      ]
     },
     "ScalingStatValuesEntry": {
       "category": "dbc_backed",
@@ -7172,7 +7764,37 @@
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
-      "is_leaf": true
+      "is_leaf": true,
+      "referenced_by": [
+        {
+          "source": "CharacterSkills",
+          "field": "skill"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "RequiredSkill"
+        },
+        {
+          "source": "LockEntry",
+          "field": "Skill[0..7]"
+        },
+        {
+          "source": "PlayercreateinfoSkills",
+          "field": "skill"
+        },
+        {
+          "source": "Quest",
+          "field": "RequiredSkillId"
+        },
+        {
+          "source": "SkillFishingBaseLevel",
+          "field": "skill"
+        },
+        {
+          "source": "SkillRaceClassInfoEntry",
+          "field": "SkillID, SkillTierID"
+        }
+      ]
     },
     "SkillLineAbilityEntry": {
       "category": "dbc_backed",
@@ -7439,7 +8061,33 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "BroadcastText",
+          "field": "SoundEntriesId"
+        },
+        {
+          "source": "CinematicCameraEntry",
+          "field": "SoundID"
+        },
+        {
+          "source": "CreatureModelDataEntry",
+          "field": "SoundID"
+        },
+        {
+          "source": "ItemEntry",
+          "field": "SoundOverrideSubclassID"
+        },
+        {
+          "source": "LiquidTypeEntry",
+          "field": "SoundId"
+        },
+        {
+          "source": "SpellVisualEntry",
+          "field": "AnimEventSoundID"
+        }
+      ]
     },
     "SpellEntry": {
       "category": "dbc_backed",
@@ -7481,6 +8129,150 @@
         {
           "source": "SpellEntry",
           "field": "EffectTriggerSpell[0..2]"
+        },
+        {
+          "source": "CharacterAura",
+          "field": "spell"
+        },
+        {
+          "source": "CharacterSpell",
+          "field": "spell"
+        },
+        {
+          "source": "CharacterSpellCooldown",
+          "field": "spell"
+        },
+        {
+          "source": "CharacterTalent",
+          "field": "spell"
+        },
+        {
+          "source": "ChrClassesEntry",
+          "field": "spellfamily"
+        },
+        {
+          "source": "CreatureSpellDataEntry",
+          "field": "spellId[0..3]"
+        },
+        {
+          "source": "CreatureTemplateSpell",
+          "field": "Spell"
+        },
+        {
+          "source": "GlyphPropertiesEntry",
+          "field": "SpellId"
+        },
+        {
+          "source": "LiquidTypeEntry",
+          "field": "SpellId"
+        },
+        {
+          "source": "NpcTrainer",
+          "field": "SpellID"
+        },
+        {
+          "source": "OverrideSpellDataEntry",
+          "field": "spellId[0..9]"
+        },
+        {
+          "source": "PetAura",
+          "field": "spell"
+        },
+        {
+          "source": "PetAuraCharacter",
+          "field": "spell"
+        },
+        {
+          "source": "PetSpell",
+          "field": "spell"
+        },
+        {
+          "source": "PetSpellCooldown",
+          "field": "spell"
+        },
+        {
+          "source": "PlayerFactionchangeSpells",
+          "field": "alliance_id, horde_id"
+        },
+        {
+          "source": "PlayerbotsPreferredMounts",
+          "field": "spellid"
+        },
+        {
+          "source": "PlayercreateinfoCastSpell",
+          "field": "spell"
+        },
+        {
+          "source": "PlayercreateinfoSpellCustom",
+          "field": "Spell"
+        },
+        {
+          "source": "QuestTemplateAddon",
+          "field": "SourceSpellID"
+        },
+        {
+          "source": "SkillDiscoveryTemplate",
+          "field": "spellId"
+        },
+        {
+          "source": "SkillExtraItemTemplate",
+          "field": "spellId"
+        },
+        {
+          "source": "SkillLineAbilityEntry",
+          "field": "Spell"
+        },
+        {
+          "source": "SkillPerfectItemTemplate",
+          "field": "spellId"
+        },
+        {
+          "source": "SpellArea",
+          "field": "spellId"
+        },
+        {
+          "source": "SpellClickInfo",
+          "field": "spellId"
+        },
+        {
+          "source": "SpellCustomAttr",
+          "field": "spell_id"
+        },
+        {
+          "source": "SpellDifficultyEntry",
+          "field": "SpellID[0..3]"
+        },
+        {
+          "source": "SpellGroup",
+          "field": "spell_id"
+        },
+        {
+          "source": "SpellItemEnchantmentEntry",
+          "field": "spellid[0..2]"
+        },
+        {
+          "source": "SpellMixology",
+          "field": "entry"
+        },
+        {
+          "source": "SpellProc",
+          "field": "SpellId"
+        },
+        {
+          "source": "SpellRanks",
+          "field": "first_spell_id, spell_id"
+        },
+        {
+          "source": "SpellRequired",
+          "field": "req_spell, spell_id"
+        },
+        {
+          "source": "SpellScriptNames",
+          "field": "spell_id"
+        },
+        {
+          "source": "TrainerSpell",
+          "field": "SpellId"
         }
       ],
       "fields": {
@@ -8689,7 +9481,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "CastingTimeIndex"
+        }
+      ]
     },
     "SpellCategoryEntry": {
       "category": "dbc_backed",
@@ -8717,7 +9515,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "Category"
+        }
+      ]
     },
     "SpellDifficultyEntry": {
       "category": "dbc_backed",
@@ -8813,7 +9617,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "DurationIndex"
+        }
+      ]
     },
     "SpellFocusObjectEntry": {
       "category": "dbc_backed",
@@ -9062,7 +9872,13 @@
           "sql_column": "requiredLevel",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "socketBonus"
+        }
+      ]
     },
     "SpellItemEnchantmentConditionEntry": {
       "category": "dbc_backed",
@@ -9214,7 +10030,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "EffectRadiusIndex[0..2]"
+        }
+      ]
     },
     "SpellRangeEntry": {
       "category": "dbc_backed",
@@ -9266,7 +10088,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "RangeIndex"
+        }
+      ]
     },
     "SpellRuneCostEntry": {
       "category": "dbc_backed",
@@ -9623,7 +10451,13 @@
           "sql_column": "MissileImpactOffsetZ",
           "notes": "Skipped"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "SpellEntry",
+          "field": "SpellVisual[0..1]"
+        }
+      ]
     },
     "StableSlotPricesEntry": {
       "category": "dbc_backed",
@@ -9796,7 +10630,17 @@
           "sql_column": "addToSpellBook",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "CharacterGlyphs",
+          "field": "talentGroup"
+        },
+        {
+          "source": "TalentEntry",
+          "field": "DependsOn"
+        }
+      ]
     },
     "TalentTabEntry": {
       "category": "dbc_backed",
@@ -9840,7 +10684,21 @@
           "sql_column": "tabpage",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "CreatureFamilyEntry",
+          "field": "petTalentType"
+        },
+        {
+          "source": "TalentEntry",
+          "field": "TalentTab"
+        },
+        {
+          "source": "TalentTabEntry",
+          "field": "TalentTabID, petTalentMask"
+        }
+      ]
     },
     "TaxiNodesEntry": {
       "category": "dbc_backed",
@@ -10162,7 +11020,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "TotemCategory"
+        }
+      ]
     },
     "TransportAnimationEntry": {
       "category": "dbc_backed",
@@ -10472,7 +11336,25 @@
           "sql_column": "m_powerDisplayId",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "CreatureTemplate",
+          "field": "VehicleId"
+        },
+        {
+          "source": "VehicleAccessory",
+          "field": "guid"
+        },
+        {
+          "source": "VehicleSeatEntry",
+          "field": "m_attachmentID"
+        },
+        {
+          "source": "VehicleTemplateAccessory",
+          "field": "seat_entry"
+        }
+      ]
     },
     "VehicleSeatEntry": {
       "category": "dbc_backed",
@@ -10531,7 +11413,13 @@
           "sql_column": "m_flagsB",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "VehicleEntry",
+          "field": "m_seatID[0..7]"
+        }
+      ]
     },
     "WMOAreaTableEntry": {
       "category": "dbc_backed",
@@ -10735,6 +11623,54 @@
         {
           "source": "CreatureTemplate",
           "field": "DifficultyEntry1..3"
+        },
+        {
+          "source": "CellObjectGuids",
+          "field": "Creature spawn GUIDs in this cell"
+        },
+        {
+          "source": "Condition",
+          "field": "SourceEntry"
+        },
+        {
+          "source": "CreatureDefaultTrainer",
+          "field": "CreatureId"
+        },
+        {
+          "source": "CreatureMovementData",
+          "field": "CreatureChaseMovementType, CreatureFlightMovementType, CreatureGroundMovementType"
+        },
+        {
+          "source": "CreatureTemplateModel",
+          "field": "CreatureID"
+        },
+        {
+          "source": "CreatureTemplateMovement",
+          "field": "CreatureId"
+        },
+        {
+          "source": "CreatureTemplateResistance",
+          "field": "CreatureID"
+        },
+        {
+          "source": "FormationInfo",
+          "field": "leaderGUID"
+        },
+        {
+          "source": "GameEventCreature",
+          "field": "guid"
+        },
+        {
+          "source": "LinkedRespawn",
+          "field": "ObjectGuid"
+        },
+        {
+          "source": "VehicleAccessory",
+          "field": "accessory_entry"
+        },
+        {
+          "source": "VehicleTemplateAccessory",
+          "field": "accessory_entry"
         }
       ],
       "fields": {
@@ -12212,6 +13148,42 @@
         {
           "source": "Quest",
           "field": "RewardItemId1..4, RewardChoiceItemId1..6, ItemDrop1..4"
+        },
+        {
+          "source": "AchievementReward",
+          "field": "itemId"
+        },
+        {
+          "source": "CharacterGifts",
+          "field": "item_guid"
+        },
+        {
+          "source": "GuildBankItem",
+          "field": "item_guid"
+        },
+        {
+          "source": "ItemLootStorage",
+          "field": "itemid"
+        },
+        {
+          "source": "ItemRefundInstance",
+          "field": "item_guid"
+        },
+        {
+          "source": "ItemSoulboundTradeData",
+          "field": "itemGuid"
+        },
+        {
+          "source": "LootStoreItem",
+          "field": "itemid"
+        },
+        {
+          "source": "MailItems",
+          "field": "item_guid"
+        },
+        {
+          "source": "PlayerFactionchangeItems",
+          "field": "alliance_id, horde_id"
         }
       ],
       "fields": {
@@ -12755,7 +13727,13 @@
         }
       },
       "reference_status": "leaf",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "ItemTemplate",
+          "field": "ItemSet"
+        }
+      ]
     },
     "Quest": {
       "category": "sql_objectmgr",
@@ -14148,7 +15126,21 @@
           "notes": "Emote ID for option 7, slot 2"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "GossipMenus",
+          "field": "TextID"
+        },
+        {
+          "source": "GossipText",
+          "field": "Options[0].BroadcastTextID"
+        },
+        {
+          "source": "Quest",
+          "field": "RewardMailSenderEntry"
+        }
+      ]
     },
     "GossipMenus": {
       "category": "sql_objectmgr",
@@ -14272,7 +15264,13 @@
           "notes": ""
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "CreatureTemplate",
+          "field": "GossipMenuId"
+        }
+      ]
     },
     "BroadcastText": {
       "category": "sql_objectmgr",
@@ -14342,7 +15340,13 @@
           "sql_column": "Flags",
           "notes": ""
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "GossipMenuItems",
+          "field": "OptionBroadcastTextID"
+        }
+      ]
     },
     "PointOfInterest": {
       "category": "sql_objectmgr",
@@ -14606,7 +15610,17 @@
           "notes": ""
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "CalendarEvent",
+          "field": "int32"
+        },
+        {
+          "source": "LfgDungeonTemplate",
+          "field": "dungeonId"
+        }
+      ]
     },
     "DungeonProgressionRequirements": {
       "category": "sql_objectmgr",
@@ -17092,7 +18106,45 @@
           "sql_column": "announce"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "GameEventConditionSave",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventCreatureQuest",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventGameobject",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventGameobjectQuest",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventNpcflag",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventPool",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventPrerequisite",
+          "field": "eventEntry, prerequisite_event"
+        },
+        {
+          "source": "GameEventQuestCondition",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventSave",
+          "field": "eventEntry"
+        }
+      ]
     },
     "GameEventFinishCondition": {
       "category": "sql_manager",
@@ -17234,7 +18286,29 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "GameEventPool",
+          "field": "pool_entry"
+        },
+        {
+          "source": "PoolCreature",
+          "field": "pool_entry"
+        },
+        {
+          "source": "PoolGameobject",
+          "field": "pool_entry"
+        },
+        {
+          "source": "PoolPool",
+          "field": "mother_pool, pool_id"
+        },
+        {
+          "source": "PoolQuest",
+          "field": "pool_entry"
+        }
+      ]
     },
     "WaypointPath": {
       "category": "sql_manager",
@@ -17260,7 +18334,25 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "ScriptWaypoint",
+          "field": "entry"
+        },
+        {
+          "source": "WaypointData",
+          "field": "id"
+        },
+        {
+          "source": "WaypointDataAddon",
+          "field": "PathID"
+        },
+        {
+          "source": "Waypoints",
+          "field": "entry"
+        }
+      ]
     },
     "AchievementCriteriaData": {
       "category": "sql_manager",
@@ -18039,7 +19131,13 @@
         }
       },
       "reference_status": "linked",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "GmSubsurvey",
+          "field": "questionId"
+        }
+      ]
     },
     "Petition": {
       "category": "sql_manager",
@@ -18493,7 +19591,37 @@
       "references": {
         "target": "GuildEntry",
         "type": "linked_entry"
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "GuildBankEventlog",
+          "field": "guildid"
+        },
+        {
+          "source": "GuildBankRight",
+          "field": "guildid"
+        },
+        {
+          "source": "GuildBankTab",
+          "field": "guildid"
+        },
+        {
+          "source": "GuildEventlog",
+          "field": "guildid"
+        },
+        {
+          "source": "GuildMember",
+          "field": "guildid"
+        },
+        {
+          "source": "GuildRank",
+          "field": "guildid"
+        },
+        {
+          "source": "PlayerbotsGuildTasks",
+          "field": "guildid"
+        }
+      ]
     },
     "ArenaTeam": {
       "category": "sql_manager",
@@ -19471,7 +20599,13 @@
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Entities/Creature/CreatureData.h",
-      "container_type": ""
+      "container_type": "",
+      "referenced_by": [
+        {
+          "source": "CreatureTemplate",
+          "field": "movementId"
+        }
+      ]
     },
     "CreatureTemplateResistance": {
       "category": "sql_objectmgr",
@@ -19541,7 +20675,13 @@
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Entities/Creature/CreatureData.h",
-      "container_type": ""
+      "container_type": "",
+      "referenced_by": [
+        {
+          "source": "CreatureTemplate",
+          "field": "PetSpellDataId"
+        }
+      ]
     },
     "DisenchantLootTemplate": {
       "category": "sql_auxiliary",
@@ -22810,7 +23950,13 @@
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Spells/SpellMgr.h",
-      "container_type": ""
+      "container_type": "",
+      "referenced_by": [
+        {
+          "source": "SpellGroupStackRules",
+          "field": "group_id"
+        }
+      ]
     },
     "SpellGroupStackRules": {
       "category": "sql_manager",
@@ -28108,7 +29254,25 @@
       "header_file": "src/server/game/Entities/Player/Player.h",
       "container_type": "",
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "LogsIpActions",
+          "field": "account_id"
+        },
+        {
+          "source": "PlayerbotsAccountKeys",
+          "field": "account_id"
+        },
+        {
+          "source": "PlayerbotsAccountLinks",
+          "field": "account_id, linked_account_id"
+        },
+        {
+          "source": "PlayerbotsAccountType",
+          "field": "account_id"
+        }
+      ]
     },
     "AccountAccess": {
       "category": "sql_auxiliary",
