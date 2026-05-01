@@ -68,7 +68,6 @@ class AcoreDataServer:
 
         # Initialize database connection and discovery
         self.database._check_db_connection()
-        self.registry._field_name_cache = self.registry._build_field_name_cache()
         self.database._discover_all_tables()
 
     def _load_dbc(self, dbc_name: str) -> WDBCReader:

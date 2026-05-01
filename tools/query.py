@@ -12,6 +12,13 @@ import re
 import sys
 from typing import Dict, Any, List, Optional, Tuple
 
+from core.annotation import (
+    _annotate_dbc_result as _annotate_dbc_impl,
+    _build_schema_error as _build_schema_error_impl,
+    _convert_filter_for_dbc as _convert_filter_for_dbc_impl,
+    _dbc_filter_to_sql_where,
+    _escape_like_pattern,
+)
 from core.type_resolver import resolve_type_fields
 
 
@@ -99,16 +106,6 @@ def _build_sql_filter_clause(
 
     # Numeric / boolean values
     return f"{col_name} = {val}", False
-
-
-def _escape_like_pattern(pattern: str) -> str:
-    """Escape SQL LIKE special characters and wrap with quotes.
-
-    Preserves user-provided % and _ wildcards. Only escapes backslashes
-    (the ESCAPE character). For exact match, use a plain string value
-    instead of $like/$ilike operators."""
-    escaped = pattern.replace("\\", "\\\\")
-    return f"'{escaped}'"
 
 
 def query_tools(server):
@@ -203,11 +200,11 @@ def _query_dbc(
     if filter_data and reg_entry:
         try:
             dbc_name_for_filter = reg_entry.get('dbc_name', name) if reg_entry else name
-            dbc_filter, filter_notes = _convert_filter_for_dbc(
+            dbc_filter, filter_notes = _convert_filter_for_dbc_impl(
                 server.registry, filter_data, reg_entry, dbc_name_for_filter
             )
         except ValueError as e:
-            return _build_schema_error(name, str(e), reg_entry, filter_data)
+            return _build_schema_error_impl(name, str(e), reg_entry, filter_data)
 
     # Query DBC
     dbc_result = None
@@ -228,6 +225,7 @@ def _query_dbc(
                 dbc_result = dbc_result[:limit]
         else:
             # Return all records (limited)
+            dbc_result = []
             for i in range(min(limit, reader.record_count)):
                 record = reader.get_record(i)
                 if record:
@@ -406,7 +404,7 @@ def _query_sql_overlay(
 
     if dbc_filter:
         where_clauses.extend(
-            _dbc_filter_to_sql_where_server(server, dbc_filter, reg_entry)
+            _dbc_filter_to_sql_where(dbc_filter, reg_entry)
         )
 
     if where_clauses:
@@ -444,35 +442,6 @@ def _merge_dbc_sql(
     return {"error": "No data found", "isError": True}
 
 
-def _convert_filter_for_dbc(
-    registry, filter_data: Dict, reg_entry: Dict, dbc_name: str
-) -> tuple:
-    """Convert filter dict with field names to DBC-compatible numeric indices."""
-    if not filter_data:
-        return {}, []
-
-    converted = {}
-    notes = []
-
-    for key, value in filter_data.items():
-        idx, resolved_name, note = registry._resolve_filter_key(
-            key, reg_entry, dbc_name, set()
-        )
-        converted[idx] = value
-        if note:
-            notes.append(f"  {note}")
-
-    return converted, notes
-
-
-def _dbc_filter_to_sql_where_server(
-    server, filter_dict: Dict[int, Any], reg_entry: Optional[Dict]
-) -> List[str]:
-    """Convert DBC filter to SQL WHERE clauses."""
-    from core.annotation import _dbc_filter_to_sql_where
-    return _dbc_filter_to_sql_where(filter_dict, reg_entry)
-
-
 def _annotate_dbc_result(
     result: List,
     reg_entry: Optional[Dict],
@@ -482,23 +451,21 @@ def _annotate_dbc_result(
     single_record: bool = False
 ) -> Any:
     """Annotate DBC results. Wrap/unwrap based on single_record flag."""
-    from core.annotation import _annotate_dbc_result as annotate_func
-
     if not result:
         return []
 
     # Convert fields_param=False to None for annotation
     actual_fields = fields_param if fields_param is not False else None
-    
+
     # For single record lookups, unwrap to flat list
     if single_record and len(result) == 1:
-        annotated = annotate_func(
+        annotated = _annotate_dbc_impl(
             result[0], reg_entry, db_result, actual_fields, compact
         )
         return annotated.get("result", []) if isinstance(annotated, dict) else annotated
 
     # Multi-record: return nested lists
-    return annotate_func(result, reg_entry, db_result, actual_fields, compact).get(
+    return _annotate_dbc_impl(result, reg_entry, db_result, actual_fields, compact).get(
         "result", []
     )
 
@@ -515,14 +482,6 @@ def _extract_field_references(reg_entry: Optional[Dict]) -> Optional[Dict[str, L
             refs[field_name] = field_info["references"]
 
     return refs if refs else None
-
-
-def _build_schema_error(
-    store_name: str, error_msg: str, reg_entry: Optional[Dict], filter_used: Optional[Dict]
-) -> Dict[str, Any]:
-    """Build consistent schema error."""
-    from core.annotation import _build_schema_error as build_err
-    return build_err(store_name, error_msg, reg_entry, filter_used)
 
 
 def get_schema() -> Dict[str, Any]:
@@ -598,6 +557,3 @@ def get_schema() -> Dict[str, Any]:
         }
     }
 
-
-# Import re for regex usage
-import re
