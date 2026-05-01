@@ -226,7 +226,10 @@
           "name": "referredAchievement",
           "type": "uint32",
           "sql_column": "referredAchievement",
-          "notes": "-"
+          "notes": "-",
+          "references": "AchievementEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "requiredType",
@@ -2005,7 +2008,10 @@
           "name": "petTalentType",
           "type": "int32",
           "sql_column": "petTalentType",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentTabEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -4090,7 +4096,10 @@
           "name": "SoundOverrideSubclassID",
           "type": "int32",
           "sql_column": "SoundOverrideSubclassID",
-          "notes": "-"
+          "notes": "-",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "Material",
@@ -7147,7 +7156,10 @@
           "name": "SkillID",
           "type": "uint32",
           "sql_column": "SkillID",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "RaceMask",
@@ -7171,7 +7183,10 @@
           "name": "SkillTierID",
           "type": "uint32",
           "sql_column": "SkillTierID",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -9354,7 +9369,10 @@
           "name": "AnimEventSoundID",
           "type": "uint32",
           "sql_column": "AnimEventSoundID",
-          "notes": "Skipped"
+          "notes": "Skipped",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "13": {
           "name": "Flags",
@@ -9659,7 +9677,10 @@
           "name": "TalentTabID",
           "type": "uint32",
           "sql_column": "TalentTabID",
-          "notes": "Primary key"
+          "notes": "Primary key",
+          "references": "TalentTabEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "20": {
           "name": "ClassMask",
@@ -9671,7 +9692,10 @@
           "name": "petTalentMask",
           "type": "uint32",
           "sql_column": "petTalentMask",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentTabEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "22": {
           "name": "tabpage",
@@ -18321,7 +18345,10 @@
         "2": {
           "name": "criteria_type",
           "type": "enum",
-          "sql_column": "criteria_type"
+          "sql_column": "criteria_type",
+          "references": "AchievementEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "min_criteria",
@@ -19320,7 +19347,10 @@
         "0": {
           "name": "questId",
           "type": "int32",
-          "sql_column": "questId"
+          "sql_column": "questId",
+          "references": "quest_template",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "1": {
           "name": "eventEntry",
@@ -21176,7 +21206,10 @@
         "0": {
           "name": "QuestId",
           "type": "int32",
-          "sql_column": "QuestId"
+          "sql_column": "QuestId",
+          "references": "quest_template",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "1": {
           "name": "RewardMailSenderEntry",
@@ -21297,7 +21330,10 @@
         "0": {
           "name": "QuestID",
           "type": "int32",
-          "sql_column": "QuestID"
+          "sql_column": "QuestID",
+          "references": "quest_template",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "1": {
           "name": "Idx1",
@@ -23436,7 +23472,10 @@
         "5": {
           "name": "joinMapId",
           "type": "int32",
-          "sql_column": "joinMapId"
+          "sql_column": "joinMapId",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "6": {
           "name": "taxiPath0",
@@ -23610,7 +23649,10 @@
         "1": {
           "name": "item_guid",
           "type": "int32",
-          "sql_column": "item_guid"
+          "sql_column": "item_guid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "entry",
@@ -23642,7 +23684,10 @@
         "1": {
           "name": "talentGroup",
           "type": "int8",
-          "sql_column": "talentGroup"
+          "sql_column": "talentGroup",
+          "references": "TalentEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "glyph1",
@@ -25187,7 +25232,10 @@
         "1": {
           "name": "questionId",
           "type": "int32",
-          "sql_column": "questionId"
+          "sql_column": "questionId",
+          "references": "gm_survey",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "2": {
           "name": "answer",
@@ -25328,7 +25376,10 @@
         "3": {
           "name": "item_guid",
           "type": "int32",
-          "sql_column": "item_guid"
+          "sql_column": "item_guid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -25784,7 +25835,10 @@
         "0": {
           "name": "item_guid",
           "type": "int32",
-          "sql_column": "item_guid"
+          "sql_column": "item_guid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "player_guid",
@@ -25816,7 +25870,10 @@
         "0": {
           "name": "itemGuid",
           "type": "int32",
-          "sql_column": "itemGuid"
+          "sql_column": "itemGuid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "allowedPlayers",
@@ -26231,7 +26288,10 @@
         "1": {
           "name": "item_guid",
           "type": "int32",
-          "sql_column": "item_guid"
+          "sql_column": "item_guid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "receiver",
@@ -26543,7 +26603,10 @@
         "1": {
           "name": "quest_id",
           "type": "int32",
-          "sql_column": "quest_id"
+          "sql_column": "quest_id",
+          "references": "quest_template",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
