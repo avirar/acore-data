@@ -12468,7 +12468,7 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Quest": {
@@ -15441,7 +15441,7 @@
           "notes": "Health percentage (0-100)"
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ExplorationBaseXP": {
@@ -16610,7 +16610,7 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Condition": {
@@ -16881,7 +16881,7 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "NPCVendorEntry": {
@@ -17246,7 +17246,10 @@
           "name": "leaderGUID",
           "type": "`ObjectGuid::LowType`",
           "notes": "",
-          "sql_column": "leaderGUID"
+          "sql_column": "leaderGUID",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "follow_dist": {
           "name": "follow_dist",
@@ -17279,7 +17282,6 @@
           "sql_column": "point_2"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CreatureTextEntry": {
@@ -17457,7 +17459,7 @@
           "sql_column": "action"
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "WardenCheckResult": {
@@ -17530,10 +17532,12 @@
           "name": "ScriptId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "ScriptName"
+          "sql_column": "ScriptName",
+          "references": "self_ref",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "RandomEnchantmentData": {
@@ -17748,7 +17752,7 @@
           "notes": "Max MMR (present in schema, not populated by INSERT)"
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Petition": {
@@ -17958,7 +17962,7 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GroupData": {
@@ -18033,7 +18037,7 @@
           "notes": "Player"
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GroupMembers": {
@@ -18078,7 +18082,7 @@
           "notes": "Roles bitmask"
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "LFGData": {
@@ -18501,7 +18505,7 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AuctionEntry": {
@@ -18795,14 +18799,16 @@
         "1": {
           "name": "bg_template",
           "type": "int32",
-          "sql_column": "bg_template"
+          "sql_column": "bg_template",
+          "references": "BattlemasterListEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Battlegrounds/BattlegroundMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "BroadcastTextLocale": {
@@ -19078,7 +19084,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CreatureTemplateModel": {
@@ -19586,7 +19592,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "id",
@@ -19603,7 +19612,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventGameobject": {
@@ -19615,7 +19623,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int32",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "guid",
@@ -19627,7 +19638,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventGameobjectQuest": {
@@ -19639,7 +19649,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "id",
@@ -19656,7 +19669,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventNpcflag": {
@@ -19668,7 +19680,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "guid",
@@ -19685,7 +19700,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventPool": {
@@ -19697,19 +19711,24 @@
         "0": {
           "name": "eventEntry",
           "type": "int32",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "pool_entry",
           "type": "int32",
-          "sql_column": "pool_entry"
+          "sql_column": "pool_entry",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventPrerequisite": {
@@ -19721,19 +19740,24 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "prerequisite_event",
           "type": "int32",
-          "sql_column": "prerequisite_event"
+          "sql_column": "prerequisite_event",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventQuestCondition": {
@@ -19745,7 +19769,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "quest",
@@ -19767,7 +19794,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventSeasonalQuestrelation": {
@@ -19989,7 +20015,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GossipMenuOptionLocale": {
@@ -20028,7 +20054,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GraveyardZone": {
@@ -20090,14 +20116,16 @@
         "3": {
           "name": "holiday_duration",
           "type": "int32",
-          "sql_column": "holiday_duration"
+          "sql_column": "holiday_duration",
+          "references": "HolidaysEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ItemLootTemplate": {
@@ -21416,7 +21444,10 @@
         "1": {
           "name": "pool_entry",
           "type": "int32",
-          "sql_column": "pool_entry"
+          "sql_column": "pool_entry",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "chance",
@@ -21433,7 +21464,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Pools/PoolMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PoolGameobject": {
@@ -21450,7 +21480,10 @@
         "1": {
           "name": "pool_entry",
           "type": "int32",
-          "sql_column": "pool_entry"
+          "sql_column": "pool_entry",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "chance",
@@ -21467,7 +21500,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Pools/PoolMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PoolPool": {
@@ -21479,12 +21511,18 @@
         "0": {
           "name": "pool_id",
           "type": "int32",
-          "sql_column": "pool_id"
+          "sql_column": "pool_id",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "mother_pool",
           "type": "int32",
-          "sql_column": "mother_pool"
+          "sql_column": "mother_pool",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "chance",
@@ -21501,7 +21539,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Pools/PoolMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PoolQuest": {
@@ -21518,7 +21555,10 @@
         "1": {
           "name": "pool_entry",
           "type": "int32",
-          "sql_column": "pool_entry"
+          "sql_column": "pool_entry",
+          "references": "PoolTemplateData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "2": {
           "name": "description",
@@ -21530,7 +21570,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Pools/PoolMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ProspectingLootTemplate": {
@@ -22200,7 +22239,10 @@
         "0": {
           "name": "entry",
           "type": "int32",
-          "sql_column": "entry"
+          "sql_column": "entry",
+          "references": "WaypointPath",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "pointid",
@@ -22237,7 +22279,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Scripting/ScriptSystem.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SkillDiscoveryTemplate": {
@@ -22494,7 +22535,10 @@
         "0": {
           "name": "group_id",
           "type": "int32",
-          "sql_column": "group_id"
+          "sql_column": "group_id",
+          "references": "SpellGroup",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "stack_rule",
@@ -22511,7 +22555,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Spells/SpellMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SpellJumpDistance": {
@@ -22646,7 +22689,10 @@
         "0": {
           "name": "entry",
           "type": "int32",
-          "sql_column": "entry"
+          "sql_column": "entry",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "1": {
           "name": "pctMod",
@@ -22658,7 +22704,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Spells/SpellMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SpellProc": {
@@ -22983,7 +23028,7 @@
       "store_variable": "",
       "header_file": "src/server/game/Maps/TransportMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "WaypointData": {
@@ -22995,7 +23040,10 @@
         "0": {
           "name": "id",
           "type": "int32",
-          "sql_column": "id"
+          "sql_column": "id",
+          "references": "WaypointPath",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "point",
@@ -23062,7 +23110,6 @@
       "store_variable": "",
       "header_file": "src/server/game/Movement/Waypoints/WaypointMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "WaypointDataAddon": {
@@ -23074,7 +23121,10 @@
         "0": {
           "name": "PathID",
           "type": "int32",
-          "sql_column": "PathID"
+          "sql_column": "PathID",
+          "references": "WaypointPath",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "PointID",
@@ -23187,7 +23237,10 @@
         "0": {
           "name": "entry",
           "type": "int32",
-          "sql_column": "entry"
+          "sql_column": "entry",
+          "references": "WaypointPath",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "pointid",
@@ -23229,7 +23282,6 @@
       "store_variable": "",
       "header_file": "src/server/game/AI/SmartScripts/SmartAI.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AccountData": {
@@ -23263,7 +23315,7 @@
       "store_variable": "",
       "header_file": "src/server/game/Entities/Player/Player.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AccountInstanceTimes": {
@@ -23292,7 +23344,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AccountTutorial": {
@@ -23351,7 +23403,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ActiveArenaSeason": {
@@ -23497,7 +23549,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ChannelsBans": {
@@ -23526,7 +23578,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ChannelsRights": {
@@ -23963,7 +24015,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CharacterDeclinedname": {
@@ -24206,7 +24258,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CharacterGifts": {
@@ -25735,7 +25787,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "condition_id",
@@ -25752,7 +25807,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventSave": {
@@ -25764,7 +25818,10 @@
         "0": {
           "name": "eventEntry",
           "type": "int8",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "ID"
         },
         "1": {
           "name": "state",
@@ -25781,7 +25838,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameobjectRespawn": {
@@ -25895,7 +25951,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GuildBankEventlog": {
@@ -26711,7 +26767,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "LogEncounter": {
@@ -26820,7 +26876,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Mail": {
@@ -26847,7 +26903,10 @@
         "3": {
           "name": "mailTemplateId",
           "type": "int32",
-          "sql_column": "mailTemplateId"
+          "sql_column": "mailTemplateId",
+          "references": "MailTemplateEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "sender",
@@ -26904,7 +26963,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "MailItems": {
@@ -26958,7 +27016,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "MailServerTemplate": {
@@ -27041,7 +27099,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "leaf",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "MailServerTemplateItems": {
@@ -27178,7 +27236,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsGuildNames": {
@@ -27231,7 +27289,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PoolQuestSave": {
@@ -27453,7 +27511,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "RecoveryItem": {
@@ -27571,7 +27629,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "WorldState": {
@@ -27624,7 +27682,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Account": {
@@ -27797,7 +27855,7 @@
       "store_variable": "",
       "header_file": "src/server/game/Entities/Player/Player.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AccountBanned": {
@@ -27914,7 +27972,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AutobroadcastLocale": {
@@ -27948,7 +28006,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "BuildInfo": {
@@ -28107,7 +28165,10 @@
         "1": {
           "name": "account_id",
           "type": "int32",
-          "sql_column": "account_id"
+          "sql_column": "account_id",
+          "references": "Account",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "2": {
           "name": "character_guid",
@@ -28149,7 +28210,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Motd": {
@@ -28173,7 +28233,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "MotdLocalized": {
@@ -28202,7 +28262,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Realmcharacters": {
@@ -28231,7 +28291,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "Realmlist": {
@@ -28368,7 +28428,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AiPlayerbotTexts": {
@@ -28488,7 +28548,10 @@
         "0": {
           "name": "account_id",
           "type": "int32",
-          "sql_column": "account_id"
+          "sql_column": "account_id",
+          "references": "Account",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "1": {
           "name": "security_key",
@@ -28505,7 +28568,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsAccountLinks": {
@@ -28522,12 +28584,18 @@
         "1": {
           "name": "account_id",
           "type": "int32",
-          "sql_column": "account_id"
+          "sql_column": "account_id",
+          "references": "Account",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "2": {
           "name": "linked_account_id",
           "type": "int32",
-          "sql_column": "linked_account_id"
+          "sql_column": "linked_account_id",
+          "references": "Account",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "3": {
           "name": "created_at",
@@ -28539,7 +28607,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsAccountType": {
@@ -28551,7 +28618,10 @@
         "0": {
           "name": "account_id",
           "type": "int32",
-          "sql_column": "account_id"
+          "sql_column": "account_id",
+          "references": "Account",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "ID"
         },
         "1": {
           "name": "account_type",
@@ -28568,7 +28638,6 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsCustomStrategy": {
@@ -28607,7 +28676,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsDbStore": {
@@ -29207,7 +29276,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsRarityCache": {
@@ -29499,7 +29568,7 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
+      "reference_status": "linked",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "PlayerbotsTravelnodePath": {
