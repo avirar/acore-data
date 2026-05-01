@@ -63,6 +63,44 @@ Each entry includes:
 - [Trainer Stores](#trainer-stores)
 - [Fishing](#fishing)
 - [Reserved/Profanity Names](#reservedprofanity-names)
+- [CellObjectGuids](#cellobjectguids)
+- [CreatureDefaultTrainer](#creaturedefaulttrainer)
+- [CreatureQuestender](#creaturequestender)
+- [CreatureTemplateAddon](#creaturetemplateaddon)
+- [CreatureTemplateModel](#creaturetemplatemodel)
+- [CreatureTemplateMovement](#creaturetemplatemovement)
+- [CreatureTemplateResistance](#creaturetemplateresistance)
+- [CreatureTemplateSpell](#creaturetemplatespell)
+- [DungeonAccessRequirements](#dungeonaccessrequirements)
+- [EventScripts](#eventscripts)
+- [GameobjectQuestender](#gameobjectquestender)
+- [GameobjectQueststarter](#gameobjectqueststarter)
+- [PlayerClassStats](#playerclassstats)
+- [PlayerFactionchangeAchievement](#playerfactionchangeachievement)
+- [PlayerFactionchangeItems](#playerfactionchangeitems)
+- [PlayerFactionchangeQuests](#playerfactionchangequests)
+- [PlayerFactionchangeReputations](#playerfactionchangereputations)
+- [PlayerFactionchangeSpells](#playerfactionchangespells)
+- [PlayerFactionchangeTitles](#playerfactionchangetitles)
+- [PlayerRaceStats](#playerracestats)
+- [PlayercreateinfoAction](#playercreateinfoaction)
+- [PlayercreateinfoCastSpell](#playercreateinfocastspell)
+- [PlayercreateinfoItem](#playercreateinfoitem)
+- [PlayercreateinfoSkills](#playercreateinfoskills)
+- [PlayercreateinfoSpellCustom](#playercreateinfospellcustom)
+- [QuestDetails](#questdetails)
+- [QuestMailSender](#questmailsender)
+- [QuestMoneyRewardArray](#questmoneyrewardarray)
+- [QuestOfferReward](#questofferreward)
+- [QuestPoiPoints](#questpoipoints)
+- [QuestRequestItems](#questrequestitems)
+- [QuestTemplateAddon](#questtemplateaddon)
+- [SkillFishingBaseLevel](#skillfishingbaselevel)
+- [SpawnGroupTemplateData](#spawngrouptemplatedata)
+- [SpellScriptNames](#spellscriptnames)
+- [TrainerSpell](#trainerspell)
+- [VehicleTemplateAccessory](#vehicletemplateaccessory)
+- [WaypointScripts](#waypointscripts)
 
 ---
 
@@ -1554,3 +1592,714 @@ Outer key: `MAKE_PAIR32(mapId, spawnMode)`, Inner key: grid cell ID.
 |-------|----------|-------|
 | creatures | std::set&lt;ObjectGuid::LowType&gt; | Creature spawn GUIDs in this cell |
 | gameobjects | std::set&lt;ObjectGuid::LowType&gt; | GO spawn GUIDs in this cell |
+
+---
+
+## CellObjectGuids
+
+- **Source:** Derived from `creature` and `gameobject` spawn data during grid insertion
+- **Struct:** `CellObjectGuids` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_mapObjectGuidsStore` (nested `std::unordered_map`)
+- **Loader:** Populated during `LoadCreatures()` / `LoadGameobjects()` via `AddCreatureToGrid()` / `AddGameobjectToGrid()`
+
+See [MapObjectGuids](#mapobjectguids) for the enclosing container. This struct holds the per-cell GUID sets.
+
+| Field | C++ Type | Notes |
+|-------|----------|-------|
+| creatures | std::set&lt;ObjectGuid::LowType&gt; | Creature spawn GUIDs in this cell |
+| gameobjects | std::set&lt;ObjectGuid::LowType&gt; | GO spawn GUIDs in this cell |
+
+---
+
+## CreatureDefaultTrainer
+
+- **SQL Table:** `creature_default_trainer`
+- **Struct:** N/A (stored as `std::unordered_map&lt;uint32, uint32&gt;`)
+- **Store:** `ObjectMgr::_creatureDefaultTrainers`
+- **Loader:** Loaded within `ObjectMgr::LoadTrainers()`
+
+Maps creature entry to trainer ID. See [Trainer Stores](#trainer-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| CreatureId | int32 | map key | Creature template entry |
+| TrainerId | int32 | map value | Trainer ID |
+
+---
+
+## CreatureQuestender
+
+- **SQL Table:** `creature_questender`
+- **Struct:** `QuestRelations` = `std::multimap&lt;uint32, uint32&gt;` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_creatureQuestInvolvedRelations`
+- **Loader:** `ObjectMgr::LoadCreatureQuestEnders()`
+
+See [QuestRelations](#questrelations) for shared schema details.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| id | int32 | multimap key | Creature entry |
+| quest | int32 | multimap value | Quest ID |
+
+---
+
+## CreatureTemplateAddon
+
+- **SQL Table:** `creature_template_addon`
+- **Struct:** `CreatureAddon` (`src/server/game/Entities/Creature/CreatureData.h`)
+- **Store:** `ObjectMgr::_creatureTemplateAddonStore`
+- **Loader:** `ObjectMgr::LoadCreatureTemplateAddons()`
+
+Same struct as [CreatureAddon](#creatureaddon) but keyed by creature template entry instead of spawn GUID.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| entry | int32 | map key | Primary key, creature template entry |
+| path_id | int32 | path_id | |
+| mount | int32 | mount | |
+| bytes1 | int32 | bytes1 | |
+| bytes2 | int32 | bytes2 | |
+| emote | int32 | emote | |
+| visibilityDistanceType | int8 | visibilityDistanceType | |
+| auras | string | auras | Comma-separated aura spell IDs |
+
+---
+
+## CreatureTemplateModel
+
+- **SQL Table:** `creature_template_model`
+- **Struct:** `CreatureModel` (`src/server/game/Entities/Creature/CreatureData.h`)
+- **Loader:** Loaded within `ObjectMgr::LoadCreatureTemplates()`
+
+Populates the `CreatureTemplate.CreatureModel` array. See [CreatureTemplate](#creaturetemplate) sub-struct.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| CreatureID | int32 | *(parent key)* | Groups models by creature |
+| Idx | int32 | *(array index)* | Model slot index |
+| CreatureDisplayID | int32 | CreatureDisplayID | |
+| DisplayScale | float | DisplayScale | |
+| Probability | float | Probability | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## CreatureTemplateMovement
+
+- **SQL Table:** `creature_template_movement`
+- **Struct:** `CreatureMovementData` (`src/server/game/Entities/Creature/CreatureData.h`)
+- **Loader:** Loaded within `ObjectMgr::LoadCreatureTemplates()` via LEFT JOIN
+
+Populates the `CreatureTemplate.Movement` field. See [CreatureTemplate](#creaturetemplate) sub-struct.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| CreatureId | int32 | *(parent key)* | Creature template entry |
+| Ground | int8 | Ground | enum CreatureGroundMovementType |
+| Swim | int8 | Swim | bool |
+| Flight | int8 | Flight | enum CreatureFlightMovementType |
+| Rooted | int8 | Rooted | bool |
+| Chase | int8 | Chase | enum CreatureChaseMovementType |
+| Random | int8 | Random | enum CreatureRandomMovementType |
+| InteractionPauseTimer | int32 | InteractionPauseTimer | |
+
+---
+
+## CreatureTemplateResistance
+
+- **SQL Table:** `creature_template_resistance`
+- **Struct:** `CreatureTemplate.resistance[]` (`src/server/game/Entities/Creature/CreatureData.h`)
+- **Store:** `ObjectMgr::_creatureTemplateStore` (loaded into CreatureTemplate)
+- **Loader:** `ObjectMgr::LoadCreatureTemplateResistances()`
+
+Populates the `CreatureTemplate.resistance[7]` array. See [CreatureTemplate](#creaturetemplate).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| CreatureID | int32 | *(parent key)* | Creature template entry |
+| School | int8 | *(array index)* | School index (0-6) |
+| Resistance | int32 | resistance[School] | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## CreatureTemplateSpell
+
+- **SQL Table:** `creature_template_spell`
+- **Struct:** `CreatureTemplate.spells[]` (`src/server/game/Entities/Creature/CreatureData.h`)
+- **Store:** `ObjectMgr::_creatureTemplateStore` (loaded into CreatureTemplate)
+- **Loader:** `ObjectMgr::LoadCreatureTemplateSpells()`
+
+Populates the `CreatureTemplate.spells[8]` array. See [CreatureTemplate](#creaturetemplate).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| CreatureID | int32 | *(parent key)* | Creature template entry |
+| Index | int8 | *(array index)* | Spell slot (0-7) |
+| Spell | int32 | spells[Index] | -> SpellEntry |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## DungeonAccessRequirements
+
+- **SQL Table:** `dungeon_access_requirements`
+- **Struct:** `ProgressionRequirement` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `DungeonProgressionRequirements` (see [DungeonProgressionRequirements](#dungeonprogressionrequirements))
+- **Loader:** Loaded within `ObjectMgr::LoadAccessRequirements()`
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| dungeon_access_id | int8 | *(parent key)* | Links to dungeon_access_template |
+| requirement_type | int8 | type | Quest/item/achievement selector |
+| requirement_id | int32 | id | Quest/item/achievement ID |
+| requirement_note | string | note | |
+| faction | int8 | faction | 0=both, 1=Horde, 2=Alliance |
+| priority | int8 | priority | |
+| leader_only | int8 | leaderOnly | |
+| comment | string | *(not loaded)* | |
+
+---
+
+## EventScripts
+
+- **SQL Table:** `event_scripts`
+- **Struct:** `ScriptInfo` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `sEventScripts` (`ScriptMapMap`)
+- **Loader:** `ObjectMgr::LoadEventScripts()`
+
+Same structure as [ScriptInfo](#scriptinfo). All fields (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) are identical.
+
+---
+
+## GameobjectQuestender
+
+- **SQL Table:** `gameobject_questender`
+- **Struct:** `QuestRelations` = `std::multimap&lt;uint32, uint32&gt;` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_goQuestInvolvedRelations`
+- **Loader:** `ObjectMgr::LoadGameobjectQuestEnders()`
+
+See [QuestRelations](#questrelations) for shared schema details.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| id | int32 | multimap key | Gameobject entry |
+| quest | int32 | multimap value | Quest ID |
+
+---
+
+## GameobjectQueststarter
+
+- **SQL Table:** `gameobject_queststarter`
+- **Struct:** `QuestRelations` = `std::multimap&lt;uint32, uint32&gt;` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_goQuestRelations`
+- **Loader:** `ObjectMgr::LoadGameobjectQuestStarters()`
+
+See [QuestRelations](#questrelations) for shared schema details.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| id | int32 | multimap key | Gameobject entry |
+| quest | int32 | multimap value | Quest ID |
+
+---
+
+## PlayerClassStats
+
+- **SQL Table:** `player_class_stats`
+- **Struct:** `PlayerClassInfo` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerLevelInfo`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| Class | int8 | *(key part)* | Class ID |
+| Level | int8 | *(key part)* | Level |
+| BaseHP | int32 | basehp | |
+| BaseMana | int32 | basemana | |
+| Strength | int32 | stats[0] | |
+| Agility | int32 | stats[1] | |
+| Stamina | int32 | stats[2] | |
+| Intellect | int32 | stats[3] | |
+| Spirit | int32 | stats[4] | |
+
+---
+
+## PlayerFactionchangeAchievement
+
+- **SQL Table:** `player_factionchange_achievement`
+- **Store:** `ObjectMgr::FactionChangeAchievements` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeAchievements()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> AchievementEntry |
+| alliance_comment | string | *(not loaded)* | |
+| horde_id | int32 | map value | -> AchievementEntry |
+| horde_comment | string | *(not loaded)* | |
+
+---
+
+## PlayerFactionchangeItems
+
+- **SQL Table:** `player_factionchange_items`
+- **Store:** `ObjectMgr::FactionChangeItems` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeItems()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> ItemTemplate |
+| alliance_comment | string | *(not loaded)* | |
+| horde_id | int32 | map value | -> ItemTemplate |
+| horde_comment | string | *(not loaded)* | |
+
+---
+
+## PlayerFactionchangeQuests
+
+- **SQL Table:** `player_factionchange_quests`
+- **Store:** `ObjectMgr::FactionChangeQuests` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeQuests()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> quest_template |
+| horde_id | int32 | map value | -> quest_template |
+
+---
+
+## PlayerFactionchangeReputations
+
+- **SQL Table:** `player_factionchange_reputations`
+- **Store:** `ObjectMgr::FactionChangeReputation` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeReputations()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> FactionTemplateEntry |
+| alliance_comment | string | *(not loaded)* | |
+| horde_id | int32 | map value | -> FactionTemplateEntry |
+| horde_comment | string | *(not loaded)* | |
+
+---
+
+## PlayerFactionchangeSpells
+
+- **SQL Table:** `player_factionchange_spells`
+- **Store:** `ObjectMgr::FactionChangeSpells` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeSpells()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> SpellEntry |
+| alliance_comment | string | *(not loaded)* | |
+| horde_id | int32 | map value | -> SpellEntry |
+| horde_comment | string | *(not loaded)* | |
+
+---
+
+## PlayerFactionchangeTitles
+
+- **SQL Table:** `player_factionchange_titles`
+- **Store:** `ObjectMgr::FactionChangeTitles` (`CharacterConversionMap`)
+- **Loader:** `ObjectMgr::LoadFactionChangeTitles()`
+
+See [Faction Change Stores](#faction-change-stores).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| alliance_id | int32 | map key | -> CharTitlesEntry |
+| alliance_comment | string | *(not loaded)* | |
+| horde_id | int32 | map value | -> CharTitlesEntry |
+| horde_comment | string | *(not loaded)* | |
+
+---
+
+## PlayerRaceStats
+
+- **SQL Table:** `player_race_stats`
+- **Struct:** `PlayerRaceInfo` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+Provides base stats per race (used for initial character stats). See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| Race | int8 | *(key)* | Race ID |
+| Strength | int32 | baseStrength | |
+| Agility | int32 | baseAgility | |
+| Stamina | int32 | baseStamina | |
+| Intellect | int32 | baseIntellect | |
+| Spirit | int32 | baseSpirit | |
+
+---
+
+## PlayercreateinfoAction
+
+- **SQL Table:** `playercreateinfo_action`
+- **Struct:** `PlayerInfo.action` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerCreateInfoActions`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| race | int8 | *(key part)* | Race ID |
+| class | int8 | *(key part)* | Class ID |
+| button | int32 | button | Action bar slot |
+| action | int32 | action | Spell/item ID |
+| type | int32 | type | Action type |
+
+---
+
+## PlayercreateinfoCastSpell
+
+- **SQL Table:** `playercreateinfo_cast_spell`
+- **Struct:** `PlayerInfo.castSpells` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerCreateInfoSpells`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| raceMask | int32 | raceMask | Race bitmask |
+| classMask | int32 | classMask | Class bitmask |
+| spell | int32 | spell | -> SpellEntry |
+| note | string | *(not loaded)* | |
+
+---
+
+## PlayercreateinfoItem
+
+- **SQL Table:** `playercreateinfo_item`
+- **Struct:** `PlayerInfo.item` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerCreateInfoItems`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| race | int8 | *(key part)* | Race ID |
+| class | int8 | *(key part)* | Class ID |
+| itemid | int32 | itemid | Item template entry |
+| amount | int32 | amount | Stack count |
+| Note | string | *(not loaded)* | |
+
+---
+
+## PlayercreateinfoSkills
+
+- **SQL Table:** `playercreateinfo_skills`
+- **Struct:** `PlayerInfo.skill` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerCreateInfoSkills`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| raceMask | int32 | raceMask | Race bitmask |
+| classMask | int32 | classMask | Class bitmask |
+| skill | int32 | skill | -> SkillLineEntry |
+| rank | int32 | rank | |
+| comment | string | *(not loaded)* | |
+
+---
+
+## PlayercreateinfoSpellCustom
+
+- **SQL Table:** `playercreateinfo_spell_custom`
+- **Struct:** `PlayerInfo.customSpells` (`src/server/game/Entities/Player/Player.h`)
+- **Store:** Nested within `ObjectMgr::_playerInfo` as `PlayerCreateInfoSpells`
+- **Loader:** Loaded within `ObjectMgr::LoadPlayerInfo()`
+
+See [PlayerInfo](#playerinfo).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| racemask | int32 | raceMask | Race bitmask |
+| classmask | int32 | classMask | Class bitmask |
+| Spell | int32 | spell | -> SpellEntry |
+| Note | string | *(not loaded)* | |
+
+---
+
+## QuestDetails
+
+- **SQL Table:** `quest_details`
+- **Struct:** `Quest` (DetailsEmote fields) (`src/server/game/Quests/QuestDef.h`)
+- **Store:** `ObjectMgr::_questTemplates` (loaded into Quest)
+- **Loader:** Loaded within `ObjectMgr::LoadQuests()`
+
+See [Quest](#quest). Populates `DetailsEmote[4]` and `DetailsEmoteDelay[4]`.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| ID | int32 | Id | Primary key |
+| Emote1 | int32 | DetailsEmote[0] | |
+| Emote2 | int32 | DetailsEmote[1] | |
+| Emote3 | int32 | DetailsEmote[2] | |
+| Emote4 | int32 | DetailsEmote[3] | |
+| EmoteDelay1 | int32 | DetailsEmoteDelay[0] | |
+| EmoteDelay2 | int32 | DetailsEmoteDelay[1] | |
+| EmoteDelay3 | int32 | DetailsEmoteDelay[2] | |
+| EmoteDelay4 | int32 | DetailsEmoteDelay[3] | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## QuestMailSender
+
+- **SQL Table:** `quest_mail_sender`
+- **Struct:** `Quest` (RewardMailSenderEntry field) (`src/server/game/Quests/QuestDef.h`)
+- **Store:** `ObjectMgr::_questTemplates` (loaded into Quest)
+- **Loader:** Loaded within `ObjectMgr::LoadQuests()`
+
+See [Quest](#quest). Populates `Quest.RewardMailSenderEntry`.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| QuestId | int32 | Id | Quest ID |
+| RewardMailSenderEntry | int32 | RewardMailSenderEntry | Creature entry for mail sender |
+
+---
+
+## QuestMoneyRewardArray
+
+- **SQL Table:** `quest_money_reward`
+- **Struct:** `QuestMoneyRewardArray` = `std::array&lt;uint32, 10&gt;` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_questMoneyRewards` (`QuestMoneyRewardStore` = `std::unordered_map&lt;uint32, QuestMoneyRewardArray&gt;`)
+- **Loader:** `ObjectMgr::LoadQuestMoneyRewards()`
+
+See [QuestMoneyReward](#questmoneyreward) for the existing entry with identical data.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| Level | uint32 | map key | Quest level |
+| Money0 | uint32 | [0] | Reward at level offset 0 |
+| Money1 | uint32 | [1] | |
+| Money2 | uint32 | [2] | |
+| Money3 | uint32 | [3] | |
+| Money4 | uint32 | [4] | |
+| Money5 | uint32 | [5] | |
+| Money6 | uint32 | [6] | |
+| Money7 | uint32 | [7] | |
+| Money8 | uint32 | [8] | |
+| Money9 | uint32 | [9] | |
+
+---
+
+## QuestOfferReward
+
+- **SQL Table:** `quest_offer_reward`
+- **Struct:** `Quest` (OfferReward fields) (`src/server/game/Quests/QuestDef.h`)
+- **Store:** `ObjectMgr::_questTemplates` (loaded into Quest)
+- **Loader:** Loaded within `ObjectMgr::LoadQuests()`
+
+See [Quest](#quest). Populates reward text and emotes.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| ID | int32 | Id | Primary key |
+| Emote1 | int32 | OfferRewardEmote[0] | |
+| Emote2 | int32 | OfferRewardEmote[1] | |
+| Emote3 | int32 | OfferRewardEmote[2] | |
+| Emote4 | int32 | OfferRewardEmote[3] | |
+| EmoteDelay1 | int32 | OfferRewardEmoteDelay[0] | |
+| EmoteDelay2 | int32 | OfferRewardEmoteDelay[1] | |
+| EmoteDelay3 | int32 | OfferRewardEmoteDelay[2] | |
+| EmoteDelay4 | int32 | OfferRewardEmoteDelay[3] | |
+| RewardText | string | OfferRewardText | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## QuestPoiPoints
+
+- **SQL Table:** `quest_poi_points`
+- **Struct:** `QuestPOIPoint` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** Nested within `ObjectMgr::_questPOIStore`
+- **Loader:** Loaded within `ObjectMgr::LoadQuestPOI()`
+
+See [QuestPOI](#questpoi).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| QuestID | int32 | *(grouping)* | Groups points by quest |
+| Idx1 | int32 | *(POI id match)* | Matches to parent QuestPOI |
+| Idx2 | int32 | *(ordering)* | ORDER BY Idx2 |
+| X | int32 | x | |
+| Y | int32 | y | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## QuestRequestItems
+
+- **SQL Table:** `quest_request_items`
+- **Struct:** `Quest` (RequestItems fields) (`src/server/game/Quests/QuestDef.h`)
+- **Store:** `ObjectMgr::_questTemplates` (loaded into Quest)
+- **Loader:** Loaded within `ObjectMgr::LoadQuests()`
+
+See [Quest](#quest). Populates request items text and emotes.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| ID | int32 | Id | Primary key |
+| EmoteOnComplete | int32 | EmoteOnComplete | |
+| EmoteOnIncomplete | int32 | EmoteOnIncomplete | |
+| CompletionText | string | RequestItemsText | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## QuestTemplateAddon
+
+- **SQL Table:** `quest_template_addon`
+- **Struct:** `Quest` (addon fields) (`src/server/game/Quests/QuestDef.h`)
+- **Store:** `ObjectMgr::_questTemplates` (loaded into Quest)
+- **Loader:** Loaded within `ObjectMgr::LoadQuests()`
+
+See [Quest](#quest). The addon table provides extended quest properties.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| ID | int32 | Id | Primary key |
+| MaxLevel | int8 | MaxLevel | |
+| AllowableClasses | int32 | RequiredClasses | Class mask |
+| SourceSpellID | int32 | SourceSpellid | -> SpellEntry |
+| PrevQuestID | int32 | PrevQuestId | |
+| NextQuestID | int32 | NextQuestId | |
+| ExclusiveGroup | int32 | ExclusiveGroup | |
+| BreadcrumbForQuestId | int32 | BreadcrumbForQuestId | |
+| RewardMailTemplateID | int32 | RewardMailTemplateId | |
+| RewardMailDelay | int32 | RewardMailDelay | |
+| RequiredSkillID | int32 | RequiredSkillId | |
+| RequiredSkillPoints | int32 | RequiredSkillPoints | |
+| RequiredMinRepFaction | int32 | RequiredMinRepFaction | |
+| RequiredMaxRepFaction | int32 | RequiredMaxRepFaction | |
+| RequiredMinRepValue | int32 | RequiredMinRepValue | |
+| RequiredMaxRepValue | int32 | RequiredMaxRepValue | |
+| ProvidedItemCount | int8 | StartItemCount | |
+| SpecialFlags | int32 | SpecialFlags | enum QuestSpecialFlags |
+
+---
+
+## SkillFishingBaseLevel
+
+- **SQL Table:** `skill_fishing_base_level`
+- **Store:** `ObjectMgr::_fishingBaseForAreaStore` (`FishingBaseSkillContainer`)
+- **Loader:** `ObjectMgr::LoadFishingBaseSkillLevel()`
+
+See [Fishing](#fishing). Maps area ID to required fishing skill level.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| entry | int32 | map key | Area ID |
+| skill | int32 | map value | Base fishing skill level |
+
+---
+
+## SpawnGroupTemplateData
+
+- **Source:** Hardcoded default (no SQL table in base schema)
+- **Struct:** `SpawnGroupTemplateData` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `ObjectMgr::_spawnGroupDataStore` (`SpawnGroupDataContainer` = `std::unordered_map&lt;uint32, SpawnGroupTemplateData&gt;`)
+- **Loader:** Initialized in ObjectMgr constructor
+
+See [SpawnGroupData](#spawngroupdata). Default entry: `{0, "Default Group", 0, SPAWNGROUP_FLAG_SYSTEM}`.
+
+| Field | C++ Type | Notes |
+|-------|----------|-------|
+| groupId | uint32 | |
+| name | std::string | |
+| mapid | uint16 | |
+| flags | SpawnGroupFlags | SPAWNGROUP_FLAG_SYSTEM, etc. |
+
+---
+
+## SpellScriptNames
+
+- **SQL Table:** `spell_script_names`
+- **Struct:** `SpellScriptsContainer` entry (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** Aggregated into `ObjectMgr::_scriptNamesStore`
+- **Loader:** Loaded within `ObjectMgr::LoadScriptNames()`
+
+Maps spell IDs to their script handler names. See [ScriptNameStore](#scriptnamestore).
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| spell_id | int32 | spell_id | -> SpellEntry |
+| ScriptName | string | ScriptName | Resolved to script ID |
+
+---
+
+## TrainerSpell
+
+- **SQL Table:** `trainer_spell`
+- **Struct:** `Trainer::Spell` (`Trainer.h`)
+- **Store:** Nested within `ObjectMgr::_trainers`
+- **Loader:** Loaded within `ObjectMgr::LoadTrainers()`
+
+See [Trainer Stores](#trainer-stores). Each row defines one spell available from a trainer.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| TrainerId | int32 | *(parent key)* | Trainer ID |
+| SpellId | int32 | spell | -> SpellEntry |
+| MoneyCost | int32 | moneyCost | |
+| ReqSkillLine | int32 | reqSkill | |
+| ReqSkillRank | int32 | reqSkillRank | |
+| ReqAbility1 | int32 | reqAbility[0] | |
+| ReqAbility2 | int32 | reqAbility[1] | |
+| ReqAbility3 | int32 | reqAbility[2] | |
+| ReqLevel | int8 | reqLevel | |
+| VerifiedBuild | int32 | *(not loaded)* | |
+
+---
+
+## VehicleTemplateAccessory
+
+- **SQL Table:** `vehicle_template_accessory`
+- **Struct:** `VehicleAccessory` (`src/server/game/Entities/Vehicle/VehicleDefines.h`)
+- **Store:** `ObjectMgr::_vehicleTemplateAccessoryStore` (`VehicleAccessoryContainer`)
+- **Loader:** `ObjectMgr::LoadVehicleTemplateAccessories()`
+
+See [VehicleAccessory](#vehicleaccessory). Template-based (per-entry) vehicle passengers.
+
+| SQL Column | C++ Type | Field Name | Notes |
+|-----------|----------|------------|-------|
+| seat_entry | uint32 | map key | Vehicle creature entry |
+| accessory_entry | uint32 | AccessoryEntry | Passenger creature entry |
+| seat_id | int8 | SeatId | |
+| minion | bool | IsMinion | |
+| description | string | *(not loaded)* | SQL comment |
+| summontype | uint8 | SummonedType | Default 6 |
+| summontimer | uint32 | SummonTime | Default 30000 |
+
+---
+
+## WaypointScripts
+
+- **SQL Table:** `waypoint_scripts`
+- **Struct:** `ScriptInfo` (`src/server/game/Globals/ObjectMgr.h`)
+- **Store:** `sWaypointScripts` (`ScriptMapMap`)
+- **Loader:** `ObjectMgr::LoadWaypointScripts()`
+
+Same structure as [ScriptInfo](#scriptinfo). Includes an additional `guid` column (SQL PRIMARY KEY only, not loaded). All other fields (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) are identical to spell_scripts/event_scripts.

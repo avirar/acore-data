@@ -2,13 +2,15 @@
 
 ## Overview
 
-AzerothCore has three categories of datastores:
+AzerothCore has four categories of datastores:
 
 1. **DBC-Backed Stores** (~112 stores) - Binary `.dbc` files loaded into packed C structs via `DBCStorage<T>`, with optional SQL overlay tables (`*_dbc` in `db_world`). See [dbc-backed-stores.md](dbc-backed-stores.md).
 
-2. **SQL-Only Stores (ObjectMgr)** (~100+ tables) - Template/spawn data for creatures, gameobjects, items, quests, etc. loaded directly via `WorldDatabase.Query()` into `std::unordered_map` containers managed by `ObjectMgr`. See [sql-objectmgr-stores.md](sql-objectmgr-stores.md).
+2. **SQL-Only Stores (ObjectMgr)** (~95 tables) - Template/spawn data for creatures, gameobjects, items, quests, etc. loaded directly via `WorldDatabase.Query()` into `std::unordered_map` containers managed by `ObjectMgr`. See [sql-objectmgr-stores.md](sql-objectmgr-stores.md).
 
-3. **SQL Stores (Other Managers)** (~30+ managers) - Data loaded by other singleton managers: `SpellMgr`, `PoolMgr`, `GameEventMgr`, `LootStore`, `SmartAIMgr`, `ConditionMgr`, `WaypointMgr`, etc. See [sql-manager-stores.md](sql-manager-stores.md).
+3. **SQL Stores (Other Managers)** (~48 managers/systems) - Data loaded by other singleton managers: `SpellMgr`, `PoolMgr`, `GameEventMgr`, `LootStore`, `SmartAIMgr`, `ConditionMgr`, `WaypointMgr`, etc. See [sql-manager-stores.md](sql-manager-stores.md).
+
+4. **SQL Auxiliary Stores** (~171 tables) - Auto-discovered tables from all databases (`acore_world`, `acore_characters`, `acore_auth`, `acore_playerbots`) not in the static registry. See [sql-auxiliary-stores.md](sql-auxiliary-stores.md).
 
 For a complete cross-reference index, see [cross-reference.md](cross-reference.md).
 
