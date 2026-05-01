@@ -3078,6 +3078,18 @@
         {
           "source": "CreatureTextEntry",
           "field": "emote"
+        },
+        {
+          "source": "QuestDetails",
+          "field": "Emote1, Emote2, Emote3, Emote4"
+        },
+        {
+          "source": "QuestOfferReward",
+          "field": "Emote1, Emote2, Emote3, Emote4"
+        },
+        {
+          "source": "QuestRequestItems",
+          "field": "EmoteOnComplete, EmoteOnIncomplete"
         }
       ]
     },
@@ -3343,6 +3355,10 @@
         {
           "source": "TavernAreaTrigger",
           "field": "uint32"
+        },
+        {
+          "source": "QuestTemplateAddon",
+          "field": "RequiredMaxRepFaction, RequiredMinRepFaction"
         }
       ],
       "fields": {
@@ -6663,6 +6679,14 @@
         {
           "source": "WorldMapAreaEntry",
           "field": "map_id, virtual_map_id"
+        },
+        {
+          "source": "Quest",
+          "field": "POIContinent"
+        },
+        {
+          "source": "QuestPOI",
+          "field": "uint32"
         }
       ]
     },
@@ -7793,6 +7817,10 @@
         {
           "source": "SkillRaceClassInfoEntry",
           "field": "SkillID, SkillTierID"
+        },
+        {
+          "source": "QuestTemplateAddon",
+          "field": "RequiredSkillID"
         }
       ]
     },
@@ -11671,6 +11699,18 @@
         {
           "source": "VehicleTemplateAccessory",
           "field": "accessory_entry"
+        },
+        {
+          "source": "CreatureQuestItem",
+          "field": "uint32"
+        },
+        {
+          "source": "CreatureQuestender",
+          "field": "id"
+        },
+        {
+          "source": "QuestRelations",
+          "field": "uint32"
         }
       ],
       "fields": {
@@ -12994,7 +13034,21 @@
             "id_col": "ID"
           }
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "GameObjectQuestItem",
+          "field": "uint32"
+        },
+        {
+          "source": "GameobjectQuestender",
+          "field": "id"
+        },
+        {
+          "source": "GameobjectQueststarter",
+          "field": "id"
+        }
+      ]
     },
     "GameObjectTemplateAddon": {
       "category": "sql_objectmgr",
@@ -13766,6 +13820,46 @@
         {
           "source": "creature_onkill_reputation",
           "field": "quest_identifier"
+        },
+        {
+          "source": "CreatureQuestender",
+          "field": "quest"
+        },
+        {
+          "source": "GameobjectQuestender",
+          "field": "quest"
+        },
+        {
+          "source": "GameobjectQueststarter",
+          "field": "quest"
+        },
+        {
+          "source": "QuestDetails",
+          "field": "ID"
+        },
+        {
+          "source": "QuestOfferReward",
+          "field": "ID"
+        },
+        {
+          "source": "QuestPOI",
+          "field": ""
+        },
+        {
+          "source": "QuestPoiPoints",
+          "field": "QuestID"
+        },
+        {
+          "source": "QuestRelations",
+          "field": "uint32"
+        },
+        {
+          "source": "QuestRequestItems",
+          "field": "ID"
+        },
+        {
+          "source": "QuestTemplateAddon",
+          "field": "BreadcrumbForQuestId, NextQuestID, PrevQuestID"
         }
       ],
       "fields": {
@@ -14012,19 +14106,21 @@
           "name": "POIContinent",
           "type": "uint32",
           "sql_column": "POIContinent",
-          "notes": ""
+          "notes": "Fallback single-point POI MapID (use quest_poi table for multi-point objectives)",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry"
         },
         "POIx": {
           "name": "POIx",
           "type": "float",
           "sql_column": "POIx",
-          "notes": ""
+          "notes": "Fallback POI X coordinate (float, -16000..16000)"
         },
         "POIy": {
           "name": "POIy",
           "type": "float",
           "sql_column": "POIy",
-          "notes": ""
+          "notes": "Fallback POI Y coordinate (float, -16000..16000)"
         },
         "POIPriority": {
           "name": "POIPriority",
@@ -14084,7 +14180,7 @@
           "name": "RequiredNpcOrGo",
           "type": "int32[4]",
           "sql_column": "RequiredNpcOrGo1..4",
-          "notes": ">0 creature, <0 gameobject",
+          "notes": ">0=CreatureTemplate entry (direct look-up), <0=GameObjectTemplate entry (use abs(value)). RequiredNPCOrGoCount is how many of each must be interacted with.",
           "references": [
             {
               "type": "sql_table",
@@ -14382,86 +14478,113 @@
       "c_struct": "QuestPOI",
       "fields": {
         "QuestID": {
-          "name": "",
+          "name": "QuestID",
           "type": "*(grouping)*",
           "sql_column": "QuestID",
-          "notes": "Matches to parent QuestPOI"
+          "notes": "Matches to parent QuestPOI",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID",
+          "_source_table": "quest_poi"
         },
         "id": {
           "name": "uint32",
           "type": "Id",
           "sql_column": "id",
-          "notes": "POI identifier"
+          "notes": "POI identifier",
+          "_source_table": "quest_poi"
         },
         "ObjectiveIndex": {
           "name": "int32",
           "type": "ObjectiveIndex",
           "sql_column": "ObjectiveIndex",
-          "notes": ""
+          "notes": "-1=quest turn-in point, 0-3=objective index",
+          "_source_table": "quest_poi"
         },
         "MapID": {
           "name": "uint32",
           "type": "MapId",
           "sql_column": "MapID",
-          "notes": ""
+          "notes": "Map ID (see MapEntry)",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID",
+          "_source_table": "quest_poi"
         },
         "WorldMapAreaId": {
           "name": "uint32",
           "type": "AreaId",
           "sql_column": "WorldMapAreaId",
-          "notes": ""
+          "notes": "Maps to AreaTable entry for minimap overlay",
+          "_source_table": "quest_poi"
         },
         "Floor": {
           "name": "uint32",
           "type": "FloorId",
           "sql_column": "Floor",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi"
         },
         "Priority": {
           "name": "uint32",
           "type": "Unk3",
           "sql_column": "Priority",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi"
         },
         "Flags": {
           "name": "uint32",
           "type": "Unk4",
           "sql_column": "Flags",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi"
         },
         "VerifiedBuild": {
           "name": "",
           "type": "*(not loaded)*",
           "sql_column": "VerifiedBuild",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi"
         },
         "Idx1": {
           "name": "",
           "type": "POI id match",
           "sql_column": "Idx1",
-          "notes": "Matches points to POI by id"
+          "notes": "Matches points to POI by id",
+          "_source_table": "quest_poi_points",
+          "references": "QuestPOI",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "Idx2": {
           "name": "",
           "type": "*(ordering)*",
           "sql_column": "Idx2",
-          "notes": "ORDER BY Idx2"
+          "notes": "ORDER BY Idx2",
+          "_source_table": "quest_poi_points"
         },
         "X": {
           "name": "int32",
           "type": "x",
           "sql_column": "X",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi_points"
         },
         "Y": {
           "name": "int32",
           "type": "y",
           "sql_column": "Y",
-          "notes": ""
+          "notes": "",
+          "_source_table": "quest_poi_points"
         }
       },
-      "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "QuestPOI",
+          "field": ""
+        }
+      ]
     },
     "QuestAreaTrigger": {
       "category": "sql_objectmgr",
@@ -14535,16 +14658,22 @@
       "c_struct": "QuestRelations",
       "fields": {
         "id": {
-          "name": "uint32",
-          "type": "multimap key",
+          "name": "id",
+          "type": "uint32",
           "sql_column": "id",
-          "notes": "Creature/GO entry"
+          "notes": "Creature/GO entry",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "quest": {
-          "name": "uint32",
-          "type": "multimap value",
+          "name": "quest",
+          "type": "uint32",
           "sql_column": "quest",
-          "notes": "Quest ID"
+          "notes": "Quest ID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "is_leaf": true,
@@ -16917,7 +17046,10 @@
           "name": "uint32",
           "type": "map key",
           "sql_column": "GameObjectEntry",
-          "notes": "GO template entry"
+          "notes": "GO template entry",
+          "references": "GameObjectTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "ItemId": {
           "name": "uint32",
@@ -16957,7 +17089,10 @@
           "name": "uint32",
           "type": "map key",
           "sql_column": "CreatureEntry",
-          "notes": "Creature template entry"
+          "notes": "Creature template entry",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "ItemId": {
           "name": "uint32",
@@ -20392,12 +20527,18 @@
         "0": {
           "name": "id",
           "type": "int32",
-          "sql_column": "id"
+          "sql_column": "id",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "1": {
           "name": "quest",
           "type": "int32",
-          "sql_column": "quest"
+          "sql_column": "quest",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -21366,12 +21507,18 @@
         "0": {
           "name": "id",
           "type": "int32",
-          "sql_column": "id"
+          "sql_column": "id",
+          "references": "GameObjectTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "1": {
           "name": "quest",
           "type": "int32",
-          "sql_column": "quest"
+          "sql_column": "quest",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -21390,12 +21537,18 @@
         "0": {
           "name": "id",
           "type": "int32",
-          "sql_column": "id"
+          "sql_column": "id",
+          "references": "GameObjectTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "1": {
           "name": "quest",
           "type": "int32",
-          "sql_column": "quest"
+          "sql_column": "quest",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -23072,27 +23225,42 @@
         "0": {
           "name": "ID",
           "type": "int32",
-          "sql_column": "ID"
+          "sql_column": "ID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "1": {
           "name": "Emote1",
           "type": "int32",
-          "sql_column": "Emote1"
+          "sql_column": "Emote1",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Emote2",
           "type": "int32",
-          "sql_column": "Emote2"
+          "sql_column": "Emote2",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Emote3",
           "type": "int32",
-          "sql_column": "Emote3"
+          "sql_column": "Emote3",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "Emote4",
           "type": "int32",
-          "sql_column": "Emote4"
+          "sql_column": "Emote4",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "EmoteDelay1",
@@ -23200,27 +23368,42 @@
         "0": {
           "name": "ID",
           "type": "int32",
-          "sql_column": "ID"
+          "sql_column": "ID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "1": {
           "name": "Emote1",
           "type": "int32",
-          "sql_column": "Emote1"
+          "sql_column": "Emote1",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Emote2",
           "type": "int32",
-          "sql_column": "Emote2"
+          "sql_column": "Emote2",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Emote3",
           "type": "int32",
-          "sql_column": "Emote3"
+          "sql_column": "Emote3",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "Emote4",
           "type": "int32",
-          "sql_column": "Emote4"
+          "sql_column": "Emote4",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "EmoteDelay1",
@@ -23304,19 +23487,22 @@
           "name": "QuestID",
           "type": "int32",
           "sql_column": "QuestID",
-          "references": "quest_template",
-          "reference_type": "sql_table",
-          "reference_column": "ID"
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID",
+          "notes": "Quest ID (FK to quest_template.ID)"
         },
         "1": {
           "name": "Idx1",
           "type": "int32",
-          "sql_column": "Idx1"
+          "sql_column": "Idx1",
+          "notes": "Matches quest_poi.id for same QuestID"
         },
         "2": {
           "name": "Idx2",
           "type": "int32",
-          "sql_column": "Idx2"
+          "sql_column": "Idx2",
+          "notes": "Point index within POI polygon, ORDER BY Idx2"
         },
         "3": {
           "name": "X",
@@ -23348,17 +23534,26 @@
         "0": {
           "name": "ID",
           "type": "int32",
-          "sql_column": "ID"
+          "sql_column": "ID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "1": {
           "name": "EmoteOnComplete",
           "type": "int32",
-          "sql_column": "EmoteOnComplete"
+          "sql_column": "EmoteOnComplete",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "EmoteOnIncomplete",
           "type": "int32",
-          "sql_column": "EmoteOnIncomplete"
+          "sql_column": "EmoteOnIncomplete",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "CompletionText",
@@ -23444,12 +23639,18 @@
         "4": {
           "name": "PrevQuestID",
           "type": "int32",
-          "sql_column": "PrevQuestID"
+          "sql_column": "PrevQuestID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "5": {
           "name": "NextQuestID",
           "type": "int32",
-          "sql_column": "NextQuestID"
+          "sql_column": "NextQuestID",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "6": {
           "name": "ExclusiveGroup",
@@ -23459,7 +23660,10 @@
         "7": {
           "name": "BreadcrumbForQuestId",
           "type": "int32",
-          "sql_column": "BreadcrumbForQuestId"
+          "sql_column": "BreadcrumbForQuestId",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "8": {
           "name": "RewardMailTemplateID",
@@ -23474,7 +23678,10 @@
         "10": {
           "name": "RequiredSkillID",
           "type": "int32",
-          "sql_column": "RequiredSkillID"
+          "sql_column": "RequiredSkillID",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "11": {
           "name": "RequiredSkillPoints",
@@ -23484,12 +23691,18 @@
         "12": {
           "name": "RequiredMinRepFaction",
           "type": "int32",
-          "sql_column": "RequiredMinRepFaction"
+          "sql_column": "RequiredMinRepFaction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "13": {
           "name": "RequiredMaxRepFaction",
           "type": "int32",
-          "sql_column": "RequiredMaxRepFaction"
+          "sql_column": "RequiredMaxRepFaction",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "14": {
           "name": "RequiredMinRepValue",
