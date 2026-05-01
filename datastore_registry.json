@@ -11777,6 +11777,287 @@
           "sql_column": "ScriptName",
           "notes": ""
         }
+      },
+      "type_field_mappings": {
+        "0": {
+          "data1": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          }
+        },
+        "1": {
+          "data1": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data3": {
+            "name": "linkedTrap",
+            "resolve_type": "sql",
+            "target": "gameobject_template"
+          }
+        },
+        "2": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data3": {
+            "name": "gossipID",
+            "resolve_type": "sql",
+            "target": "gossip_menu_option",
+            "id_col": "menu_id"
+          }
+        },
+        "3": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data1": {
+            "name": "lootId",
+            "resolve_type": "loot",
+            "target": "gameobject_loot_template",
+            "id_col": "Entry"
+          },
+          "data6": {
+            "name": "eventId",
+            "resolve_type": "sql",
+            "target": "event_scripts"
+          },
+          "data7": {
+            "name": "linkedTrapId",
+            "resolve_type": "sql",
+            "target": "gameobject_template"
+          },
+          "data8": {
+            "name": "questId",
+            "resolve_type": "sql",
+            "target": "quest_template",
+            "id_col": "ID"
+          }
+        },
+        "5": {
+          "data5": {
+            "name": "questId",
+            "resolve_type": "sql",
+            "target": "quest_template",
+            "id_col": "ID"
+          }
+        },
+        "6": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data3": {
+            "name": "spellId",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "8": {
+          "data0": {
+            "name": "focusId",
+            "resolve_type": "dbc",
+            "target": "SpellFocusObject",
+            "id_col": "ID"
+          },
+          "data4": {
+            "name": "questID",
+            "resolve_type": "sql",
+            "target": "quest_template",
+            "id_col": "ID"
+          }
+        },
+        "9": {
+          "data0": {
+            "name": "pageID",
+            "resolve_type": "sql",
+            "target": "page_text",
+            "id_col": "entry"
+          }
+        },
+        "10": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data1": {
+            "name": "questId",
+            "resolve_type": "sql",
+            "target": "quest_template",
+            "id_col": "ID"
+          },
+          "data2": {
+            "name": "eventId",
+            "resolve_type": "sql",
+            "target": "event_scripts"
+          },
+          "data10": {
+            "name": "spellId",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data12": {
+            "name": "linkedTrapId",
+            "resolve_type": "sql",
+            "target": "gameobject_template"
+          },
+          "data19": {
+            "name": "gossipID",
+            "resolve_type": "sql",
+            "target": "gossip_menu_option",
+            "id_col": "menu_id"
+          }
+        },
+        "12": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          }
+        },
+        "13": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data1": {
+            "name": "cinematicId",
+            "resolve_type": "dbc",
+            "target": "CinematicCamera",
+            "id_col": "ID"
+          }
+        },
+        "15": {
+          "data0": {
+            "name": "taxiPathId",
+            "resolve_type": "dbc",
+            "target": "TaxiPath",
+            "id_col": "ID"
+          }
+        },
+        "18": {
+          "data1": {
+            "name": "spellId",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data2": {
+            "name": "animSpell",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data4": {
+            "name": "casterTargetSpell",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "22": {
+          "data0": {
+            "name": "spellId",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "24": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data1": {
+            "name": "pickupSpell",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data3": {
+            "name": "returnAura",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data4": {
+            "name": "returnSpell",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "25": {
+          "data1": {
+            "name": "lootId",
+            "resolve_type": "loot",
+            "target": "gameobject_loot_template",
+            "id_col": "Entry"
+          },
+          "data4": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          }
+        },
+        "26": {
+          "data0": {
+            "name": "lockId",
+            "resolve_type": "dbc",
+            "target": "Lock",
+            "id_col": "ID"
+          },
+          "data2": {
+            "name": "pickupSpell",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "30": {
+          "data2": {
+            "name": "auraID1",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          },
+          "data4": {
+            "name": "auraID2",
+            "resolve_type": "dbc",
+            "target": "Spell",
+            "id_col": "ID"
+          }
+        },
+        "31": {
+          "data0": {
+            "name": "mapID",
+            "resolve_type": "dbc",
+            "target": "Map",
+            "id_col": "ID"
+          }
+        }
       }
     },
     "GameObjectTemplateAddon": {
