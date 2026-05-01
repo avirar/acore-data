@@ -10,8 +10,8 @@ AzerothCore stores game data in four categories of datastores. This server gives
 |----------|------:|-------------|
 | `dbc_backed` | ~112 | Binary `.dbc` files loaded into packed C structs, with optional SQL overlay (`*_dbc` tables) |
 | `sql_objectmgr` | ~95 | ObjectMgr SQL tables — creature templates, gameobjects, items, quests, gossip, etc. |
-| `sql_manager` | ~30+ | Tables loaded by other singleton managers (SpellMgr, PoolMgr, GameEventMgr, LootStore, …) |
-| `sql_auxiliary` | rest | Discovered SQL tables not in the static registry |
+| `sql_manager` | ~48 | Tables loaded by other singleton managers (SpellMgr, PoolMgr, GameEventMgr, LootStore, …) |
+| `sql_auxiliary` | ~171 | Discovered SQL tables not in the static registry |
 
 For the full technical reference on how each category is loaded in AzerothCore, see [docs/datastores/README.md](docs/datastores/README.md).
 
@@ -219,6 +219,7 @@ acore-data/
 │   ├── dbc-backed-stores.md
 │   ├── sql-objectmgr-stores.md
 │   ├── sql-manager-stores.md
+│   ├── sql-auxiliary-stores.md
 │   └── cross-reference.md
 │
 ├── generators/                  # Scripts to generate/update the registry
