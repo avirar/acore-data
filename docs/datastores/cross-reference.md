@@ -12,9 +12,9 @@ Quick lookup indices for all datastores. See also:
 
 | Struct Name | Source | Document |
 |-------------|--------|----------|
+| AchievementCategoryEntry | Achievement_Category.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#achievementcategoryentry) |
 | AchievementCriteriaData | achievement_criteria_data | [sql-manager-stores.md](sql-manager-stores.md#8-achievementglobalmgr-sachievementmgr) |
 | AchievementCriteriaEntry | Achievement_Criteria.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#achievementcriteriaentry) |
-| AchievementCategoryEntry | Achievement_Category.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#achievementcategoryentry) |
 | AchievementEntry | Achievement.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#achievemententry) |
 | AchievementReward | achievement_reward | [sql-manager-stores.md](sql-manager-stores.md#8-achievementglobalmgr-sachievementmgr) |
 | AchievementRewardLocale | achievement_reward_locale | [sql-manager-stores.md](sql-manager-stores.md#8-achievementglobalmgr-sachievementmgr) |
@@ -27,10 +27,11 @@ Quick lookup indices for all datastores. See also:
 | AreaTriggerTeleport | areatrigger_teleport | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#areatriggerteleport) |
 | AuctionEntry | auctionhouse (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#30-auctionhousemgr-sauctionmgr) |
 | AuctionHouseEntry | AuctionHouse.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#auctionhouseentry) |
-| BannedAddon | banned_addons (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#31-addonmgr-namespace) |
 | BankBagSlotPricesEntry | BankBagSlotPrices.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#bankbagslotpricesentry) |
+| BannedAddon | banned_addons (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#31-addonmgr-namespace) |
 | BarberShopStyleEntry | BarberShopStyle.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#barbershopstyleentry) |
 | BattlegroundTemplate | battleground_template | [sql-manager-stores.md](sql-manager-stores.md#10-battlegroundmgr-sbattlegroundmgr) |
+| BattlemasterEntry | battlemaster_entry | [sql-manager-stores.md](sql-manager-stores.md#battlemasterentry) |
 | BattlemasterListEntry | BattlemasterList.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#battlemasterlistentry) |
 | BroadcastText | broadcast_text | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#broadcasttext) |
 | CalendarEvent | calendar_events (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#29-calendarmgr-scalendarmgr) |
@@ -44,10 +45,12 @@ Quick lookup indices for all datastores. See also:
 | ChrRacesEntry | ChrRaces.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#chrracesentry) |
 | CinematicCameraEntry | CinematicCamera.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#cinematiccameraentry) |
 | CinematicSequencesEntry | CinematicSequences.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#cinematicsequencesentry) |
+| Command | command | [sql-manager-stores.md](sql-manager-stores.md#command) |
 | Condition | conditions | [sql-manager-stores.md](sql-manager-stores.md#4-conditionmgr-sconditionmgr) |
 | CreatureAddon | creature_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creatureaddon) |
 | CreatureBaseStats | creature_classlevelstats | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturebasestats) |
 | CreatureData | creature | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturedata) |
+| CreatureDefaultTrainer | creature_default_trainer | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturedefaulttrainer) |
 | CreatureDisplayInfoEntry | CreatureDisplayInfo.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturedisplayinfoentry) |
 | CreatureDisplayInfoExtraEntry | CreatureDisplayInfoExtra.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturedisplayinfoextraentry) |
 | CreatureFamilyEntry | CreatureFamily.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturefamilyentry) |
@@ -55,16 +58,23 @@ Quick lookup indices for all datastores. See also:
 | CreatureModelDataEntry | CreatureModelData.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturemodeldataentry) |
 | CreatureModelInfo | creature_model_info | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturemodelinfo) |
 | CreatureMovementData | creature_template_movement | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplate) |
+| CreatureQuestender | creature_questender | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturequestender) |
 | CreatureQuestItem | creature_questitem | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturequestitem) |
-| CreatureSpellDataEntry | CreatureSpellData.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturespelldataentry) |
 | CreatureSparring | creature_sparring | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturesparring) |
+| CreatureSpellDataEntry | CreatureSpellData.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturespelldataentry) |
+| CreatureTemplate | creature_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplate) |
+| CreatureTemplateAddon | creature_template_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplateaddon) |
+| CreatureTemplateModel | creature_template_model | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplatemodel) |
+| CreatureTemplateMovement | creature_template_movement | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplatemovement) |
+| CreatureTemplateResistance | creature_template_resistance | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplateresistance) |
+| CreatureTemplateSpell | creature_template_spell | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplatespell) |
 | CreatureTextEntry | creature_text | [sql-manager-stores.md](sql-manager-stores.md#13-creaturetextmgr-screaturetextmgr) |
 | CreatureTextLocale | creature_text_locale | [sql-manager-stores.md](sql-manager-stores.md#13-creaturetextmgr-screaturetextmgr) |
-| CreatureTemplate | creature_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#creaturetemplate) |
 | CreatureTypeEntry | CreatureType.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#creaturetypeentry) |
 | CurrencyTypesEntry | CurrencyTypes.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#currencytypesentry) |
 | DestructibleModelDataEntry | DestructibleModelData.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#destructiblemodeldataentry) |
 | DisableData | disables | [sql-manager-stores.md](sql-manager-stores.md#11-disablemgr-sdisablemgr) |
+| DungeonAccessRequirements | dungeon_access_requirements | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#dungeonaccessrequirements) |
 | DungeonEncounter | instance_encounters | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#dungeonencounter) |
 | DungeonEncounterEntry | DungeonEncounter.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#dungeonencounterentry) |
 | DungeonProgressionRequirements | dungeon_access_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#dungeonprogressionrequirements) |
@@ -75,30 +85,35 @@ Quick lookup indices for all datastores. See also:
 | EmotesTextSoundEntry | EmotesTextSound.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#emotestextsoundentry) |
 | EnchStoreItem | item_enchantment_template | [sql-manager-stores.md](sql-manager-stores.md#19-itemenchantmentmgr-standalone) |
 | EquipmentInfo | creature_equip_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#equipmentinfo) |
+| EventScripts | event_scripts | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#eventscripts) |
 | ExplorationBaseXP | exploration_basexp | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#explorationbasexp) |
 | FactionEntry | Faction.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#factionentry) |
 | FactionTemplateEntry | FactionTemplate.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#factiontemplateentry) |
 | FormationInfo | creature_formations | [sql-manager-stores.md](sql-manager-stores.md#12-formationmgr-sformationmgr) |
+| GameEventArenaSeasons | game_event_arena_seasons | [sql-manager-stores.md](sql-manager-stores.md#gameeventarenaseasons) |
 | GameEventData | game_event | [sql-manager-stores.md](sql-manager-stores.md#5-gameeventmgr-sgameeventmgr) |
 | GameEventFinishCondition | game_event_condition | [sql-manager-stores.md](sql-manager-stores.md#5-gameeventmgr-sgameeventmgr) |
+| GameGraveyard | game_graveyard | [sql-manager-stores.md](sql-manager-stores.md#gamegraveyard) |
 | GameObjectAddon | gameobject_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectaddon) |
 | GameObjectArtKitEntry | GameObjectArtKit.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gameobjectartkitentry) |
 | GameObjectData | gameobject | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectdata) |
 | GameObjectDisplayInfoEntry | GameObjectDisplayInfo.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gameobjectdisplayinfoentry) |
+| GameobjectQuestender | gameobject_questender | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectquestender) |
 | GameObjectQuestItem | gameobject_questitem | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectquestitem) |
+| GameobjectQueststarter | gameobject_queststarter | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectqueststarter) |
 | GameObjectSummonData | gameobject_summon_groups | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjectsummondata) |
 | GameObjectTemplate | gameobject_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjecttemplate) |
 | GameObjectTemplateAddon | gameobject_template_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gameobjecttemplateaddon) |
 | GameTele | game_tele | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gametele) |
 | GemPropertiesEntry | GemProperties.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gempropertiesentry) |
-| GmTicket | gm_ticket (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#23-ticketmgr-sticketmgr) |
 | GlyphPropertiesEntry | GlyphProperties.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#glyphpropertiesentry) |
 | GlyphSlotEntry | GlyphSlot.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#glyphslotentry) |
+| GmTicket | gm_ticket (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#23-ticketmgr-sticketmgr) |
 | GossipMenuItems | gossip_menu_option | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gossipmenuitems) |
 | GossipMenus | gossip_menu | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gossipmenus) |
 | GossipText | npc_text | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#gossiptext) |
+| GraveyardZone | graveyard_zone | [sql-manager-stores.md](sql-manager-stores.md#graveyardzone) |
 | Group | groups (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#26-groupmgr-sgroupmgr) |
-| Guild | guild (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#27-guildmgr-sguildmgr) |
 | GtBarberShopCostBaseEntry | gtBarberShopCostBase.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtbarbershopcostbaseentry) |
 | GtChanceToMeleeCritBaseEntry | gtChanceToMeleeCritBase.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtchancetomeleecritbaseentry) |
 | GtChanceToMeleeCritEntry | gtChanceToMeleeCrit.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtchancetomeleecritentry) |
@@ -110,6 +125,7 @@ Quick lookup indices for all datastores. See also:
 | GtOCTRegenHPEntry | gtOCTRegenHP.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtoctregenhpentry) |
 | GtRegenHPPerSptEntry | gtRegenHPPerSpt.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtregenhppersptentry) |
 | GtRegenMPPerSptEntry | gtRegenMPPerSpt.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#gtregenmppersptentry) |
+| Guild | guild (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#27-guildmgr-sguildmgr) |
 | HolidaysEntry | Holidays.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#holidaysentry) |
 | InstanceSave | instance (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#25-instancesavemgr-sinstancesavemgr) |
 | InstanceTemplate | instance_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#instancetemplate) |
@@ -144,9 +160,22 @@ Quick lookup indices for all datastores. See also:
 | OverrideSpellDataEntry | OverrideSpellData.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#overridespelldataentry) |
 | PageText | page_text | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#pagetext) |
 | PetAura | spell_pet_auras | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
-| PetLevelInfo | pet_levelstats | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#petlevelinfo) |
 | Petition | petition (characters DB) | [sql-manager-stores.md](sql-manager-stores.md#24-petitionmgr-spetitionmgr) |
+| PetLevelInfo | pet_levelstats | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#petlevelinfo) |
+| PlayerClassStats | player_class_stats | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerclassstats) |
+| PlayercreateinfoAction | playercreateinfo_action | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playercreateinfoaction) |
+| PlayercreateinfoCastSpell | playercreateinfo_cast_spell | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playercreateinfocastspell) |
+| PlayercreateinfoItem | playercreateinfo_item | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playercreateinfoitem) |
+| PlayercreateinfoSkills | playercreateinfo_skills | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playercreateinfoskills) |
+| PlayercreateinfoSpellCustom | playercreateinfo_spell_custom | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playercreateinfospellcustom) |
+| PlayerFactionchangeAchievement | player_factionchange_achievement | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangeachievement) |
+| PlayerFactionchangeItems | player_factionchange_items | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangeitems) |
+| PlayerFactionchangeQuests | player_factionchange_quests | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangequests) |
+| PlayerFactionchangeReputations | player_factionchange_reputations | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangereputations) |
+| PlayerFactionchangeSpells | player_factionchange_spells | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangespells) |
+| PlayerFactionchangeTitles | player_factionchange_titles | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerfactionchangetitles) |
 | PlayerInfo | playercreateinfo | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerinfo) |
+| PlayerRaceStats | player_race_stats | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerracestats) |
 | PlayerShapeshiftModel | player_shapeshift_model | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playershapeshiftmodel) |
 | PlayerTotemModel | player_totem_model | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playertotemmodel) |
 | PlayerXPperLevel | player_xp_for_level | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#playerxpperlevel) |
@@ -156,11 +185,18 @@ Quick lookup indices for all datastores. See also:
 | PowerDisplayEntry | PowerDisplay.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#powerdisplayentry) |
 | PvPDifficultyEntry | PvpDifficulty.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#pvpdifficultyentry) |
 | Quest | quest_template | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#quest) |
+| QuestDetails | quest_details | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questdetails) |
 | QuestFactionRewEntry | QuestFactionReward.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#questfactionrewentry) |
 | QuestGreeting | quest_greeting | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questgreeting) |
+| QuestMailSender | quest_mail_sender | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questmailsender) |
+| QuestMoneyRewardArray | quest_money_reward | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questmoneyrewardarray) |
+| QuestOfferReward | quest_offer_reward | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questofferreward) |
 | QuestPOI | quest_poi | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questpoi) |
 | QuestPOIPoint | quest_poi_points | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questpoi) |
+| QuestPoiPoints | quest_poi_points | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questpoipoints) |
+| QuestRequestItems | quest_request_items | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questrequestitems) |
 | QuestSortEntry | QuestSort.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#questsortentry) |
+| QuestTemplateAddon | quest_template_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#questtemplateaddon) |
 | QuestXPEntry | QuestXP.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#questxpentry) |
 | RandomPropertiesPointsEntry | RandPropPoints.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#randompropertiespointsentry) |
 | RepRewardRate | reputation_reward_rate | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#reprewardrate) |
@@ -170,11 +206,16 @@ Quick lookup indices for all datastores. See also:
 | ScalingStatDistributionEntry | ScalingStatDistribution.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#scalingstatdistributionentry) |
 | ScalingStatValuesEntry | ScalingStatValues.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#scalingstatvaluesentry) |
 | ScriptInfo | spell_scripts/event_scripts/waypoint_scripts | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#scriptinfo) |
+| ScriptWaypoint | script_waypoint | [sql-manager-stores.md](sql-manager-stores.md#scriptwaypoint) |
 | ServerMail | mail_server_template | [sql-manager-stores.md](sql-manager-stores.md#15-servermailmgr-sservermailmgr) |
 | ServerMailCondition | mail_server_template_conditions | [sql-manager-stores.md](sql-manager-stores.md#15-servermailmgr-sservermailmgr) |
 | ServerMailItems | mail_server_template_items | [sql-manager-stores.md](sql-manager-stores.md#15-servermailmgr-sservermailmgr) |
+| SkillDiscoveryTemplate | skill_discovery_template | [sql-manager-stores.md](sql-manager-stores.md#skilldiscoverytemplate) |
+| SkillExtraItemTemplate | skill_extra_item_template | [sql-manager-stores.md](sql-manager-stores.md#skillextraitemtemplate) |
+| SkillFishingBaseLevel | skill_fishing_base_level | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#skillfishingbaselevel) |
 | SkillLineAbilityEntry | SkillLineAbility.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#skilllineabilityentry) |
 | SkillLineEntry | SkillLine.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#skilllineentry) |
+| SkillPerfectItemTemplate | skill_perfect_item_template | [sql-manager-stores.md](sql-manager-stores.md#skillperfectitemtemplate) |
 | SkillRaceClassInfoEntry | SkillRaceClassInfo.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#skillraceclassinfoentry) |
 | SkillTiersEntry | SkillTiers.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#skilltiersentry) |
 | SmartScriptHolder | smart_scripts | [sql-manager-stores.md](sql-manager-stores.md#3-smartaimgr-ssmartscriptmgr) |
@@ -186,26 +227,34 @@ Quick lookup indices for all datastores. See also:
 | SpellCategoryEntry | SpellCategory.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellcategoryentry) |
 | SpellChainNode | spell_ranks | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
 | SpellCooldownOverride | spell_cooldown_overrides | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
+| SpellCustomAttr | spell_custom_attr | [sql-manager-stores.md](sql-manager-stores.md#spellcustomattr) |
 | SpellDifficultyEntry | SpellDifficulty.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spelldifficultyentry) |
 | SpellDurationEntry | SpellDuration.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spelldurationentry) |
 | SpellEnchantProcEntry | spell_enchant_proc_data | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
 | SpellEntry | Spell.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellentry) |
 | SpellFocusObjectEntry | SpellFocusObject.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellfocusobjectentry) |
+| SpellGroup | spell_group | [sql-manager-stores.md](sql-manager-stores.md#spellgroup) |
+| SpellGroupStackRules | spell_group_stack_rules | [sql-manager-stores.md](sql-manager-stores.md#spellgroupstackrules) |
 | SpellItemEnchantmentConditionEntry | SpellItemEnchantmentCondition.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellitemenchantmentconditionentry) |
 | SpellItemEnchantmentEntry | SpellItemEnchantment.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellitemenchantmententry) |
+| SpellJumpDistance | spell_jump_distance | [sql-manager-stores.md](sql-manager-stores.md#spelljumpdistance) |
+| SpellLinkedSpell | spell_linked_spell | [sql-manager-stores.md](sql-manager-stores.md#spelllinkedspell) |
+| SpellMixology | spell_mixology | [sql-manager-stores.md](sql-manager-stores.md#spellmixology) |
+| SpellProc | spell_proc | [sql-manager-stores.md](sql-manager-stores.md#spellproc) |
 | SpellProcEntry | spell_proc_event | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
 | SpellRadiusEntry | SpellRadius.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellradiusentry) |
 | SpellRangeEntry | SpellRange.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellrangeentry) |
 | SpellRuneCostEntry | SpellRuneCost.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellrunecostentry) |
+| SpellScriptNames | spell_script_names | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#spellscriptnames) |
 | SpellShapeshiftFormEntry | SpellShapeshiftForm.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellshapeshiftformentry) |
 | SpellTargetPosition | spell_target_position | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
 | SpellThreatEntry | spell_threat | [sql-manager-stores.md](sql-manager-stores.md#1-spellmgr-sspellmgr) |
 | SpellVisualEntry | SpellVisual.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#spellvisualentry) |
 | StableSlotPricesEntry | StableSlotPrices.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#stableslotpricesentry) |
 | SummonPropertiesEntry | SummonProperties.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#summonpropertiesentry) |
-| TavernAreaTrigger | areatrigger_tavern | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#tavernareatrigger) |
 | TalentEntry | Talent.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#talententry) |
 | TalentTabEntry | TalentTab.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#talenttabentry) |
+| TavernAreaTrigger | areatrigger_tavern | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#tavernareatrigger) |
 | TaxiNodesEntry | TaxiNodes.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#taxinodesentry) |
 | TaxiPathEntry | TaxiPath.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#taxipathentry) |
 | TaxiPathNodeEntry | TaxiPathNode.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#taxipathnodeentry) |
@@ -213,6 +262,7 @@ Quick lookup indices for all datastores. See also:
 | TempSummonData | creature_summon_groups | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#tempsummondata) |
 | TotemCategoryEntry | TotemCategory.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#totemcategoryentry) |
 | Trainer::Trainer | trainer | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#trainer-stores) |
+| TrainerSpell | trainer_spell | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#trainerspell) |
 | TransportAnimationEntry | TransportAnimation.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#transportanimationentry) |
 | TransportRotationEntry | TransportRotation.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#transportrotationentry) |
 | TransportTemplate | transports | [sql-manager-stores.md](sql-manager-stores.md#16-transportmgr-stransportmgr) |
@@ -220,11 +270,14 @@ Quick lookup indices for all datastores. See also:
 | VehicleEntry | Vehicle.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#vehicleentry) |
 | VehicleSeatAddon | vehicle_seat_addon | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#vehicleseataddon) |
 | VehicleSeatEntry | VehicleSeat.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#vehicleseatentry) |
+| VehicleTemplateAccessory | vehicle_template_accessory | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#vehicletemplateaccessory) |
 | VendorItem | npc_vendor | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#vendoritem) |
 | WardenCheck | warden_checks | [sql-manager-stores.md](sql-manager-stores.md#14-wardencheckmgr-swardencheckmgr) |
 | WardenCheckResult | warden_action | [sql-manager-stores.md](sql-manager-stores.md#14-wardencheckmgr-swardencheckmgr) |
 | WaypointNode | waypoint_data | [sql-manager-stores.md](sql-manager-stores.md#7-waypointmgr-swaypointmgr) |
 | WaypointPath | waypoint_data | [sql-manager-stores.md](sql-manager-stores.md#7-waypointmgr-swaypointmgr) |
+| Waypoints | waypoints | [sql-manager-stores.md](sql-manager-stores.md#waypoints) |
+| WaypointScripts | waypoint_scripts | [sql-objectmgr-stores.md](sql-objectmgr-stores.md#waypointscripts) |
 | WeatherData | game_weather | [sql-manager-stores.md](sql-manager-stores.md#17-weathermgr-namespace) |
 | WMOAreaTableEntry | WMOAreaTable.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#wmoareatableentry) |
 | WorldMapAreaEntry | WorldMapArea.dbc | [dbc-backed-stores.md](dbc-backed-stores.md#worldmapareaentry) |
@@ -355,22 +408,24 @@ Quick lookup indices for all datastores. See also:
 
 | SQL Table | Struct Name | Document |
 |-----------|-------------|----------|
-| acore_string | AcoreString | sql-objectmgr-stores.md |
 | achievement_criteria_data | AchievementCriteriaData | sql-manager-stores.md |
 | achievement_reward | AchievementReward | sql-manager-stores.md |
 | achievement_reward_locale | AchievementRewardLocale | sql-manager-stores.md |
-| arena_season_reward_group | ArenaSeasonRewardGroup | sql-manager-stores.md |
-| arena_season_reward | ArenaSeasonReward | sql-manager-stores.md |
+| acore_string | AcoreString | sql-objectmgr-stores.md |
 | areatrigger | AreaTrigger | sql-objectmgr-stores.md |
 | areatrigger_involvedrelation | QuestAreaTrigger | sql-objectmgr-stores.md |
 | areatrigger_scripts | AreaTriggerScript | sql-objectmgr-stores.md |
 | areatrigger_tavern | TavernAreaTrigger | sql-objectmgr-stores.md |
 | areatrigger_teleport | AreaTriggerTeleport | sql-objectmgr-stores.md |
+| arena_season_reward | ArenaSeasonReward | sql-manager-stores.md |
+| arena_season_reward_group | ArenaSeasonRewardGroup | sql-manager-stores.md |
 | autobroadcast | Autobroadcast data | sql-manager-stores.md |
 | autobroadcast_locale | Autobroadcast locale | sql-manager-stores.md |
 | battleground_template | BattlegroundTemplate | sql-manager-stores.md |
+| battlemaster_entry | BattlemasterEntry | sql-manager-stores.md |
 | broadcast_text | BroadcastText | sql-objectmgr-stores.md |
 | broadcast_text_locale | BroadcastText | sql-objectmgr-stores.md |
+| command | Command | sql-manager-stores.md |
 | conditions | Condition | sql-manager-stores.md |
 | creature | CreatureData | sql-objectmgr-stores.md |
 | creature_addon | CreatureAddon | sql-objectmgr-stores.md |
@@ -379,9 +434,11 @@ Quick lookup indices for all datastores. See also:
 | creature_equip_template | EquipmentInfo | sql-objectmgr-stores.md |
 | creature_formations | FormationInfo | sql-manager-stores.md |
 | creature_immunities | CreatureImmunities | sql-manager-stores.md |
+| creature_loot_template | LootStoreItem | sql-manager-stores.md |
 | creature_model_info | CreatureModelInfo | sql-objectmgr-stores.md |
 | creature_movement_override | CreatureMovementData | sql-objectmgr-stores.md |
 | creature_onkill_reputation | ReputationOnKillEntry | sql-objectmgr-stores.md |
+| creature_questender | CreatureQuestender | sql-objectmgr-stores.md |
 | creature_questitem | CreatureQuestItems | sql-objectmgr-stores.md |
 | creature_sparring | CreatureSparring | sql-objectmgr-stores.md |
 | creature_summon_groups | TempSummonData | sql-objectmgr-stores.md |
@@ -394,13 +451,14 @@ Quick lookup indices for all datastores. See also:
 | creature_template_spell | CreatureTemplate spells | sql-objectmgr-stores.md |
 | creature_text | CreatureTextEntry | sql-manager-stores.md |
 | creature_text_locale | CreatureTextLocale | sql-manager-stores.md |
-| creature_loot_template | LootStoreItem | sql-manager-stores.md |
 | disenchant_loot_template | LootStoreItem | sql-manager-stores.md |
-| dungeon_access_template | DungeonProgressionRequirements | sql-objectmgr-stores.md |
 | dungeon_access_requirements | DungeonProgressionRequirements | sql-objectmgr-stores.md |
+| dungeon_access_template | DungeonProgressionRequirements | sql-objectmgr-stores.md |
+| event_scripts | EventScripts | sql-objectmgr-stores.md |
 | exploration_basexp | ExplorationBaseXP | sql-objectmgr-stores.md |
 | fishing_loot_template | LootStoreItem | sql-manager-stores.md |
 | game_event | GameEventData | sql-manager-stores.md |
+| game_event_arena_seasons | GameEventArenaSeasons | sql-manager-stores.md |
 | game_event_battleground_holiday | BG holiday data | sql-manager-stores.md |
 | game_event_condition | GameEventFinishCondition | sql-manager-stores.md |
 | game_event_condition_save | Event condition save | sql-manager-stores.md |
@@ -416,14 +474,15 @@ Quick lookup indices for all datastores. See also:
 | game_event_quest_condition | Quest-event conditions | sql-manager-stores.md |
 | game_event_save | Event save data | sql-manager-stores.md |
 | game_event_seasonal_questrelation | Seasonal quest links | sql-manager-stores.md |
+| game_graveyard | GameGraveyard | sql-manager-stores.md |
 | game_tele | GameTele | sql-objectmgr-stores.md |
 | game_weather | WeatherData | sql-manager-stores.md |
 | gameobject | GameObjectData | sql-objectmgr-stores.md |
 | gameobject_addon | GameObjectAddon | sql-objectmgr-stores.md |
 | gameobject_loot_template | LootStoreItem | sql-manager-stores.md |
+| gameobject_questender | QuestRelations | sql-objectmgr-stores.md |
 | gameobject_questitem | GameObjectQuestItems | sql-objectmgr-stores.md |
 | gameobject_queststarter | QuestRelations | sql-objectmgr-stores.md |
-| gameobject_questender | QuestRelations | sql-objectmgr-stores.md |
 | gameobject_summon_groups | GameObjectSummonData | sql-objectmgr-stores.md |
 | gameobject_template | GameObjectTemplate | sql-objectmgr-stores.md |
 | gameobject_template_addon | GameObjectTemplateAddon | sql-objectmgr-stores.md |
@@ -431,6 +490,7 @@ Quick lookup indices for all datastores. See also:
 | gossip_menu | GossipMenus | sql-objectmgr-stores.md |
 | gossip_menu_option | GossipMenuItems | sql-objectmgr-stores.md |
 | gossip_menu_option_locale | GossipMenuItemsLocale | sql-objectmgr-stores.md |
+| graveyard_zone | GraveyardZone | sql-manager-stores.md |
 | instance_encounters | DungeonEncounter | sql-objectmgr-stores.md |
 | instance_template | InstanceTemplate | sql-objectmgr-stores.md |
 | item_enchantment_template | EnchStoreItem | sql-manager-stores.md |
@@ -455,19 +515,28 @@ Quick lookup indices for all datastores. See also:
 | npc_text_locale | NpcTextLocale | sql-objectmgr-stores.md |
 | npc_vendor | VendorItem | sql-objectmgr-stores.md |
 | outdoorpvp_template | OutdoorPvPData | sql-manager-stores.md |
+| pet_levelstats | PetLevelInfo | sql-objectmgr-stores.md |
 | pet_name_generation | PetNameGeneration | sql-objectmgr-stores.md |
 | pet_name_generation_locale | PetNameGenerationLocale | sql-objectmgr-stores.md |
-| pet_levelstats | PetLevelInfo | sql-objectmgr-stores.md |
 | pickpocketing_loot_template | LootStoreItem | sql-manager-stores.md |
+| player_class_stats | PlayerClassStats | sql-objectmgr-stores.md |
 | player_factionchange_achievement | FactionChangeAchievements | sql-objectmgr-stores.md |
 | player_factionchange_items | FactionChangeItems | sql-objectmgr-stores.md |
 | player_factionchange_quests | FactionChangeQuests | sql-objectmgr-stores.md |
 | player_factionchange_reputation | FactionChangeReputations | sql-objectmgr-stores.md |
+| player_factionchange_reputations | PlayerFactionchangeReputations | sql-objectmgr-stores.md |
 | player_factionchange_spells | FactionChangeSpells | sql-objectmgr-stores.md |
 | player_factionchange_titles | FactionChangeTitles | sql-objectmgr-stores.md |
+| player_loot_template | LootStoreItem | sql-manager-stores.md |
+| player_race_stats | PlayerRaceStats | sql-objectmgr-stores.md |
 | player_shapeshift_model | PlayerShapeshiftModel | sql-objectmgr-stores.md |
 | player_totem_model | PlayerTotemModel | sql-objectmgr-stores.md |
 | player_xp_for_level | PlayerXPperLevel | sql-objectmgr-stores.md |
+| playercreateinfo_action | PlayercreateinfoAction | sql-objectmgr-stores.md |
+| playercreateinfo_cast_spell | PlayercreateinfoCastSpell | sql-objectmgr-stores.md |
+| playercreateinfo_item | PlayercreateinfoItem | sql-objectmgr-stores.md |
+| playercreateinfo_skills | PlayercreateinfoSkills | sql-objectmgr-stores.md |
+| playercreateinfo_spell_custom | PlayercreateinfoSpellCustom | sql-objectmgr-stores.md |
 | points_of_interest | PointOfInterest | sql-objectmgr-stores.md |
 | points_of_interest_locale | PointOfInterestLocale | sql-objectmgr-stores.md |
 | pool_creature | PoolObject | sql-manager-stores.md |
@@ -475,11 +544,11 @@ Quick lookup indices for all datastores. See also:
 | pool_pool | PoolObject | sql-manager-stores.md |
 | pool_quest | PoolObject | sql-manager-stores.md |
 | pool_template | PoolTemplateData | sql-manager-stores.md |
-| player_loot_template | LootStoreItem | sql-manager-stores.md |
 | prospecting_loot_template | LootStoreItem | sql-manager-stores.md |
 | quest_details | Quest (emotes) | sql-objectmgr-stores.md |
 | quest_greeting | QuestGreeting | sql-objectmgr-stores.md |
 | quest_greeting_locale | QuestGreeting | sql-objectmgr-stores.md |
+| quest_mail_sender | QuestMailSender | sql-objectmgr-stores.md |
 | quest_money_reward | QuestMoneyReward | sql-objectmgr-stores.md |
 | quest_offer_reward | Quest (emotes) | sql-objectmgr-stores.md |
 | quest_poi | QuestPOI | sql-objectmgr-stores.md |
@@ -492,19 +561,26 @@ Quick lookup indices for all datastores. See also:
 | reference_loot_template | LootStoreItem | sql-manager-stores.md |
 | reputation_reward_rate | RepRewardRate | sql-objectmgr-stores.md |
 | reputation_spillover_template | RepSpilloverTemplate | sql-objectmgr-stores.md |
+| script_waypoint | ScriptWaypoint | sql-manager-stores.md |
+| skill_discovery_template | SkillDiscoveryTemplate | sql-manager-stores.md |
+| skill_extra_item_template | SkillExtraItemTemplate | sql-manager-stores.md |
 | skill_fishing_base_level | FishingBaseSkillLevel | sql-objectmgr-stores.md |
+| skill_perfect_item_template | SkillPerfectItemTemplate | sql-manager-stores.md |
 | skinning_loot_template | LootStoreItem | sql-manager-stores.md |
 | smart_scripts | SmartScriptHolder | sql-manager-stores.md |
 | spell_area | SpellArea | sql-manager-stores.md |
 | spell_bonus_data | SpellBonusEntry | sql-manager-stores.md |
 | spell_cooldown_overrides | SpellCooldownOverride | sql-manager-stores.md |
+| spell_custom_attr | SpellCustomAttr | sql-manager-stores.md |
 | spell_enchant_proc_data | SpellEnchantProcEntry | sql-manager-stores.md |
 | spell_group | SpellGroup data | sql-manager-stores.md |
 | spell_group_stack_rules | SpellGroupStackRules | sql-manager-stores.md |
+| spell_jump_distance | SpellJumpDistance | sql-manager-stores.md |
 | spell_linked_spell | SpellLinked data | sql-manager-stores.md |
 | spell_loot_template | LootStoreItem | sql-manager-stores.md |
 | spell_mixology | SpellMixology data | sql-manager-stores.md |
 | spell_pet_auras | PetAura | sql-manager-stores.md |
+| spell_proc | SpellProc | sql-manager-stores.md |
 | spell_proc_event | SpellProcEntry | sql-manager-stores.md |
 | spell_ranks | SpellChainNode | sql-manager-stores.md |
 | spell_required | SpellRequired | sql-manager-stores.md |
@@ -512,17 +588,18 @@ Quick lookup indices for all datastores. See also:
 | spell_target_position | SpellTargetPosition | sql-manager-stores.md |
 | spell_threat | SpellThreatEntry | sql-manager-stores.md |
 | trainer | Trainer::Trainer | sql-objectmgr-stores.md |
-| trainer_spell | Trainer::Spell | sql-objectmgr-stores.md |
 | trainer_locale | Trainer locale | sql-objectmgr-stores.md |
+| trainer_spell | Trainer::Spell | sql-objectmgr-stores.md |
 | transports | TransportTemplate | sql-manager-stores.md |
 | vehicle_accessory | VehicleAccessory | sql-objectmgr-stores.md |
 | vehicle_seat_addon | VehicleSeatAddon | sql-objectmgr-stores.md |
 | vehicle_template_accessory | VehicleAccessory | sql-objectmgr-stores.md |
-| warden_checks | WardenCheck | sql-manager-stores.md |
 | warden_action | WardenCheckResult | sql-manager-stores.md |
+| warden_checks | WardenCheck | sql-manager-stores.md |
 | waypoint_data | WaypointNode | sql-manager-stores.md |
 | waypoint_data_addon | WaypointNode splines | sql-manager-stores.md |
 | waypoint_scripts | ScriptInfo | sql-objectmgr-stores.md |
+| waypoints | Waypoints | sql-manager-stores.md |
 
 ### db_characters (SQL Tables)
 
@@ -538,10 +615,10 @@ Quick lookup indices for all datastores. See also:
 | character_arena_stats | ArenaTeam member stats | sql-manager-stores.md |
 | character_equipmentsets | Equipment set data | (runtime, not cached) |
 | character_instance | InstanceSave player binds | sql-manager-stores.md |
-| gm_ticket | GmTicket | sql-manager-stores.md |
 | gm_survey | Survey ID tracking | sql-manager-stores.md |
-| groups | Group | sql-manager-stores.md |
+| gm_ticket | GmTicket | sql-manager-stores.md |
 | group_member | Group member data | sql-manager-stores.md |
+| groups | Group | sql-manager-stores.md |
 | guild | Guild | sql-manager-stores.md |
 | guild_bank_eventlog | Guild bank event log | sql-manager-stores.md |
 | guild_bank_item | Guild bank items | sql-manager-stores.md |
@@ -567,6 +644,196 @@ Quick lookup indices for all datastores. See also:
 | autobroadcast_locale | Autobroadcast locale | sql-manager-stores.md |
 | motd | MOTD text | sql-manager-stores.md |
 | motd_localized | MOTD locale | sql-manager-stores.md |
+
+### db_world (SQL Auxiliary)
+
+| SQL Table | Struct Name | Document |
+|-----------|-------------|----------|
+| antidos_opcode_policies | AntidosOpcodePolicies | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| arena_season_reward | ArenaSeasonReward | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| arena_season_reward_group | ArenaSeasonRewardGroup | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| broadcast_text_locale | BroadcastTextLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| creature_loot_template | CreatureLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| creature_template_locale | CreatureTemplateLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| disenchant_loot_template | DisenchantLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| fishing_loot_template | FishingLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gameobject_loot_template | GameobjectLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gameobject_template_locale | GameobjectTemplateLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gossip_menu_option_locale | GossipMenuOptionLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| holiday_dates | HolidayDates | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_loot_template | ItemLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_set_names_locale | ItemSetNamesLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_template_locale | ItemTemplateLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_loot_template | MailLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| milling_loot_template | MillingLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| module_string_locale | ModuleStringLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| npc_text_locale | NpcTextLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| npc_trainer | NpcTrainer | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| page_text_locale | PageTextLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pet_name_generation_locale | PetNameGenerationLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pickpocketing_loot_template | PickpocketingLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| player_loot_template | PlayerLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_rpg_races | PlayerbotsRpgRaces | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| points_of_interest_locale | PointsOfInterestLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| prospecting_loot_template | ProspectingLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| quest_greeting_locale | QuestGreetingLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| quest_offer_reward_locale | QuestOfferRewardLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| quest_request_items_locale | QuestRequestItemsLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| quest_template_locale | QuestTemplateLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| reference_loot_template | ReferenceLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| skinning_loot_template | SkinningLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| spell_loot_template | SpellLootTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| trainer_locale | TrainerLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+
+### db_characters (SQL Auxiliary)
+
+| SQL Table | Struct Name | Document |
+|-----------|-------------|----------|
+| account_data | AccountData | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| account_instance_times | AccountInstanceTimes | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| account_tutorial | AccountTutorial | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| active_arena_season | ActiveArenaSeason | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| battleground_deserters | BattlegroundDeserters | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| bugreport | Bugreport | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| channels | Channels | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| channels_bans | ChannelsBans | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| channels_rights | ChannelsRights | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_account_data | CharacterAccountData | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_achievement | CharacterAchievement | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_achievement_offline_updates | CharacterAchievementOfflineUpdates | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_achievement_progress | CharacterAchievementProgress | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_action | CharacterAction | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_arena_stats | CharacterArenaStats | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_aura | CharacterAura | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_banned | CharacterBanned | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_battleground_random | CharacterBattlegroundRandom | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_brew_of_the_month | CharacterBrewOfTheMonth | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_declinedname | CharacterDeclinedname | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_entry_point | CharacterEntryPoint | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_equipmentsets | CharacterEquipmentsets | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_gifts | CharacterGifts | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_glyphs | CharacterGlyphs | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_homebind | CharacterHomebind | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_inventory | CharacterInventory | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_pet | Pet | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_pet_declinedname | CharacterPetDeclinedname | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus | CharacterQueststatus | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus_daily | CharacterQueststatusDaily | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus_monthly | CharacterQueststatusMonthly | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus_rewarded | CharacterQueststatusRewarded | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus_seasonal | CharacterQueststatusSeasonal | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_queststatus_weekly | CharacterQueststatusWeekly | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_reputation | CharacterReputation | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_settings | CharacterSettings | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_skills | CharacterSkills | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_social | CharacterSocial | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_spell | CharacterSpell | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_spell_cooldown | CharacterSpellCooldown | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_stats | CharacterStats | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| character_talent | CharacterTalent | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| characters | CharacterInfo | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| corpse | Corpse | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| creature_respawn | CreatureRespawn | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| game_event_condition_save | GameEventConditionSave | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| game_event_save | GameEventSave | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gameobject_respawn | GameobjectRespawn | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gm_subsurvey | GmSubsurvey | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gm_survey | GmSurvey | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| gm_survey | gm_survey | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_bank_eventlog | GuildBankEventlog | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_bank_item | GuildBankItem | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_bank_right | GuildBankRight | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_bank_tab | GuildBankTab | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_eventlog | GuildEventlog | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_member | GuildMember | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_member_withdraw | GuildMemberWithdraw | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| guild_rank | GuildRank | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| instance_saved_go_state_data | InstanceSavedGoStateData | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_instance | Item | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_loot_storage | ItemLootStorage | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_refund_instance | ItemRefundInstance | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| item_soulbound_trade_data | ItemSoulboundTradeData | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| lag_reports | LagReports | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| log_arena_fights | LogArenaFights | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| log_arena_memberstats | LogArenaMemberstats | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| log_encounter | LogEncounter | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| log_money | LogMoney | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail | Mail | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_items | MailItems | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_server_character | MailServerCharacter | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_server_template | MailServerTemplate | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_server_template_conditions | MailServerTemplateConditions | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| mail_server_template_items | MailServerTemplateItems | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pet_aura | Aura (runtime) | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pet_spell | PetSpell | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pet_spell_cooldown | PetSpellCooldown | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_arena_team_names | PlayerbotsArenaTeamNames | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_guild_names | PlayerbotsGuildNames | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_names | PlayerbotsNames | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pool_quest_save | PoolQuestSave | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| profanity_name | ProfanityName | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pvpstats_battlegrounds | PvpstatsBattlegrounds | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| pvpstats_players | PvpstatsPlayers | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| quest_tracker | QuestTracker | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| recovery_item | RecoveryItem | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| reserved_name | ReservedName | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| spam_reports | SpamReports | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| spell_pet_auras | PetAura | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| world_state | WorldState | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| worldstates | Worldstates | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+
+### db_auth (SQL Auxiliary)
+
+| SQL Table | Struct Name | Document |
+|-----------|-------------|----------|
+| account | AccountInfo | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| account_access | AccountAccess | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| account_banned | AccountBanned | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| account_muted | AccountMuted | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| autobroadcast | Autobroadcast | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| autobroadcast_locale | AutobroadcastLocale | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| build_info | BuildInfo | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| ip_banned | IpBanned | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| logs | Logs | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| logs_ip_actions | LogsIpActions | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| motd | Motd | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| motd_localized | MotdLocalized | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| realmcharacters | Realmcharacters | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| realmlist | RealmInfo | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| secret_digest | SecretDigest | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| uptime | Uptime | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+
+### db_playerbots (SQL Auxiliary)
+
+| SQL Table | Struct Name | Document |
+|-----------|-------------|----------|
+| ai_playerbot_texts | AiPlayerbotTexts | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| ai_playerbot_texts_chance | AiPlayerbotTextsChance | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_account_keys | PlayerbotsAccountKeys | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_account_links | PlayerbotsAccountLinks | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_account_type | PlayerbotsAccountType | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_custom_strategy | PlayerbotsCustomStrategy | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_db_store | PlayerbotsDbStore | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_dungeon_suggestion_abbrevation | PlayerbotsDungeonSuggestionAbbrevation | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_dungeon_suggestion_definition | PlayerbotsDungeonSuggestionDefinition | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_dungeon_suggestion_strategy | PlayerbotsDungeonSuggestionStrategy | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_enchants | PlayerbotsEnchants | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_equip_cache | PlayerbotsEquipCache | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_guild_tasks | PlayerbotsGuildTasks | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_item_info_cache | PlayerbotsItemInfoCache | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_preferred_mounts | PlayerbotsPreferredMounts | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_random_bots | PlayerbotsRandomBots | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_rarity_cache | PlayerbotsRarityCache | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_rnditem_cache | PlayerbotsRnditemCache | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_speech | PlayerbotsSpeech | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_speech_probability | PlayerbotsSpeechProbability | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_tele_cache | PlayerbotsTeleCache | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_travelnode | PlayerbotsTravelnode | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_travelnode_link | PlayerbotsTravelnodeLink | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_travelnode_path | PlayerbotsTravelnodePath | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_weightscale_data | PlayerbotsWeightscaleData | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| playerbots_weightscales | PlayerbotsWeightscales | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
+| version_db_playerbots | VersionDbPlayerbots | [sql-auxiliary-stores.md](sql-auxiliary-stores.md) |
 
 ---
 

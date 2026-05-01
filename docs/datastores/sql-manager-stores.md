@@ -26,6 +26,23 @@ This document lists all datastores loaded by manager singletons other than `Obje
 - [20. ArenaSeasonMgr (sArenaSeasonMgr)](#20-arenaseasonmgr-sarenaseasonmgr)
 - [21. AutobroadcastMgr (sAutobroadcastMgr)](#21-autobroadcastmgr-sautobroadcastmgr)
 - [22. MotdMgr (sMotdMgr)](#22-motdmgr-smotdmgr)
+- [32. BattlemasterEntry (sBattlegroundMgr)](#32-battlemasterentry-sbattlegroundmgr)
+- [33. ChatCommand (standalone)](#33-chatcommand-standalone)
+- [34. GameEventArenaSeasons (sArenaSeasonMgr)](#34-gameeventarenaseasons-sarenaseasonmgr)
+- [35. GameGraveyard (standalone)](#35-gamegraveyard-standalone)
+- [36. GraveyardZone (standalone)](#36-graveyardzone-standalone)
+- [37. ScriptWaypoint (standalone)](#37-scriptwaypoint-standalone)
+- [38. SkillDiscovery (standalone)](#38-skilldiscovery-standalone)
+- [39. SkillExtraItems (standalone)](#39-skillextraitems-standalone)
+- [40. SkillPerfectItem (standalone)](#40-skillperfectitem-standalone)
+- [41. SpellCustomAttr (sSpellMgr)](#41-spellcustomattr-sspellmgr)
+- [42. SpellGroup (sSpellMgr)](#42-spellgroup-sspellmgr)
+- [43. SpellGroupStackRules (sSpellMgr)](#43-spellgroupstackrules-sspellmgr)
+- [44. SpellJumpDistance (sSpellMgr)](#44-spelljumpdistance-sspellmgr)
+- [45. SpellLinkedSpell (sSpellMgr)](#45-spelllinkedspell-sspellmgr)
+- [46. SpellMixology (sSpellMgr)](#46-spellmixology-sspellmgr)
+- [47. SpellProc (sSpellMgr)](#47-spellproc-sspellmgr)
+- [48. Waypoints (sSmartScriptMgr)](#48-waypoints-ssmartscriptmgr)
 
 ---
 
@@ -1263,3 +1280,285 @@ Auction items loaded via `Item::LoadFromDB()` from `item_instance`.
 | Name | NameMD5 | std::array&lt;uint8, 16&gt; | MD5 hashed |
 | Version | VersionMD5 | std::array&lt;uint8, 16&gt; | MD5 hashed |
 | Timestamp | Timestamp | time_t | |
+
+---
+
+## 32. BattlemasterEntry (sBattlegroundMgr)
+
+**Accessor:** `sBattlegroundMgr`
+**Class:** `BattlegroundMgr`
+**Header:** `src/server/game/Battlegrounds/BattlegroundMgr.h`
+
+### BattlemasterEntry -- `battlemaster_entry`
+
+| Field | C++ Type |
+|-------|----------|
+| entry | `int32` |
+| bg_template | `int32` |
+
+---
+
+## 33. ChatCommand (standalone)
+
+**Header:** `src/server/game/Chat/ChatCommand.h`
+
+### ChatCommand -- `command`
+
+| Field | C++ Type |
+|-------|----------|
+| name | `std::string` |
+| security | `int8` |
+| help | `std::string` |
+
+---
+
+## 34. GameEventArenaSeasons (sArenaSeasonMgr)
+
+**Accessor:** `sArenaSeasonMgr`
+**Class:** `ArenaSeasonMgr`
+**Header:** `src/server/game/Battlegrounds/ArenaSeason/ArenaSeasonMgr.h`
+
+### GameEventArenaSeasons -- `game_event_arena_seasons`
+
+| Field | C++ Type |
+|-------|----------|
+| eventEntry | `int8` |
+| season | `int8` |
+
+---
+
+## 35. GameGraveyard (standalone)
+
+**Header:** `src/server/game/Misc/GameGraveyard.h`
+
+### GraveyardStruct -- `game_graveyard`
+
+| Field | C++ Type |
+|-------|----------|
+| ID | `int32` |
+| Map | `int32` |
+| x | `float` |
+| y | `float` |
+| z | `float` |
+| Comment | `std::string` |
+
+---
+
+## 36. GraveyardZone (standalone)
+
+**Header:** `src/server/game/Misc/GameGraveyard.h`
+
+### GraveyardData -- `graveyard_zone`
+
+| Field | C++ Type |
+|-------|----------|
+| ID | `int32` |
+| GhostZone | `int32` |
+| Faction | `int32` |
+| Comment | `std::string` |
+
+---
+
+## 37. ScriptWaypoint (standalone)
+
+**Header:** `src/server/game/Scripting/ScriptSystem.h`
+
+### Waypoint -- `script_waypoint`
+
+| Field | C++ Type |
+|-------|----------|
+| entry | `int32` |
+| pointid | `int32` |
+| location_x | `float` |
+| location_y | `float` |
+| location_z | `float` |
+| waittime | `int32` |
+| point_comment | `std::string` |
+
+---
+
+## 38. SkillDiscovery (standalone)
+
+**Header:** `src/server/game/Skills/SkillDiscovery.h`
+
+### SkillDiscoveryEntry -- `skill_discovery_template`
+
+| Field | C++ Type |
+|-------|----------|
+| spellId | `int32` |
+| reqSpell | `int32` |
+| reqSkillValue | `int32` |
+| chance | `float` |
+
+---
+
+## 39. SkillExtraItems (standalone)
+
+**Header:** `src/server/game/Skills/SkillExtraItems.h`
+
+### SkillExtraItemEntry -- `skill_extra_item_template`
+
+| Field | C++ Type |
+|-------|----------|
+| spellId | `int32` |
+| requiredSpecialization | `int32` |
+| additionalCreateChance | `float` |
+| additionalMaxNum | `int8` |
+
+---
+
+## 40. SkillPerfectItem (standalone)
+
+**Header:** `src/server/game/Skills/SkillExtraItems.h`
+
+### SkillPerfectItemEntry -- `skill_perfect_item_template`
+
+| Field | C++ Type |
+|-------|----------|
+| spellId | `int32` |
+| requiredSpecialization | `int32` |
+| perfectCreateChance | `float` |
+| perfectItemType | `int32` |
+
+---
+
+## 41. SpellCustomAttr (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellCustomAttr -- `spell_custom_attr`
+
+| Field | C++ Type |
+|-------|----------|
+| spell_id | `int32` |
+| attributes | `int32` |
+
+---
+
+## 42. SpellGroup (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellGroup -- `spell_group`
+
+| Field | C++ Type |
+|-------|----------|
+| id | `int32` |
+| spell_id | `int32` |
+
+---
+
+## 43. SpellGroupStackRules (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellGroupStackRule -- `spell_group_stack_rules`
+
+| Field | C++ Type |
+|-------|----------|
+| group_id | `int32` |
+| stack_rule | `int8` |
+| description | `std::string` |
+
+---
+
+## 44. SpellJumpDistance (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellJumpDistance -- `spell_jump_distance`
+
+| Field | C++ Type |
+|-------|----------|
+| ID | `int32` |
+| JumpDistance | `float` |
+
+---
+
+## 45. SpellLinkedSpell (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellLinkedSpell -- `spell_linked_spell`
+
+| Field | C++ Type |
+|-------|----------|
+| spell_trigger | `int32` |
+| spell_effect | `int32` |
+| type | `int8` |
+| comment | `std::string` |
+
+---
+
+## 46. SpellMixology (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellMixology -- `spell_mixology`
+
+| Field | C++ Type |
+|-------|----------|
+| entry | `int32` |
+| pctMod | `float` |
+
+---
+
+## 47. SpellProc (sSpellMgr)
+
+**Accessor:** `sSpellMgr`
+**Class:** `SpellMgr`
+**Header:** `src/server/game/Spells/SpellMgr.h`
+
+### SpellProcEntry -- `spell_proc`
+
+| Field | C++ Type |
+|-------|----------|
+| SpellId | `int32` |
+| SchoolMask | `int8` |
+| SpellFamilyName | `int32` |
+| SpellFamilyMask0 | `int32` |
+| SpellFamilyMask1 | `int32` |
+| SpellFamilyMask2 | `int32` |
+| ProcFlags | `int32` |
+| SpellTypeMask | `int32` |
+| SpellPhaseMask | `int32` |
+| HitMask | `int32` |
+| AttributesMask | `int32` |
+| DisableEffectsMask | `int32` |
+| ProcsPerMinute | `float` |
+| Chance | `float` |
+| Cooldown | `int32` |
+| Charges | `int8` |
+
+---
+
+## 48. Waypoints (sSmartScriptMgr)
+
+**Accessor:** `sSmartScriptMgr`
+**Class:** `SmartAIMgr`
+**Header:** `src/server/game/AI/SmartScripts/SmartAI.h`
+
+### Waypoint -- `waypoints`
+
+| Field | C++ Type |
+|-------|----------|
+| entry | `int32` |
+| pointid | `int32` |
+| position_x | `float` |
+| position_y | `float` |
+| position_z | `float` |
+| orientation | `float` |
+| delay | `int32` |
+| point_comment | `std::string` |
