@@ -1567,8 +1567,8 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "ChatChannelsEntry": {
       "category": "dbc_backed",
@@ -1586,7 +1586,10 @@
           "name": "ChannelID",
           "type": "uint32",
           "sql_column": "ChannelID",
-          "notes": "Primary key"
+          "notes": "Primary key",
+          "references": "ChatChannelsEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "flags",
@@ -1691,7 +1694,6 @@
           "notes": "Localized"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ChrClassesEntry": {
@@ -1722,7 +1724,10 @@
           "name": "spellfamily",
           "type": "uint32",
           "sql_column": "spellfamily",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "58": {
           "name": "CinematicSequence",
@@ -1737,7 +1742,6 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "ChrRacesEntry": {
@@ -1920,7 +1924,10 @@
           "name": "ModelId",
           "type": "uint32",
           "sql_column": "ModelId",
-          "notes": "-"
+          "notes": "-",
+          "references": "CreatureModelDataEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "ExtendedDisplayInfoID",
@@ -1935,7 +1942,6 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CreatureDisplayInfoExtraEntry": {
@@ -2456,8 +2462,8 @@
           "notes": "Unknown (skipped)"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "DungeonEncounterEntry": {
       "category": "dbc_backed",
@@ -2993,8 +2999,8 @@
           "notes": "Extra field in DBC, not in SQL table (skipped)"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "EmotesTextSoundEntry": {
       "category": "dbc_backed",
@@ -7156,8 +7162,8 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "SkillLineAbilityEntry": {
       "category": "dbc_backed",
@@ -10202,8 +10208,8 @@
           "notes": "Movement sequence ID (skipped)"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "TransportRotationEntry": {
       "category": "dbc_backed",
@@ -10260,8 +10266,8 @@
           "notes": "Loaded - rotation quaternion W"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "is_leaf": true
     },
     "VehicleEntry": {
       "category": "dbc_backed",
@@ -15199,7 +15205,10 @@
           "name": "ObjectGuid",
           "type": "map key",
           "sql_column": "guid",
-          "notes": "HighGuid determined by linkType"
+          "notes": "HighGuid determined by linkType",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "linkedGuid": {
           "name": "ObjectGuid",
@@ -15214,7 +15223,6 @@
           "notes": "0=CREATURE_TO_CREATURE, 1=CREATURE_TO_GO, 2=GO_TO_GO, 3=GO_TO_CREATURE"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AcoreString": {
@@ -16691,7 +16699,10 @@
           "name": "EventId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventEntry",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "Start": {
           "name": "Start",
@@ -16762,7 +16773,6 @@
           "sql_column": "announce"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventFinishCondition": {
@@ -18462,7 +18472,10 @@
           "name": "AuctionHouseId",
           "type": "houseId",
           "sql_column": "houseid",
-          "notes": ""
+          "notes": "",
+          "references": "AuctionHouseEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "itemguid": {
           "name": "ObjectGuid",
@@ -18525,7 +18538,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SavedAddons": {
@@ -19476,8 +19488,8 @@
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not in registry (Guild, ArenaTeam, Battleground)"
     },
     "GameEventCreature": {
       "category": "sql_manager",
@@ -27240,8 +27252,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not in registry (Guild, ArenaTeam, Battleground)"
     },
     "PvpstatsPlayers": {
       "category": "sql_auxiliary",
