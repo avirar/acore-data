@@ -8,7 +8,12 @@
       "sql_manager",
       "sql_objectmgr"
     ],
-    "total_entries": 462
+    "total_entries": 467,
+    "cross_reference_stats": {
+      "total_cross_ref_fields": 418,
+      "entries_with_refs": 233,
+      "coverage_pct": 49.9
+    }
   },
   "entries": {
     "AchievementEntry": {
