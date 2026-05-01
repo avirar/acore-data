@@ -141,7 +141,10 @@
           "name": "categoryId",
           "type": "uint32",
           "sql_column": "categoryId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AchievementCategoryEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "39": {
           "name": "points",
@@ -321,7 +324,10 @@
           "name": "mapid",
           "type": "uint32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "zone",
@@ -816,49 +822,73 @@
           "name": "mapid[0]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "mapid[1]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "mapid[2]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "mapid[3]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "5": {
           "name": "mapid[4]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "6": {
           "name": "mapid[5]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "7": {
           "name": "mapid[6]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "8": {
           "name": "mapid[7]",
           "type": "int32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "9": {
           "name": "type",
@@ -1725,7 +1755,10 @@
           "name": "FactionID",
           "type": "uint32",
           "sql_column": "FactionID",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionTemplateEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "model_m",
@@ -1793,7 +1826,10 @@
           "name": "SoundID",
           "type": "uint32",
           "sql_column": "SoundID",
-          "notes": "-"
+          "notes": "-",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "Origin[0]",
@@ -2067,7 +2103,10 @@
           "name": "SoundID",
           "type": "uint32",
           "sql_column": "SoundID",
-          "notes": "Skipped in struct"
+          "notes": "Skipped in struct",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "14": {
           "name": "CollisionWidth",
@@ -3116,7 +3155,10 @@
           "name": "team",
           "type": "uint32",
           "sql_column": "team",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "19": {
           "name": "spilloverRateIn",
@@ -3351,7 +3393,10 @@
           "name": "SpellId",
           "type": "uint32",
           "sql_column": "SpellID",
-          "notes": "Loaded - glyph spell ID"
+          "notes": "Loaded - glyph spell ID",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "TypeFlags",
@@ -5015,7 +5060,10 @@
           "name": "MapID",
           "type": "uint32",
           "sql_column": "MapID",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "24": {
           "name": "Difficulty",
@@ -5071,7 +5119,10 @@
           "name": "MapId",
           "type": "uint32",
           "sql_column": "ContinentID",
-          "notes": "Loaded - map/continent ID"
+          "notes": "Loaded - map/continent ID",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "X",
@@ -5193,13 +5244,19 @@
           "name": "SoundId",
           "type": "uint32",
           "sql_column": "SoundID",
-          "notes": "Sound reference (skipped)"
+          "notes": "Sound reference (skipped)",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "5": {
           "name": "SpellId",
           "type": "uint32",
           "sql_column": "SpellID",
-          "notes": "Loaded - spell ID"
+          "notes": "Loaded - spell ID",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "6": {
           "name": "MaxDarkenDepth",
@@ -5894,7 +5951,10 @@
           "name": "entrance_map",
           "type": "int32",
           "sql_column": "entrance_map",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "60": {
           "name": "entrance_x",
@@ -7304,7 +7364,10 @@
           "name": "Category",
           "type": "uint32",
           "sql_column": "Category",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellCategoryEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Dispel",
@@ -7541,7 +7604,10 @@
           "name": "DurationIndex",
           "type": "uint32",
           "sql_column": "DurationIndex",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellDurationEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "41": {
           "name": "PowerType",
@@ -7577,7 +7643,10 @@
           "name": "RangeIndex",
           "type": "uint32",
           "sql_column": "RangeIndex",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellRangeEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "47": {
           "name": "Speed",
@@ -7861,19 +7930,28 @@
           "name": "EffectRadiusIndex[0]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellRadiusEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "93": {
           "name": "EffectRadiusIndex[1]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellRadiusEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "94": {
           "name": "EffectRadiusIndex[2]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellRadiusEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "95": {
           "name": "EffectApplyAuraName[0]",
@@ -8118,13 +8196,19 @@
           "name": "SpellVisual[0]",
           "type": "uint32",
           "sql_column": "SpellVisual",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellVisualEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "132": {
           "name": "SpellVisual[1]",
           "type": "uint32",
           "sql_column": "SpellVisual",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellVisualEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "133": {
           "name": "SpellIconID",
@@ -8523,25 +8607,37 @@
           "name": "SpellID[0]",
           "type": "int32",
           "sql_column": "SpellID",
-          "notes": "10N"
+          "notes": "10N",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "SpellID[1]",
           "type": "int32",
           "sql_column": "SpellID",
-          "notes": "25N"
+          "notes": "25N",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "SpellID[2]",
           "type": "int32",
           "sql_column": "SpellID",
-          "notes": "10H"
+          "notes": "10H",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "SpellID[3]",
           "type": "int32",
           "sql_column": "SpellID",
-          "notes": "25H"
+          "notes": "25H",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -8667,19 +8763,28 @@
           "name": "spellid[0]",
           "type": "uint32",
           "sql_column": "spellid",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "12": {
           "name": "spellid[1]",
           "type": "uint32",
           "sql_column": "spellid",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "13": {
           "name": "spellid[2]",
           "type": "uint32",
           "sql_column": "spellid",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "14": {
           "name": "description[0]",
@@ -9468,7 +9573,10 @@
           "name": "TalentTab",
           "type": "uint32",
           "sql_column": "TalentTab",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentTabEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "Row",
@@ -9516,7 +9624,10 @@
           "name": "DependsOn",
           "type": "uint32",
           "sql_column": "DependsOn",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "16": {
           "name": "DependsOnRank",
@@ -9592,7 +9703,10 @@
           "name": "map_id",
           "type": "uint32",
           "sql_column": "map_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "x",
@@ -9794,7 +9908,10 @@
           "name": "mapid",
           "type": "uint32",
           "sql_column": "mapid",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "x",
@@ -10287,13 +10404,19 @@
           "name": "map_id",
           "type": "uint32",
           "sql_column": "map_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "area_id",
           "type": "uint32",
           "sql_column": "area_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "y1",
@@ -10323,7 +10446,10 @@
           "name": "virtual_map_id",
           "type": "int32",
           "sql_column": "virtual_map_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -10349,25 +10475,37 @@
           "name": "areatableID[0]",
           "type": "uint32",
           "sql_column": "areatableID",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "areatableID[1]",
           "type": "uint32",
           "sql_column": "areatableID",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "areatableID[2]",
           "type": "uint32",
           "sql_column": "areatableID",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "5": {
           "name": "areatableID[3]",
           "type": "uint32",
           "sql_column": "areatableID",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -10960,7 +11098,10 @@
           "name": "mapid",
           "type": "uint16",
           "sql_column": "map",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "phaseMask": {
           "name": "phaseMask",
@@ -13665,7 +13806,10 @@
           "name": "SoundEntriesId",
           "type": "uint32",
           "sql_column": "SoundEntriesId",
-          "notes": ""
+          "notes": "",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "EmotesID": {
           "name": "EmotesID",
@@ -13827,7 +13971,10 @@
           "name": "target_mapId",
           "type": "uint32",
           "sql_column": "target_map",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "target_position_x": {
           "name": "target_X",
@@ -14509,7 +14656,10 @@
           "name": "spellId",
           "type": "uint32",
           "sql_column": "spell_id",
-          "notes": ""
+          "notes": "",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "cast_flags": {
           "name": "castFlags",
@@ -15680,7 +15830,10 @@
           "name": "target_mapId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "TargetMapID"
+          "sql_column": "TargetMapID",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "target_X": {
           "name": "target_X",
@@ -15892,13 +16045,19 @@
           "name": "spell_id",
           "type": "uint32",
           "sql_column": "spell_id",
-          "notes": "The spell being looked up"
+          "notes": "The spell being looked up",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "req_spell",
           "type": "uint32",
           "sql_column": "req_spell",
-          "notes": "Prerequisite spell required for spell_id"
+          "notes": "Prerequisite spell required for spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       }
     },
@@ -16008,7 +16167,10 @@
         "itemid": {
           "name": "itemid",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "reference": {
           "name": "reference",
@@ -16534,7 +16696,10 @@
           "name": "itemId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "ItemID"
+          "sql_column": "ItemID",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "sender": {
           "name": "sender",
@@ -18289,7 +18454,10 @@
         "0": {
           "name": "CreatureId",
           "type": "int32",
-          "sql_column": "CreatureId"
+          "sql_column": "CreatureId",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "1": {
           "name": "TrainerId",
@@ -18490,7 +18658,10 @@
         "0": {
           "name": "CreatureID",
           "type": "int32",
-          "sql_column": "CreatureID"
+          "sql_column": "CreatureID",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "1": {
           "name": "Idx",
@@ -18532,7 +18703,10 @@
         "0": {
           "name": "CreatureId",
           "type": "int32",
-          "sql_column": "CreatureId"
+          "sql_column": "CreatureId",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "1": {
           "name": "Ground",
@@ -18584,7 +18758,10 @@
         "0": {
           "name": "CreatureID",
           "type": "int32",
-          "sql_column": "CreatureID"
+          "sql_column": "CreatureID",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "1": {
           "name": "School",
@@ -19913,7 +20090,10 @@
         "1": {
           "name": "SpellID",
           "type": "int32",
-          "sql_column": "SpellID"
+          "sql_column": "SpellID",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "MoneyCost",
@@ -21243,7 +21423,10 @@
         "3": {
           "name": "SourceSpellID",
           "type": "int32",
-          "sql_column": "SourceSpellID"
+          "sql_column": "SourceSpellID",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "PrevQuestID",
@@ -21709,7 +21892,10 @@
         "0": {
           "name": "spell_id",
           "type": "int32",
-          "sql_column": "spell_id"
+          "sql_column": "spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "attributes",
@@ -21736,7 +21922,10 @@
         "1": {
           "name": "spell_id",
           "type": "int32",
-          "sql_column": "spell_id"
+          "sql_column": "spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -22016,12 +22205,18 @@
         "0": {
           "name": "first_spell_id",
           "type": "int32",
-          "sql_column": "first_spell_id"
+          "sql_column": "first_spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "spell_id",
           "type": "int32",
-          "sql_column": "spell_id"
+          "sql_column": "spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "2": {
           "name": "rank",
@@ -22043,7 +22238,10 @@
         "0": {
           "name": "spell_id",
           "type": "int32",
-          "sql_column": "spell_id"
+          "sql_column": "spell_id",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "ScriptName",
@@ -25511,7 +25709,10 @@
         "1": {
           "name": "itemid",
           "type": "int32",
-          "sql_column": "itemid"
+          "sql_column": "itemid",
+          "references": "ItemTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "entryorguid"
         },
         "2": {
           "name": "count",
@@ -28164,7 +28365,10 @@
         "3": {
           "name": "spellid",
           "type": "int32",
-          "sql_column": "spellid"
+          "sql_column": "spellid",
+          "references": "SpellEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
@@ -28367,7 +28571,10 @@
         "2": {
           "name": "map_id",
           "type": "int32",
-          "sql_column": "map_id"
+          "sql_column": "map_id",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "x",
@@ -28409,7 +28616,10 @@
         "2": {
           "name": "map_id",
           "type": "int32",
-          "sql_column": "map_id"
+          "sql_column": "map_id",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "3": {
           "name": "x",
@@ -28528,7 +28738,10 @@
         "3": {
           "name": "map_id",
           "type": "int32",
-          "sql_column": "map_id"
+          "sql_column": "map_id",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "4": {
           "name": "x",
