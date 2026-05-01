@@ -1,11 +1,14 @@
 """
 Type resolver for acore-data.
 
-Provides type-aware field resolution for tables with type-specific data fields.
-Currently supports: gameobject_template, creature_template, item_template.
+Registry-driven resolution engine. Reads cross-reference metadata from
+datastore_registry.json to resolve fields for ANY table with registered
+references. No hardcoded mappings needed.
 
-Each table type has a mapping that defines which data fields reference other
-datastores and how to resolve those references.
+Currently resolves:
+  - DBC lookups (dbc_backed / dbc_entry references) -> names/labels
+  - SQL lookups (sql_objectmgr / sql_manager / etc.) -> names/labels
+  - Loot templates (external references) -> item lists
 """
 
 from typing import Dict, Any, List, Optional
@@ -51,106 +54,57 @@ GO_TYPE_NAMES = {
 }
 
 
-GAMEOBJECT_FIELD_MAP = {
-    # GAMEOBJECT_TYPE_DOOR (0)
-    0: {
-        "data1": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_BUTTON (1)
-    1: {
-        "data1": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data3": {"name": "linkedTrap", "references": "sql", "table": "gameobject_template"},
-    },
-    # GAMEOBJECT_TYPE_QUESTGIVER (2)
-    2: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data3": {"name": "gossipID", "references": "sql", "table": "gossip_menu_option", "id_col": "menu_id"},
-    },
-    # GAMEOBJECT_TYPE_CHEST (3)
-    3: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data1": {"name": "lootId", "references": "loot", "table": "gameobject_loot_template", "id_col": "Entry"},
-        "data6": {"name": "eventId", "references": "sql", "table": "event_scripts"},
-        "data7": {"name": "linkedTrapId", "references": "sql", "table": "gameobject_template"},
-        "data8": {"name": "questId", "references": "sql", "table": "quest_template", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_GENERIC (5)
-    5: {
-        "data5": {"name": "questId", "references": "sql", "table": "quest_template", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_TRAP (6)
-    6: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data3": {"name": "spellId", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_SPELL_FOCUS (8)
-    8: {
-        "data0": {"name": "focusId", "references": "dbc", "dbc_name": "SpellFocusObject", "id_col": "ID"},
-        "data4": {"name": "questID", "references": "sql", "table": "quest_template", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_TEXT (9)
-    9: {
-        "data0": {"name": "pageID", "references": "sql", "table": "page_text", "id_col": "entry"},
-    },
-    # GAMEOBJECT_TYPE_GOOBER (10)
-    10: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data1": {"name": "questId", "references": "sql", "table": "quest_template", "id_col": "ID"},
-        "data2": {"name": "eventId", "references": "sql", "table": "event_scripts"},
-        "data10": {"name": "spellId", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data12": {"name": "linkedTrapId", "references": "sql", "table": "gameobject_template"},
-        "data19": {"name": "gossipID", "references": "sql", "table": "gossip_menu_option", "id_col": "menu_id"},
-    },
-    # GAMEOBJECT_TYPE_AREADAMAGE (12)
-    12: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_CAMERA (13)
-    13: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data1": {"name": "cinematicId", "references": "dbc", "dbc_name": "CinematicCamera", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_MO_TRANSPORT (15)
-    15: {
-        "data0": {"name": "taxiPathId", "references": "dbc", "dbc_name": "TaxiPath", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_SUMMONING_RITUAL (18)
-    18: {
-        "data1": {"name": "spellId", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data2": {"name": "animSpell", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data4": {"name": "casterTargetSpell", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_SPELLCASTER (22)
-    22: {
-        "data0": {"name": "spellId", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_FLAGSTAND (24)
-    24: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data1": {"name": "pickupSpell", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data3": {"name": "returnAura", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data4": {"name": "returnSpell", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_FISHINGHOLE (25)
-    25: {
-        "data1": {"name": "lootId", "references": "loot", "table": "gameobject_loot_template", "id_col": "Entry"},
-        "data4": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_FLAGDROP (26)
-    26: {
-        "data0": {"name": "lockId", "references": "dbc", "dbc_name": "Lock", "id_col": "ID"},
-        "data2": {"name": "pickupSpell", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_AURA_GENERATOR (30)
-    30: {
-        "data2": {"name": "auraID1", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-        "data4": {"name": "auraID2", "references": "dbc", "dbc_name": "Spell", "id_col": "ID"},
-    },
-    # GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY (31)
-    31: {
-        "data0": {"name": "mapID", "references": "dbc", "dbc_name": "Map", "id_col": "ID"},
-    },
-}
+def _classify_target(ref_type: str, target_entry: Optional[Dict]) -> str:
+    """Classify a target into dbc/sql/loot resolution category."""
+    if ref_type in ("dbc_backed", "dbc_entry"):
+        return "dbc"
+    if target_entry:
+        cat = target_entry.get("category", "")
+        name_lower = (target_entry.get("sql_table", target_entry.get("dbc_name", "")) or "").lower()
+        if "loot" in name_lower and "template" in name_lower:
+            return "loot"
+        if cat.startswith("sql_"):
+            return "sql"
+        if cat == "dbc_backed":
+            return "dbc"
+    if ref_type == "external":
+        return "loot"
+    return "sql"
+
+
+def _get_row_value(row: Dict, sql_col: str, field_name: str):
+    """Get value from row by column name (case-insensitive)."""
+    for key in [sql_col, field_name]:
+        if key and key in row:
+            return row[key]
+    key_lower = (sql_col or field_name or "").lower()
+    for k, v in row.items():
+        if k.lower() == key_lower:
+            return v
+    return None
+
+
+def _get_row_pk(row: Dict):
+    """Get primary key value from row."""
+    for pk in ["entry", "ID", "Id", "id", "guid"]:
+        if pk in row:
+            return row[pk]
+    return str(id(row))
+
+
+def _find_registry_entry(server, table_name: str) -> Optional[Dict]:
+    """Find registry entry by SQL table name, DBC name, or struct name."""
+    resolved = server.registry._resolve_entry(table_name)
+    if resolved:
+        return resolved[1]
+    entries = server.registry.registry.get("entries", {})
+    table_lower = table_name.lower()
+    for name, entry in entries.items():
+        if (entry.get("sql_table", "") or "").lower() == table_lower:
+            return entry
+        if (entry.get("dbc_name", "") or "").lower() == table_lower:
+            return entry
+    return None
 
 
 def resolve_type_fields(
@@ -160,11 +114,11 @@ def resolve_type_fields(
     resolve_filter: Any,
     resolve_max: int = 10,
 ) -> Dict[str, Any]:
-    """Resolve type-specific data fields for supported tables.
+    """Resolve cross-reference fields for any table with registry metadata.
 
     Args:
         server: Server instance with database module
-        sql_table: SQL table name (gameobject_template, etc.)
+        sql_table: SQL table name or DBC name to resolve
         rows: Query results to resolve fields for
         resolve_filter: What to resolve - True (all), list of types, or False
         resolve_max: Max items to return for loot tables (0 = no limit)
@@ -175,40 +129,148 @@ def resolve_type_fields(
     if not rows or not resolve_filter:
         return {}
 
-    resolvers = {
-        "gameobject_template": _resolve_gameobject_fields,
-    }
-
-    resolver = resolvers.get(sql_table)
-    if not resolver:
+    reg_entry = _find_registry_entry(server, sql_table)
+    if not reg_entry:
         return {}
 
-    return resolver(server, sql_table, rows, resolve_filter, resolve_max)
+    # Special case: gameobject_template uses type-conditional resolution
+    if sql_table == "gameobject_template" and "type_field_mappings" in reg_entry:
+        return _resolve_gameobject_fields(server, reg_entry, rows, resolve_filter, resolve_max)
+
+    # Generic resolution for all other tables
+    return _resolve_generic(server, reg_entry, rows, resolve_filter, resolve_max)
 
 
-def _resolve_gameobject_fields(
+def _resolve_generic(
     server,
-    sql_table: str,
+    reg_entry: Dict,
     rows: List[Dict[str, Any]],
     resolve_filter: Any,
     resolve_max: int = 10,
 ) -> Dict[str, Any]:
-    """Resolve gameobject_template type-specific fields."""
-    resolved = {}
+    """Resolve fields using registry cross-reference metadata.
 
+    Works for any table that has fields with 'references' in the registry.
+    Handles DBC lookups, SQL lookups, and loot template expansion.
+    """
+    fields = reg_entry.get("fields", {})
+    registry = server.registry.registry.get("entries", {})
+
+    # Build list of resolvable fields from registry metadata
+    resolvable = []
+    for fid, finfo in fields.items():
+        if not isinstance(finfo, dict):
+            continue
+        target = finfo.get("references")
+        if not target or target == "self_ref":
+            continue
+        if isinstance(target, list):  # Complex multi-ref (e.g. gameobject data[])
+            continue
+
+        ref_type = finfo.get("reference_type", "")
+        ref_col = finfo.get("reference_column", "ID")
+        sql_col = finfo.get("sql_column", finfo.get("name", ""))
+        field_name = finfo.get("name", fid)
+
+        target_entry = registry.get(target)
+        resolve_category = _classify_target(ref_type, target_entry)
+
+        # Determine the lookup name for the target
+        if resolve_category == "dbc" and target_entry:
+            lookup_name = target_entry.get("dbc_name", target.replace("Entry", ""))
+        elif resolve_category == "sql" and target_entry:
+            lookup_name = target_entry.get("sql_table", target)
+        elif resolve_category == "loot" and target_entry:
+            lookup_name = target_entry.get("sql_table", target)
+        else:
+            lookup_name = target
+
+        resolvable.append({
+            "field_id": fid,
+            "field_name": field_name,
+            "sql_col": sql_col,
+            "target": target,
+            "ref_type": ref_type,
+            "ref_col": ref_col,
+            "resolve_category": resolve_category,
+            "lookup_name": lookup_name,
+        })
+
+    if not resolvable:
+        return {}
+
+    # Determine allowed resolve types
+    if isinstance(resolve_filter, list):
+        allowed = set(resolve_filter)
+    elif resolve_filter is True:
+        allowed = {"dbc", "sql", "loot"}
+    else:
+        return {}
+
+    resolved = {}
+    for row in rows:
+        pk = _get_row_pk(row)
+        row_resolved = {}
+
+        for r in resolvable:
+            raw_value = _get_row_value(row, r["sql_col"], r["field_name"])
+            if raw_value is None or raw_value == 0:
+                continue
+
+            entry_resolved = {
+                "meaning": r["field_name"],
+                "raw": raw_value,
+            }
+
+            if r["resolve_category"] == "dbc" and "dbc" in allowed:
+                resolved_val = _resolve_dbc_ref(server, r["lookup_name"], raw_value, r["ref_col"])
+                if resolved_val:
+                    entry_resolved["resolved_to"] = resolved_val
+
+            elif r["resolve_category"] == "sql" and "sql" in allowed:
+                resolved_val = _resolve_sql_ref(server, r["lookup_name"], raw_value, r["ref_col"])
+                if resolved_val:
+                    entry_resolved["resolved_to"] = resolved_val
+
+            elif r["resolve_category"] == "loot" and "loot" in allowed:
+                loot_items = _resolve_loot_ref(server, r["lookup_name"], raw_value, r["ref_col"], resolve_max)
+                if loot_items:
+                    entry_resolved.update(loot_items)
+
+            if "resolved_to" in entry_resolved or "items" in entry_resolved:
+                row_resolved[r["sql_col"]] = entry_resolved
+
+        if row_resolved:
+            resolved[pk] = row_resolved
+
+    return resolved
+
+
+def _resolve_gameobject_fields(
+    server,
+    reg_entry: Dict,
+    rows: List[Dict[str, Any]],
+    resolve_filter: Any,
+    resolve_max: int = 10,
+) -> Dict[str, Any]:
+    """Resolve gameobject_template type-specific fields from registry."""
+    type_mappings = reg_entry.get("type_field_mappings", {})
+    if not type_mappings:
+        return {}
+
+    resolved = {}
     for row in rows:
         entry_value = row.get("entry")
         go_type = row.get("type", 0)
 
         type_name = GO_TYPE_NAMES.get(go_type, f"UNKNOWN({go_type})")
-        field_map = GAMEOBJECT_FIELD_MAP.get(go_type, {})
+        field_map = type_mappings.get(str(go_type), {})
 
         if not field_map:
             continue
 
         row_resolved = {"type_name": type_name}
 
-        # Determine which references to resolve based on filter
         if isinstance(resolve_filter, list):
             allowed_refs = set(resolve_filter)
         elif resolve_filter is True:
@@ -217,7 +279,6 @@ def _resolve_gameobject_fields(
             continue
 
         for data_col, field_info in field_map.items():
-            # Case-insensitive column lookup (SQL has Data0, map uses data0)
             raw_value = row.get(data_col)
             if raw_value is None:
                 for key in row:
@@ -227,9 +288,7 @@ def _resolve_gameobject_fields(
             if raw_value is None or raw_value == 0:
                 continue
 
-            ref_type = field_info.get("references", "")
-
-            # Skip non-resolvable fields (boolean flags, etc.)
+            ref_type = field_info.get("resolve_type", "")
             if not ref_type:
                 continue
 
@@ -239,21 +298,21 @@ def _resolve_gameobject_fields(
             }
 
             if ref_type == "dbc" and "dbc" in allowed_refs:
-                dbc_name = field_info.get("dbc_name", "")
+                dbc_name = field_info.get("target", "")
                 id_col = field_info.get("id_col", "ID")
                 resolved_value = _resolve_dbc_ref(server, dbc_name, raw_value, id_col)
                 if resolved_value:
                     entry_resolved["resolved_to"] = resolved_value
 
             elif ref_type == "sql" and "sql" in allowed_refs:
-                table = field_info.get("table", "")
-                id_col = field_info.get("id_col", "ID") or field_info.get("id_col", "entry")
+                table = field_info.get("target", "")
+                id_col = field_info.get("id_col", "entry") or "entry"
                 resolved_value = _resolve_sql_ref(server, table, raw_value, id_col)
                 if resolved_value:
                     entry_resolved["resolved_to"] = resolved_value
 
             elif ref_type == "loot" and "loot" in allowed_refs:
-                table = field_info.get("table", "gameobject_loot_template")
+                table = field_info.get("target", "gameobject_loot_template")
                 id_col = field_info.get("id_col", "Entry")
                 loot_items = _resolve_loot_ref(server, table, raw_value, id_col, resolve_max)
                 if loot_items is not None:
@@ -261,7 +320,6 @@ def _resolve_gameobject_fields(
 
             row_resolved[data_col] = entry_resolved
 
-        # Use entry as key for single rows, or index-based for multiple
         resolved[entry_value] = row_resolved
 
     return resolved

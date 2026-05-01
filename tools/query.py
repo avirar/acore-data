@@ -275,6 +275,20 @@ def _query_dbc(
     if filter_notes:
         metadata["filter_notes"] = filter_notes
 
+    # Resolve cross-reference fields for DBC-backed stores
+    resolve_filter = args.get("resolve", False)
+    resolve_max = args.get("resolve_max", 10)
+
+    if resolve_filter and merged.get("result"):
+        raw_rows = _extract_rows_for_resolution(merged["result"], id_value is not None)
+        if raw_rows:
+            resolved = resolve_type_fields(
+                server, dbc_load_name, raw_rows, resolve_filter, resolve_max
+            )
+            if resolved:
+                metadata["$resolved_fields"] = resolved
+                metadata["type_resolved"] = True
+
     return {"result": merged.get("result", []), "metadata": metadata}
 
 
@@ -484,6 +498,50 @@ def _extract_field_references(reg_entry: Optional[Dict]) -> Optional[Dict[str, L
     return refs if refs else None
 
 
+def _extract_rows_for_resolution(merged_result: Any, single_record: bool) -> List[Dict[str, Any]]:
+    """Convert annotated DBC results into plain {field_name: value} dicts for resolution.
+
+    Handles both annotation formats:
+      - Single record (ID lookup): flat list of {index, name, value, ...} field dicts
+      - Multi-record: list of rows, each row is a list of {index, name, value, ...} field dicts
+      - Plain dicts (SQL-only path): passed through as-is
+
+    Returns list of {field_name: value} dicts suitable for resolve_type_fields().
+    """
+    if not merged_result:
+        return []
+
+    # If already a list of plain dicts (e.g., SQL-only merge), pass through
+    if isinstance(merged_result, list) and merged_result:
+        first = merged_result[0]
+        if isinstance(first, dict):
+            # Could be plain {col: value} OR annotated [{index, name, value}, ...]
+            # Check if it looks like an annotated field (single-record flat format)
+            if "value" in first and "name" in first:
+                # Single-record flat annotation: [{index:0, name:"ID", value:118}, ...]
+                row = {}
+                for field in merged_result:
+                    fname = field.get("name", "")
+                    if fname:
+                        row[fname] = field.get("value")
+                return [row]
+            # Already plain {col: value} dicts
+            return merged_result
+        elif isinstance(first, list):
+            # Multi-record annotation: [[{index, name, value}, ...], ...]
+            rows = []
+            for row_fields in merged_result:
+                row = {}
+                for field in row_fields:
+                    fname = field.get("name", "")
+                    if fname:
+                        row[fname] = field.get("value")
+                rows.append(row)
+            return rows
+
+    return []
+
+
 def get_schema() -> Dict[str, Any]:
     """Tool schema for MCP."""
     return {
@@ -540,9 +598,14 @@ def get_schema() -> Dict[str, Any]:
                         {"type": "array", "items": {"type": "string"}}
                     ],
                     "description": (
-                        "Resolve type-specific data fields. Use true to resolve all references, "
-                        "or ['dbc', 'sql', 'loot'] to pick specific types. For gameobject_template, "
-                        "this annotates data[0-19] with their actual meaning (lootId, lockId, spellId, etc.)"
+                        "Resolve cross-reference fields to their targets. "
+                        "Use true to resolve all, or ['dbc', 'sql', 'loot'] to pick types. "
+                        "Works for ALL tables with cross-reference metadata in the registry: "
+                        "gameobject_template (type-aware data[0-19]), "
+                        "creature_template (faction, lootid, spell1-8, mapId...), "
+                        "SpellEntry (Category, DurationIndex, RangeIndex, EffectTriggerSpell...), "
+                        "Quest (RewardSpell, RequiredSkill, ZoneOrSort...), "
+                        "and 200+ other entries. DBC and SQL lookups resolve to names/labels."
                     )
                 },
                 "resolve_max": {

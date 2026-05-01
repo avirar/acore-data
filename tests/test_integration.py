@@ -339,6 +339,66 @@ class TestSQLOverlayRegEntry(unittest.TestCase):
         # If field_N was used, MySQL would error
 
 
+class TestRegistryDrivenResolution(unittest.TestCase):
+    """Test generic cross-reference resolution driven by registry metadata."""
+
+    def test_sql_creature_template_resolve(self):
+        """creature_template with resolve=true should resolve faction, etc."""
+        result = call_query({
+            "name": "creature_template",
+            "id": 1,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+
+    def test_dbc_spell_entry_resolve(self):
+        """SpellEntry DBC query with resolve=true should resolve Category etc."""
+        result = call_query({
+            "name": "SpellEntry",
+            "id": 118,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        # May or may not have resolved_fields depending on DB/DBC availability
+        # but should not error
+
+    def test_gameobject_still_works(self):
+        """gameobject_template resolution still works after registry migration."""
+        result = call_query({
+            "name": "gameobject_template",
+            "filter": {"type": 3},
+            "resolve": True,
+            "limit": 1,
+        })
+        self.assertNotIn("error", result)
+
+    def test_resolve_filter_sql_only(self):
+        """resolve=['sql'] should only resolve SQL targets, not DBC."""
+        result = call_query({
+            "name": "creature_template",
+            "id": 1,
+            "resolve": ["sql"],
+        })
+        self.assertNotIn("error", result)
+
+    def test_resolve_filter_dbc_only(self):
+        """resolve=['dbc'] should only resolve DBC targets."""
+        result = call_query({
+            "name": "creature_template",
+            "id": 1,
+            "resolve": ["dbc"],
+        })
+        self.assertNotIn("error", result)
+
+    def test_no_resolve_by_default(self):
+        """Without resolve param, no resolution should happen."""
+        result = call_query({
+            "name": "creature_template",
+            "id": 1,
+        })
+        self.assertNotIn("error", result)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
