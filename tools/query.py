@@ -12,6 +12,8 @@ import re
 import sys
 from typing import Dict, Any, List, Optional, Tuple
 
+from core.type_resolver import resolve_type_fields
+
 
 def _resolve_sql_column(
     reg_entry: Dict, key: str, sql_table: str
@@ -286,6 +288,8 @@ def _query_sql(
     id_value = args.get("id")
     filter_data = args.get("filter")
     limit = args.get("limit", 100)
+    resolve_filter = args.get("resolve", False)
+    resolve_max = args.get("resolve_max", 10)
 
     sql_table = reg_entry.get("sql_table", "")
     if not sql_table:
@@ -351,6 +355,9 @@ def _query_sql(
                 error_msg += f"\n{suggestion}"
         return {"error": error_msg, "isError": True}
 
+    # Resolve type-specific fields (e.g. gameobject data[0-19] meanings)
+    resolved = resolve_type_fields(server, sql_table, rows or [], resolve_filter, resolve_max)
+
     metadata = {
         "source": "database",
         "category": reg_entry.get("category", ""),
@@ -377,6 +384,10 @@ def _query_sql(
     mgr = reg_entry.get("manager_singleton", "")
     if mgr:
         metadata["manager_singleton"] = mgr
+
+    if resolved:
+        metadata["$resolved_fields"] = resolved
+        metadata["type_resolved"] = True
 
     return {"result": rows or [], "count": len(rows or []), "metadata": metadata}
 
@@ -523,6 +534,7 @@ def get_schema() -> Dict[str, Any]:
             " Supports DBC binary files, SQL tables, overlays, and auxiliary stores."
             " Use id= for O(1) lookup, filter={...} for named field queries,"
             " fields=[...] for column selection, compact=true (default) to strip nulls."
+            " Use resolve=true to get type-aware field resolution for tables like gameobject_template."
         ),
         "inputSchema": {
             "type": "object",
@@ -562,6 +574,24 @@ def get_schema() -> Dict[str, Any]:
                 "compact": {
                     "type": "boolean",
                     "description": "Strip null fields (default: true)"
+                },
+                "resolve": {
+                    "oneOf": [
+                        {"type": "boolean"},
+                        {"type": "array", "items": {"type": "string"}}
+                    ],
+                    "description": (
+                        "Resolve type-specific data fields. Use true to resolve all references, "
+                        "or ['dbc', 'sql', 'loot'] to pick specific types. For gameobject_template, "
+                        "this annotates data[0-19] with their actual meaning (lootId, lockId, spellId, etc.)"
+                    )
+                },
+                "resolve_max": {
+                    "type": "number",
+                    "description": (
+                        "Max items to return per loot table resolution (default: 10). "
+                        "Use 0 for no limit."
+                    )
                 }
             },
             "required": ["name"]
