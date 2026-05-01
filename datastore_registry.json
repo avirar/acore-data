@@ -9333,7 +9333,10 @@
           "name": "creatureType",
           "type": "int32",
           "sql_column": "creatureType",
-          "notes": "-"
+          "notes": "-",
+          "references": "CreatureTypeEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "22": {
           "name": "attackSpeed",
@@ -9402,7 +9405,6 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SpellVisualEntry": {
@@ -11550,7 +11552,10 @@
           "name": "ItemEntry[0]",
           "type": "uint32",
           "sql_column": "ItemEntry1",
-          "notes": ""
+          "notes": "",
+          "references": "ItemEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "ItemEntry2": {
           "name": "ItemEntry[1]",
@@ -11565,7 +11570,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "VendorItem": {
@@ -13336,7 +13340,10 @@
           "name": "Options[0].BroadcastTextID",
           "type": "uint32",
           "sql_column": "BroadcastTextID0",
-          "notes": "DBC BroadcastText ID override (0=use raw text), option 0"
+          "notes": "DBC BroadcastText ID override (0=use raw text), option 0",
+          "references": "GossipText",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "4": {
           "name": "Options[0].Language",
@@ -13849,7 +13856,6 @@
           "notes": "Emote ID for option 7, slot 2"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GossipMenus": {
@@ -13873,10 +13879,12 @@
           "name": "TextID",
           "type": "uint32",
           "sql_column": "TextID",
-          "notes": ""
+          "notes": "",
+          "references": "GossipText",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GossipMenuItems": {
@@ -13918,7 +13926,10 @@
           "name": "OptionBroadcastTextID",
           "type": "uint32",
           "sql_column": "OptionBroadcastTextID",
-          "notes": ""
+          "notes": "",
+          "references": "BroadcastText",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "OptionType": {
           "name": "OptionType",
@@ -13969,7 +13980,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "BroadcastText": {
@@ -15529,7 +15539,10 @@
           "name": "CreatureGroundMovementType",
           "type": "Ground",
           "sql_column": "COALESCE(cmo.Ground, ctm.Ground)",
-          "notes": "None=0, Run=1, Hover=2"
+          "notes": "None=0, Run=1, Hover=2",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "COALESCE(cmo.Swim, ctm.Swim)": {
           "name": "bool",
@@ -15541,7 +15554,10 @@
           "name": "CreatureFlightMovementType",
           "type": "Flight",
           "sql_column": "COALESCE(cmo.Flight, ctm.Flight)",
-          "notes": "None=0, DisableGravity=1, CanFly=2"
+          "notes": "None=0, DisableGravity=1, CanFly=2",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "COALESCE(cmo.Rooted, ctm.Rooted)": {
           "name": "bool",
@@ -15553,7 +15569,10 @@
           "name": "CreatureChaseMovementType",
           "type": "Chase",
           "sql_column": "COALESCE(cmo.Chase, ctm.Chase)",
-          "notes": "Run=0, CanWalk=1, AlwaysWalk=2"
+          "notes": "Run=0, CanWalk=1, AlwaysWalk=2",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         },
         "COALESCE(cmo.Random, ctm.Random)": {
           "name": "CreatureRandomMovementType",
@@ -15568,7 +15587,6 @@
           "notes": "Milliseconds"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameObjectQuestItem": {
@@ -15882,7 +15900,10 @@
           "name": "Creature spawn GUIDs in this cell",
           "type": "std::set&lt;ObjectGuid::LowType&gt;",
           "sql_column": "creatures",
-          "notes": ""
+          "notes": "",
+          "references": "CreatureTemplate",
+          "reference_type": "external",
+          "reference_column": "ID"
         },
         "gameobjects": {
           "name": "GO spawn GUIDs in this cell",
@@ -15891,7 +15912,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "SpellProcEntry": {
@@ -17756,8 +17776,8 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "Signatures": {
       "category": "sql_manager",
@@ -17789,8 +17809,8 @@
           "notes": "Account ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "InstanceSave": {
       "category": "sql_manager",
@@ -18153,8 +18173,8 @@
           "sql_column": "BankMoney"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "ArenaTeam": {
       "category": "sql_manager",
@@ -18258,8 +18278,8 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "ArenaTeamMembers": {
       "category": "sql_manager",
@@ -18315,8 +18335,8 @@
           "notes": "From `character_arena_stats`"
         }
       },
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "CalendarEvent": {
       "category": "sql_manager",
@@ -18661,8 +18681,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "ArenaSeasonRewardGroup": {
       "category": "sql_auxiliary",
@@ -19464,8 +19484,8 @@
       "store_variable": "",
       "header_file": "src/server/game/Battlegrounds/ArenaSeason/ArenaSeasonMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "GameEventBattlegroundHoliday": {
       "category": "sql_manager",
@@ -20614,8 +20634,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "PickpocketingLootTemplate": {
       "category": "sql_auxiliary",
@@ -23313,8 +23333,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "BattlegroundDeserters": {
       "category": "sql_auxiliary",
@@ -26585,8 +26605,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "LogArenaMemberstats": {
       "category": "sql_auxiliary",
@@ -27140,8 +27160,8 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_status": "external_target",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
     },
     "PlayerbotsNames": {
       "category": "sql_auxiliary",
