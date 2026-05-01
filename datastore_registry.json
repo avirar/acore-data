@@ -1960,10 +1960,12 @@
           "name": "DisplayRaceID",
           "type": "uint32",
           "sql_column": "DisplayRaceID",
-          "notes": "-"
+          "notes": "-",
+          "references": "ChrRacesEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "CreatureFamilyEntry": {
@@ -3359,7 +3361,10 @@
           "name": "Displayid",
           "type": "uint32",
           "sql_column": "Displayid",
-          "notes": "Primary key"
+          "notes": "Primary key",
+          "references": "self_ref",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "1": {
           "name": "filename",
@@ -3368,7 +3373,6 @@
           "notes": "-"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GemPropertiesEntry": {
@@ -11525,7 +11529,10 @@
           "name": "modelid_other_gender",
           "type": "uint32",
           "sql_column": "modelid_other_gender",
-          "notes": ""
+          "notes": "",
+          "references": "CreatureModelDataEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "is_trigger": {
           "name": "is_trigger",
@@ -11534,7 +11541,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "EquipmentInfo": {
@@ -14246,13 +14252,19 @@
           "name": "Parent",
           "type": "uint32",
           "sql_column": "parent",
-          "notes": ""
+          "notes": "",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "ScriptName": {
           "name": "ScriptId",
           "type": "uint32",
           "sql_column": "ScriptName",
-          "notes": ""
+          "notes": "",
+          "references": "self_ref",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "AllowMount": {
           "name": "AllowMount",
@@ -14261,7 +14273,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "DungeonEncounter": {
@@ -14285,7 +14296,10 @@
           "name": "EncounterCreditType",
           "type": "creditType",
           "sql_column": "creditType",
-          "notes": "0=KILL_CREATURE, 1=CAST_SPELL"
+          "notes": "0=KILL_CREATURE, 1=CAST_SPELL",
+          "references": "MapEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         },
         "creditEntry": {
           "name": "uint32",
@@ -14306,7 +14320,6 @@
           "notes": ""
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "DungeonProgressionRequirements": {
@@ -16995,10 +17008,12 @@
         "ScriptId": {
           "name": "ScriptId",
           "type": "`uint32`",
-          "notes": ""
+          "notes": "",
+          "references": "AchievementCriteriaEntry",
+          "reference_type": "dbc_entry",
+          "reference_column": "ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "AchievementReward": {
@@ -17486,10 +17501,12 @@
           "name": "ScriptId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "script_name"
+          "sql_column": "script_name",
+          "references": "self_ref",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         }
       },
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "OutdoorPvPData": {
@@ -17776,8 +17793,12 @@
           "notes": ""
         }
       },
-      "reference_status": "external_target",
-      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
+      "reference_status": "linked",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)",
+      "references": {
+        "target": "PetitionEntry",
+        "type": "linked_entry"
+      }
     },
     "Signatures": {
       "category": "sql_manager",
@@ -17809,8 +17830,12 @@
           "notes": "Account ID"
         }
       },
-      "reference_status": "external_target",
-      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
+      "reference_status": "linked",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)",
+      "references": {
+        "target": "PetitionEntry",
+        "type": "linked_entry"
+      }
     },
     "InstanceSave": {
       "category": "sql_manager",
@@ -18173,8 +18198,12 @@
           "sql_column": "BankMoney"
         }
       },
-      "reference_status": "external_target",
-      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
+      "reference_status": "linked",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)",
+      "references": {
+        "target": "GuildEntry",
+        "type": "linked_entry"
+      }
     },
     "ArenaTeam": {
       "category": "sql_manager",
@@ -18335,8 +18364,12 @@
           "notes": "From `character_arena_stats`"
         }
       },
-      "reference_status": "external_target",
-      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
+      "reference_status": "linked",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)",
+      "references": {
+        "target": "ArenaTeamEntry",
+        "type": "linked_entry"
+      }
     },
     "CalendarEvent": {
       "category": "sql_manager",
@@ -18681,8 +18714,12 @@
       "store_variable": "",
       "header_file": "",
       "container_type": "",
-      "reference_status": "external_target",
-      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)"
+      "reference_status": "linked",
+      "reference_notes": "References tables not directly accessible via registry (Guild/ArenaTeam/Battleground)",
+      "references": {
+        "target": "ArenaTeamEntry",
+        "type": "linked_entry"
+      }
     },
     "ArenaSeasonRewardGroup": {
       "category": "sql_auxiliary",
@@ -19520,19 +19557,24 @@
         "0": {
           "name": "eventEntry",
           "type": "int32",
-          "sql_column": "eventEntry"
+          "sql_column": "eventEntry",
+          "references": "GameEventEntry",
+          "reference_type": "sql_table",
+          "reference_column": "ID"
         },
         "1": {
           "name": "guid",
           "type": "int32",
-          "sql_column": "guid"
+          "sql_column": "guid",
+          "references": "CreatureTemplate",
+          "reference_type": "object_manager",
+          "reference_column": "ID"
         }
       },
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Events/GameEventMgr.h",
       "container_type": "",
-      "reference_status": "needs_manual_analysis",
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
     },
     "GameEventCreatureQuest": {
@@ -29722,6 +29764,36 @@
           "notes": "-"
         }
       }
+    },
+    "GuildEntry": {
+      "name": "GuildEntry",
+      "category": "sql_manager",
+      "sql_table": "guild",
+      "reference_notes": "Guild table (master guild data, not managed by object manager)"
+    },
+    "ArenaTeamEntry": {
+      "name": "ArenaTeamEntry",
+      "category": "sql_manager",
+      "sql_table": "arena_team",
+      "reference_notes": "Arena team master table"
+    },
+    "PetitionEntry": {
+      "name": "PetitionEntry",
+      "category": "sql_manager",
+      "sql_table": "petition",
+      "reference_notes": "Guild petition table for guild creation requests"
+    },
+    "PetEntry": {
+      "name": "PetEntry",
+      "category": "sql_auxiliary",
+      "sql_table": "character_pet",
+      "reference_notes": "Character pet data table"
+    },
+    "BattlegroundEntry": {
+      "name": "BattlegroundEntry",
+      "category": "sql_manager",
+      "sql_table": "battleground_template",
+      "reference_notes": "Battleground master data"
     }
   },
   "indices": {
