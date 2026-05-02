@@ -121,8 +121,27 @@ def sql_tools(server):
                     if table_match.lastindex >= 2
                     else table_match.group(1)
                 )
+
+                # Check if the table name matches a DBC-backed store
+                resolved = server.registry._resolve_entry(bad_table)
+                if resolved:
+                    struct_name, entry = resolved
+                    if entry.get("category") == "dbc_backed":
+                        dbc_name = entry.get("dbc_name", bad_table)
+                        sql_overlay = entry.get("sql_table", "")
+                        hint = (
+                            f"\n\n'{bad_table}' is a DBC binary file, not a SQL table.\n"
+                            f"Use acore_data_query(name='{dbc_name}') to query this data."
+                        )
+                        if sql_overlay:
+                            hint += f"\nSQL overlay table (partial/extended data): '{sql_overlay}'."
+                        msg = hint
+                        msg += f"\n\nExample: acore_data_query(name='{dbc_name}', id=118)"
+                        msg += f"\nUse lookup(query='{bad_table}') for full field list."
+                        return {"error": msg, "isError": True}
+
                 suggestions = server.database._suggest_similar_tables(bad_table)
-                
+
                 if suggestions:
                     suggestion_info = []
                     for s in suggestions[:5]:

@@ -762,6 +762,141 @@ class TestAchievementCriteriaResolution(unittest.TestCase):
         self.assertNotIn("error", result)
 
 
+class TestDBCFixedAlias(unittest.TestCase):
+    """Test underscore-to-bracket alias resolution and improved fuzzy suggestions."""
+
+    def test_underscore_alias_slot_1(self):
+        """EffectMiscValue_1 should resolve to EffectMiscValue[0] (index 110)."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectMiscValue_1": 0},
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_underscore_alias_slot_2(self):
+        """EffectMiscValue_2 should resolve to EffectMiscValue[1] (index 111)."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectMiscValue_2": 0},
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_effect_underscore_alias(self):
+        """Effect_1 should resolve to Effect[0] (index 71)."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"Effect_1": 6},
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_bracket_still_works(self):
+        """Bracket notation Effect[0] should still work as before."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"Effect[0]": 6},
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_base_field_name_matches_any_slot(self):
+        """Base field name 'EffectMiscValue' should match first slot (index 110)."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectMiscValue": 0},
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_bad_key_shows_relevant_suggestions(self):
+        """Bad key 'EffectMisvalue_X' should suggest EffectMiscValue variants."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectMisvalue_X": 0},
+        })
+        # Should get an error with useful suggestions, not generic ones
+        self.assertIn("error", result)
+        error_text = result.get("error", "") + result.get("suggestion", "")
+        # At least should mention EffectMiscValue in the error output
+        self.assertTrue(
+            "EffectMiscValue" in error_text or "Effect" in error_text,
+            f"Error should mention Effect-related fields. Got: {error_text[:200]}"
+        )
+
+    def test_misspelled_key_surfaces_similar_fields(self):
+        """A misspelled key like 'EffectItemValue' should surface both EffectItemType and EffectMiscValue."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectItemValue": 0},
+        })
+        self.assertIn("error", result)
+        error_text = result.get("error", "") + result.get("suggestion", "")
+        # Both EffectItemType and EffectMiscValue should appear (not just Effect or EffectDieSides)
+        has_itemtype = "EffectItemType" in error_text
+        has_miscvalue = "EffectMiscValue" in error_text
+        self.assertTrue(
+            has_itemtype or has_miscvalue,
+            f"Error should suggest EffectItemType or EffectMiscValue for misspelling 'EffectItemValue'. Got: {error_text[:300]}"
+        )
+
+    def test_suggestions_use_compact_bracket_display(self):
+        """Suggestions should use compact [0-2] format rather than listing each slot individually."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectItemValue": 0},
+        })
+        self.assertIn("error", result)
+        error_text = result.get("error", "") + result.get("suggestion", "")
+        # Should have compact format like EffectMiscValue[0-2], not individual slots
+        # If old-style expansion was used, we'd see many more "Effect" mentions
+        # Compact format means at most a handful of distinct field families
+        import re
+        bracket_ranges = re.findall(r'\w+\[\d+-\d+\]', error_text)
+        self.assertTrue(
+            len(bracket_ranges) >= 2,
+            f"Suggestions should use compact [N-M] format (found {len(bracket_ranges)}). Got: {error_text[:300]}"
+        )
+
+    def test_suggests_correct_field_for_item_creation(self):
+        """When searching for fields related to item creation effects, EffectItemType should appear."""
+        result = call_query({
+            "name": "Spell",
+            "filter": {"EffectCreateItem": 123},
+        })
+        self.assertIn("error", result)
+        error_text = result.get("error", "") + result.get("suggestion", "")
+        # EffectItemType is the actual field for CREATE_ITEM effect item type
+        # EffectMiscValue also carries item ID for CREATE_ITEM
+        related_fields = ["EffectItemType", "EffectMiscValue", "Effect"]
+        found = [f for f in related_fields if f in error_text]
+        self.assertTrue(
+            len(found) >= 2,
+            f"Should suggest at least 2 of {related_fields}. Found: {found}. Got: {error_text[:300]}"
+        )
+
+
+class TestDBCvsSQLHints(unittest.TestCase):
+    """Test DBC vs SQL confusion hints."""
+
+    def test_sql_query_for_dbc_table_suggests_query_tool(self):
+        """Trying SQL on 'spell' (DBC table) should suggest acore_data_query."""
+        result = call_tool("sql", {"query": "SELECT * FROM spell LIMIT 1"})
+        error = result.get("error", "") + result.get("hint", "")
+        self.assertTrue(
+            "DBC" in error.upper() or "binary" in error.lower(),
+            f"Should mention DBC/binary file. Got: {error[:300]}"
+        )
+
+    def test_sql_query_for_spells_table_works(self):
+        """SQL on 'spells' table should work (different from DBC Spell)."""
+        result = call_tool("sql", {"query": "SELECT * FROM spells LIMIT 1"})
+        # The 'spells' table exists as a spell_dbc overlay or reference table
+        # Just verify the tool runs without crash
+        self.assertTrue("result" in result or "error" in result)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)

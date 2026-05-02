@@ -194,13 +194,14 @@ def _query_dbc(
         except Exception as e:
             return {"error": f"DBC error: {e}", "isError": True}
 
-    # Convert named filter to numeric indices
+    # Convert named filter to numeric indices (with OR group detection)
     dbc_filter = {}
     filter_notes = []
+    or_groups = None  # {primary_idx: [sibling_indices]} for multi-slot OR matching
     if filter_data and reg_entry:
         try:
             dbc_name_for_filter = reg_entry.get('dbc_name', name) if reg_entry else name
-            dbc_filter, filter_notes = _convert_filter_for_dbc_impl(
+            dbc_filter, filter_notes, or_groups = _convert_filter_for_dbc_impl(
                 server.registry, filter_data, reg_entry, dbc_name_for_filter
             )
         except ValueError as e:
@@ -220,7 +221,24 @@ def _query_dbc(
             record = reader.get_record(int(row_index))
             dbc_result = [record] if record else []
         elif dbc_filter:
-            dbc_result = reader.query(filter_dict=dbc_filter)
+            # Query with all non-OR-group filters first, then handle OR groups via post-filter
+            or_group_indices = set()
+            for primary, siblings in (or_groups or {}).items():
+                or_group_indices.add(primary)
+
+            and_filter = {k: v for k, v in dbc_filter.items() if k not in or_group_indices}
+            dbc_result = reader.query(filter_dict=and_filter if and_filter else None)
+
+            # Post-filter: OR across sibling slots for multi-slot fields
+            if or_groups and dbc_result:
+                def matches_or_group(record, primary_idx, siblings):
+                    target_val = dbc_filter[primary_idx]
+                    return any(record.get(i) == target_val for i in [primary_idx] + siblings)
+
+                dbc_result = [r for r in dbc_result
+                              if all(matches_or_group(r, p, s)
+                                     for p, s in or_groups.items())]
+
             if limit and len(dbc_result) > limit:
                 dbc_result = dbc_result[:limit]
         else:
