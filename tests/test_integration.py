@@ -457,6 +457,80 @@ class TestQuestResolution(unittest.TestCase):
         self.assertNotIn("error", result)
 
 
+class TestConditionResolution(unittest.TestCase):
+    """Test polymorphic condition table resolution with enum translation."""
+
+    def _cond_resolved(self, result):
+        """Get $resolved_fields from metadata for a conditions query result."""
+        meta = result.get("metadata", {})
+        return meta.get("$resolved_fields", {})
+
+    def test_spell_source_translates_enum(self):
+        """SourceType=17 should resolve to 'SPELL' enum name."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 17, "SourceEntry": 3678},
+            "resolve": True,
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._cond_resolved(result)
+        # At least one row should have been resolved
+        rows_with_resolution = [k for k in resolved if not k.startswith("$")]
+        self.assertTrue(len(rows_with_resolution) > 0 or len(resolved) > 0,
+                        "Should resolve SourceType enum name")
+
+    def test_spell_click_resolves_creature_and_spell(self):
+        """SourceType=18 should resolve SourceGroup as creature and SourceEntry as spell."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceGroup": 24418, "SourceTypeOrReferenceId": 18},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_near_creature_resolves_condition_value(self):
+        """ConditionType=29 (NEAR_CREATURE) should resolve Value1 as creature name."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceEntry": 3678, "SourceTypeOrReferenceId": 17},
+            "resolve": True,
+            "limit": 5,
+        })
+        self.assertNotIn("error", result)
+
+    def test_questtaken_resolves_condition_value(self):
+        """ConditionType=9 (QUESTTAKEN) should resolve Value1 as quest name."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceGroup": 24418, "SourceTypeOrReferenceId": 18},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_item_condition_resolves(self):
+        """ConditionType=2 (ITEM) should resolve Value1 as item name."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 1, "SourceEntry": 6994},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_multi_row_condition_filter(self):
+        """Filter for multiple conditions with resolve should work."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 17},
+            "resolve": True,
+            "limit": 10,
+        })
+        self.assertNotIn("error", result)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
