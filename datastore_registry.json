@@ -18043,6 +18043,136 @@
           "name": "enableTimed",
           "type": "`bool`",
           "notes": ""
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "unsigned tinyint",
+          "sql_column": "event_type"
+        },
+        "action_type": {
+          "name": "action_type",
+          "type": "unsigned tinyint",
+          "sql_column": "action_type"
+        },
+        "target_type": {
+          "name": "target_type",
+          "type": "unsigned tinyint",
+          "sql_column": "target_type"
+        },
+        "event_param1": {
+          "name": "event_param1",
+          "type": "unsigned int",
+          "sql_column": "event_param1"
+        },
+        "event_param2": {
+          "name": "event_param2",
+          "type": "unsigned int",
+          "sql_column": "event_param2"
+        },
+        "event_param3": {
+          "name": "event_param3",
+          "type": "unsigned int",
+          "sql_column": "event_param3"
+        },
+        "event_param4": {
+          "name": "event_param4",
+          "type": "unsigned int",
+          "sql_column": "event_param4"
+        },
+        "event_param5": {
+          "name": "event_param5",
+          "type": "unsigned int",
+          "sql_column": "event_param5"
+        },
+        "event_param6": {
+          "name": "event_param6",
+          "type": "unsigned int",
+          "sql_column": "event_param6"
+        },
+        "action_param1": {
+          "name": "action_param1",
+          "type": "unsigned int",
+          "sql_column": "action_param1"
+        },
+        "action_param2": {
+          "name": "action_param2",
+          "type": "unsigned int",
+          "sql_column": "action_param2"
+        },
+        "action_param3": {
+          "name": "action_param3",
+          "type": "unsigned int",
+          "sql_column": "action_param3"
+        },
+        "action_param4": {
+          "name": "action_param4",
+          "type": "unsigned int",
+          "sql_column": "action_param4"
+        },
+        "action_param5": {
+          "name": "action_param5",
+          "type": "unsigned int",
+          "sql_column": "action_param5"
+        },
+        "action_param6": {
+          "name": "action_param6",
+          "type": "unsigned int",
+          "sql_column": "action_param6"
+        },
+        "target_param1": {
+          "name": "target_param1",
+          "type": "unsigned int",
+          "sql_column": "target_param1"
+        },
+        "target_param2": {
+          "name": "target_param2",
+          "type": "unsigned int",
+          "sql_column": "target_param2"
+        },
+        "target_param3": {
+          "name": "target_param3",
+          "type": "unsigned int",
+          "sql_column": "target_param3"
+        },
+        "target_param4": {
+          "name": "target_param4",
+          "type": "unsigned int",
+          "sql_column": "target_param4"
+        },
+        "event_phase_mask": {
+          "name": "event_phase_mask",
+          "type": "unsigned smallint",
+          "sql_column": "event_phase_mask"
+        },
+        "event_chance": {
+          "name": "event_chance",
+          "type": "unsigned tinyint",
+          "sql_column": "event_chance"
+        },
+        "event_flags": {
+          "name": "event_flags",
+          "type": "unsigned smallint",
+          "sql_column": "event_flags"
+        },
+        "target_x": {
+          "name": "target_x",
+          "type": "float",
+          "sql_column": "target_x"
+        },
+        "target_y": {
+          "name": "target_y",
+          "type": "float",
+          "sql_column": "target_y"
+        },
+        "target_z": {
+          "name": "target_z",
+          "type": "float",
+          "sql_column": "target_z"
+        },
+        "target_o": {
+          "name": "target_o",
+          "type": "float",
+          "sql_column": "target_o"
         }
       },
       "reference_status": "linked",
@@ -18557,6 +18687,11 @@
           "references": "AchievementCriteriaEntry",
           "reference_type": "dbc_entry",
           "reference_column": "ID"
+        },
+        "criteria_id": {
+          "name": "criteria_id",
+          "type": "int",
+          "sql_column": "criteria_id"
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
