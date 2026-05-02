@@ -820,6 +820,74 @@ _SAI_SOURCE_TYPE_NAMES = {
     0: "CREATURE", 1: "GAMEOBJECT", 2: "AREATRIGGER", 9: "TIMED_ACTIONLIST",
 }
 
+# TextEmotes enum (SharedDefines.h) — used by RECEIVE_EMOTE event_type 22
+_TEXT_EMOTE_NAMES = {
+    1: "AGREE", 2: "AMAZE", 3: "ANGRY", 4: "APOLOGIZE", 5: "APPLAUD",
+    6: "BASHFUL", 7: "BECKON", 8: "BEG", 9: "BITE", 10: "BLEED",
+    11: "BLINK", 12: "BLUSH", 13: "BONK", 14: "BORED", 15: "BOUNCE",
+    16: "BRB", 17: "BOW", 18: "BURP", 19: "BYE", 20: "CACKLE",
+    21: "CHEER", 22: "CHICKEN", 23: "CHUCKLE", 24: "CLAP", 25: "CONFUSED",
+    26: "CONGRATULATE", 27: "COUGH", 28: "COWER", 29: "CRACK", 30: "CRINGE",
+    31: "CRY", 32: "CURIOUS", 33: "CURTSEY", 34: "DANCE", 35: "DRINK",
+    36: "DROOL", 37: "EAT", 38: "EYE", 39: "FART", 40: "FIDGET",
+    41: "FLEX", 42: "FROWN", 43: "GASP", 44: "GAZE", 45: "GIGGLE",
+    46: "GLARE", 47: "GLOAT", 48: "GREET", 49: "GRIN", 50: "GROAN",
+    51: "GROVEL", 52: "GUFFAW", 53: "HAIL", 54: "HAPPY", 55: "HELLO",
+    56: "HUG", 57: "HUNGRY", 58: "KISS", 59: "KNEEL", 60: "LAUGH",
+    61: "LAYDOWN", 62: "MESSAGE", 63: "MOAN", 64: "MOON", 65: "MOURN",
+    66: "NO", 67: "NOD", 68: "NOSEPICK", 69: "PANIC", 70: "PEER",
+    71: "PLEAD", 72: "POINT", 73: "POKE", 74: "PRAY", 75: "ROAR",
+    76: "ROFL", 77: "RUDE", 78: "SALUTE", 79: "SCRATCH", 80: "SEXY",
+    81: "SHAKE", 82: "SHOUT", 83: "SHRUG", 84: "SHY", 85: "SIGH",
+    86: "SIT", 87: "SLEEP", 88: "SNARL", 89: "SPIT", 90: "STARE",
+    91: "SURPRISED", 92: "SURRENDER", 93: "TALK", 94: "TALKEX", 95: "TALKQ",
+    96: "TAP", 97: "THANK", 98: "THREATEN", 99: "TIRED", 100: "VICTORY",
+    101: "WAVE", 102: "WELCOME", 103: "WHINE", 104: "WHISTLE", 105: "WORK",
+    106: "YAWN", 107: "BOGGLE", 108: "CALM", 109: "COLD", 110: "COMFORT",
+    111: "CUDDLE", 112: "DUCK", 113: "INSULT", 114: "INTRODUCE", 115: "JK",
+    116: "LICK", 117: "LISTEN", 118: "LOST", 119: "MOCK", 120: "PONDER",
+    121: "POUNCE", 122: "PRAISE", 123: "PURR", 124: "PUZZLE", 125: "RAISE",
+    126: "READY", 127: "SHIMMY", 128: "SHIVER", 129: "SHOO", 130: "SLAP",
+    131: "SMIRK", 132: "SNIFF", 133: "SNUB", 134: "SOOTHE", 135: "STINK",
+    136: "TAUNT", 137: "TEASE", 138: "THIRSTY", 139: "VETO", 140: "SNICKER",
+    141: "STAND", 142: "TICKLE", 143: "VIOLIN", 163: "SMILE", 183: "RASP",
+    203: "PITY", 204: "GROWL",
+}
+
+# Emote animation enum (SharedDefines.h) — used by PLAY_EMOTE/SET_EMOTE_STATE action_type 5,17
+_ANIM_EMOTE_NAMES = {
+    0: "NONE", 1: "TALK", 2: "BOW", 3: "WAVE", 4: "CHEER",
+    5: "EXCLAMATION", 6: "QUESTION", 7: "EAT", 10: "DANCE_STATE",
+    11: "LAUGH", 12: "SLEEP_STATE", 13: "SIT_STATE", 14: "RUDE",
+    15: "ROAR", 16: "KNEEL", 17: "KISS", 18: "CRY", 19: "CHICKEN",
+    20: "BEG", 21: "APPLAUD", 22: "SHOUT", 23: "FLEX", 24: "SHY",
+    25: "POINT", 26: "STAND_STATE", 27: "READY_UNARMED_STATE", 28: "WORK_SHEATHED_STATE",
+    29: "POINT_STATE", 30: "NONE_STATE", 33: "WOUND", 34: "WOUND_CRITICAL",
+    35: "ATTACK_UNARMED", 36: "ATTACK1H", 37: "ATTACK2HTIGHT", 38: "ATTACK2H_LOOSE",
+    39: "PARRY_UNARMED", 43: "PARRY_SHIELD", 44: "READY_UNARMED_ONESHOT", 45: "READY1H",
+    48: "READY_BOW", 50: "SPELL_PRECAST", 51: "SPELL_CAST", 53: "BATTLE_ROAR",
+    54: "SPECIALATTACK1H", 60: "KICK", 61: "ATTACK_THROWN", 64: "STUN_STATE",
+    65: "DEAD_STATE", 66: "SALUTE", 68: "KNEEL_STATE", 69: "USE_STANDING_STATE",
+    70: "WAVE_NO_SHEATHE", 71: "CHEER_NO_SHEATHE", 92: "EAT_NO_SHEATHE",
+    93: "STUN_NO_SHEATHE_STATE", 94: "DANCE", 113: "SALUTE_NO_SHEATH",
+    133: "USE_STANDING_NO_SHEATHE_STATE", 153: "LAUGH_NO_SHEATHE",
+    173: "WORK_STATE", 193: "SPELL_PRECAST_STATE", 213: "READY_RIFLE",
+    214: "READY_RIFLE_STATE", 233: "WORK_MINING_STATE", 234: "WORK_CHOPWOOD_STATE",
+    253: "APPLAUD_STATE", 254: "LIFTOFF", 273: "YES", 274: "NO",
+    275: "TRAIN", 293: "LAND", 313: "AT_EASE_STATE", 333: "READY1H_STATE",
+    353: "SPELL_KNEEL_START_STATE", 373: "SUBMERGED_STATE", 374: "SUBMERGE",
+    375: "READY2H_STATE", 376: "READY_BOW_STATE", 377: "MOUNT_SPECIAL",
+    378: "TALK_STATE", 379: "FISHING_STATE", 380: "FISHING", 381: "LOOT",
+    382: "WHIRLWIND_STATE", 383: "DROWNED_STATE", 384: "HOLD_BOW_STATE",
+    385: "HOLD_RIFLE_STATE", 386: "HOLD_THROWN_STATE", 387: "DROWN",
+    388: "STOMP", 389: "ATTACK_OFF", 390: "ATTACK_OFF_PIERCE",
+    391: "ROAR_STATE", 392: "LAUGH_STATE", 393: "CREATURE_SPECIAL",
+    394: "JUMPLANDRUN", 395: "JUMPEND", 396: "TALK_NO_SHEATHE",
+    397: "POINT_NO_SHEATHE", 398: "CANNIBALIZE_STATE", 399: "JUMPSTART",
+    400: "DANCESPECIAL_STATE", 401: "DANCESPECIAL", 402: "CUSTOM_SPELL_01",
+    403: "CUSTOM_SPELL_02", 404: "CUSTOM_SPELL_03", 405: "CUSTOM_SPELL_04",
+}
+
 # AchievementCriteriaData type enum names (AchievementCriteriaDataType)
 _AC_TYPE_NAMES = {
     0: "TYPE_NONE",
@@ -1072,10 +1140,10 @@ def _resolve_smart_script_fields(
                     gossip_parts["option_id"] = {"raw": ep2}
                 entry_resolved["event_params_gossip"] = gossip_parts
 
-            # Emote event: param1=EmoteId (from Emotes.dbc)
+            # RECEIVE_EMOTE: param1=TextEmotes enum ID (chat-text emotes, NOT animation)
             if event_type == 22 and ep1:
-                emote_name = _resolve_dbc_ref(server, "Emotes", ep1)
-                entry_resolved["event_param1"] = {"meaning": "EmoteId", "raw": ep1, "resolved_to": emote_name}
+                text_emote = _TEXT_EMOTE_NAMES.get(ep1, f"unknown_text_emote({ep1})")
+                entry_resolved["event_param1"] = {"meaning": "TextEmotes", "raw": ep1, "resolved_to": text_emote}
 
             # Game event: param1=eventEntry
             if event_type in (68, 69) and ep1:
@@ -1165,10 +1233,10 @@ def _resolve_smart_script_fields(
                 sn = _resolve_dbc_ref(server, "SoundEntries", ap1)
                 entry_resolved["action_param1"] = {"meaning": "SoundId", "raw": ap1, "resolved_to": sn}
 
-            # PLAY_EMOTE/SET_EMOTE_STATE: param1=EmoteId (from Emotes.dbc)
+            # PLAY_EMOTE/SET_EMOTE_STATE: param1=Emote animation enum ID (SharedDefines.h)
             if action_type in (5, 17) and ap1:
-                en = _resolve_dbc_ref(server, "Emotes", ap1)
-                entry_resolved["action_param1"] = {"meaning": "EmoteId", "raw": ap1, "resolved_to": en}
+                anim_emote = _ANIM_EMOTE_NAMES.get(ap1, f"unknown_anim_emote({ap1})")
+                entry_resolved["action_param1"] = {"meaning": "Emote", "raw": ap1, "resolved_to": anim_emote}
 
             # ACTIVATE_TAXI: param1=TaxiNodes
             if action_type == 52 and ap1:
@@ -1240,6 +1308,14 @@ def _resolve_smart_script_fields(
                 gn = _resolve_sql_ref(server, "gossip_menu", ap1, "entry")
                 entry_resolved["action_param1"] = {"meaning": "gossip_menu.entry", "raw": ap1, "resolved_to": gn}
 
+            # TELEPORT: param1=MapId, target_x/y/z/o destination coordinates
+            if action_type == 62:
+                teleport_info = {}
+                if ap1:
+                    map_name = _resolve_dbc_ref(server, "Map", ap1)
+                    teleport_info["map_id"] = {"raw": ap1, "resolved_to": map_name}
+                entry_resolved["teleport_info"] = teleport_info
+
         # --- Target param resolution (by target_type) ---
         if "sql" in allowed:
             tp1 = row.get("target_param1", 0) or 0
@@ -1277,6 +1353,16 @@ def _resolve_smart_script_fields(
         if target_type == 8 and any(v is not None and v != 0 for v in [tx, ty, tz]):
             entry_resolved["position"] = {
                 "type_name": "POSITION",
+                "x": tx,
+                "y": ty,
+                "z": tz,
+                "orientation": row.get("target_o"),
+            }
+
+        # TELEPORT destination coordinates (action_type 62 uses target_x/y/z/o as dest)
+        if action_type == 62 and any(v is not None and v != 0 for v in [tx, ty, tz]):
+            entry_resolved["teleport_destination"] = {
+                "map_id": ap1,
                 "x": tx,
                 "y": ty,
                 "z": tz,
