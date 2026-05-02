@@ -8760,127 +8760,127 @@
           "name": "Effect[1]",
           "type": "uint32",
           "sql_column": "Effect",
-          "notes": "-"
+          "notes": "Same as Effect[0] for slot 1 (second effect). A spell can stack multiple effects."
         },
         "73": {
           "name": "Effect[2]",
           "type": "uint32",
           "sql_column": "Effect",
-          "notes": "-"
+          "notes": "Same as Effect[0] for slot 2 (third effect)."
         },
         "74": {
           "name": "EffectDieSides[0]",
           "type": "int32",
           "sql_column": "EffectDieSides",
-          "notes": "-"
+          "notes": "Dice roll amount for slot 0. Added to EffectBasePoints. Used for ranged/melee damage variance, some DoTs."
         },
         "75": {
           "name": "EffectDieSides[1]",
           "type": "int32",
           "sql_column": "EffectDieSides",
-          "notes": "-"
+          "notes": "EffectDieSides for slot 1."
         },
         "76": {
           "name": "EffectDieSides[2]",
           "type": "int32",
           "sql_column": "EffectDieSides",
-          "notes": "-"
+          "notes": "EffectDieSides for slot 2."
         },
         "77": {
           "name": "EffectRealPointsPerLevel[0]",
           "type": "float",
           "sql_column": "EffectRealPointsPerLevel",
-          "notes": "-"
+          "notes": "Per-level scaling (float) for slot 0. Combined with EffectBasePoints to compute final value: total = base + real*level."
         },
         "78": {
           "name": "EffectRealPointsPerLevel[1]",
           "type": "float",
           "sql_column": "EffectRealPointsPerLevel",
-          "notes": "-"
+          "notes": "EffectRealPointsPerLevel for slot 1."
         },
         "79": {
           "name": "EffectRealPointsPerLevel[2]",
           "type": "float",
           "sql_column": "EffectRealPointsPerLevel",
-          "notes": "-"
+          "notes": "EffectRealPointsPerLevel for slot 2."
         },
         "80": {
           "name": "EffectBasePoints[0]",
           "type": "int32",
           "sql_column": "EffectBasePoints",
-          "notes": "-"
+          "notes": "Base value for slot 0. Meaning depends on Effect[0]: SCHOOL_DAMAGE/APPLY_AURA=amount, SUMMON=entry of summoned entity, LEARN_SPELL=spellID, DUMMY=special value used by script. Negative = heal/absorb."
         },
         "81": {
           "name": "EffectBasePoints[1]",
           "type": "int32",
           "sql_column": "EffectBasePoints",
-          "notes": "-"
+          "notes": "EffectBasePoints for slot 1."
         },
         "82": {
           "name": "EffectBasePoints[2]",
           "type": "int32",
           "sql_column": "EffectBasePoints",
-          "notes": "-"
+          "notes": "EffectBasePoints for slot 2."
         },
         "83": {
           "name": "EffectMechanic[0]",
           "type": "uint32",
           "sql_column": "EffectMechanic",
-          "notes": "-"
+          "notes": "SpellMechanic enum for slot 0 (9 values). Only if Effect[0]=APPLY_AURA: 1=Charge,2=ClearCD,3=Shield,4=Sprintf,5=Stealth,6=SkilleDodge,7=Parry,8=Block,9=Offhand. NULL(0)=no mechanic."
         },
         "84": {
           "name": "EffectMechanic[1]",
           "type": "uint32",
           "sql_column": "EffectMechanic",
-          "notes": "-"
+          "notes": "EffectMechanic for slot 1."
         },
         "85": {
           "name": "EffectMechanic[2]",
           "type": "uint32",
           "sql_column": "EffectMechanic",
-          "notes": "-"
+          "notes": "EffectMechanic for slot 2."
         },
         "86": {
           "name": "EffectImplicitTargetA[0]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetA",
-          "notes": "-"
+          "notes": "Targeting method A for slot 0. Enum TargetedPosition/FindTarget (37 values). Common: 0=custom code, 1=self, 2=destination on player, 3=current destination, 6=CONE_hostile, 8=AREA_hostile, 12=AOE_self, 15=CASTER_DEST_location. See Targets.h in C++ source."
         },
         "87": {
           "name": "EffectImplicitTargetA[1]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetA",
-          "notes": "-"
+          "notes": "EffectImplicitTargetA for slot 1."
         },
         "88": {
           "name": "EffectImplicitTargetA[2]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetA",
-          "notes": "-"
+          "notes": "EffectImplicitTargetA for slot 2."
         },
         "89": {
           "name": "EffectImplicitTargetB[0]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetB",
-          "notes": "-"
+          "notes": "Secondary targeting B for slot 0. Used when effect has dual targets (e.g., chain, bounce). 0=None."
         },
         "90": {
           "name": "EffectImplicitTargetB[1]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetB",
-          "notes": "-"
+          "notes": "EffectImplicitTargetB for slot 1."
         },
         "91": {
           "name": "EffectImplicitTargetB[2]",
           "type": "uint32",
           "sql_column": "EffectImplicitTargetB",
-          "notes": "-"
+          "notes": "EffectImplicitTargetB for slot 2."
         },
         "92": {
           "name": "EffectRadiusIndex[0]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-",
+          "notes": "Area radius index for slot 0. References SpellRadius.dbc. 0=ray(100 units), 30=15m, 31=25m. Used by area/circle effects (TARGET_AREA, TARGET_CIRCLE).",
           "references": "SpellRadiusEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -8889,7 +8889,7 @@
           "name": "EffectRadiusIndex[1]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-",
+          "notes": "EffectRadiusIndex for slot 1.",
           "references": "SpellRadiusEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -8898,7 +8898,7 @@
           "name": "EffectRadiusIndex[2]",
           "type": "uint32",
           "sql_column": "EffectRadiusIndex",
-          "notes": "-",
+          "notes": "EffectRadiusIndex for slot 2.",
           "references": "SpellRadiusEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -8907,91 +8907,91 @@
           "name": "EffectApplyAuraName[0]",
           "type": "uint32",
           "sql_column": "EffectApplyAuraName",
-          "notes": "-"
+          "notes": "Only meaningful when Effect[0]=6(APPLY_AURA). Enum SpellAura (317 values). Determines what aura effect is applied. Further reinterprets EffectMiscValue. Common: 1=MOD_DAMAGE, 4=DOT, 5=PERSISTENT_PROC, 8=OOC_REGEN, 11=MOD_RESISTANCE, 20=CASTING_ID, 39=CONTROL_VEHICLE, 56=TRANSPORT, 77=SUSPEND_POWER_REGENERATION, 100=MOD_RANGED_DAMAGE_DONE_PCT. See SpellAuraDefines.h."
         },
         "96": {
           "name": "EffectApplyAuraName[1]",
           "type": "uint32",
           "sql_column": "EffectApplyAuraName",
-          "notes": "-"
+          "notes": "EffectApplyAuraName for slot 1 (same semantics as slot 0)."
         },
         "97": {
           "name": "EffectApplyAuraName[2]",
           "type": "uint32",
           "sql_column": "EffectApplyAuraName",
-          "notes": "-"
+          "notes": "EffectApplyAuraName for slot 2 (same semantics as slot 0)."
         },
         "98": {
           "name": "EffectAmplitude[0]",
           "type": "uint32",
           "sql_column": "EffectAmplitude",
-          "notes": "-"
+          "notes": "Wave amplitude for slot 0. Used by periodic damage over area effects with sine-wave pattern."
         },
         "99": {
           "name": "EffectAmplitude[1]",
           "type": "uint32",
           "sql_column": "EffectAmplitude",
-          "notes": "-"
+          "notes": "EffectAmplitude for slot 1."
         },
         "100": {
           "name": "EffectAmplitude[2]",
           "type": "uint32",
           "sql_column": "EffectAmplitude",
-          "notes": "-"
+          "notes": "EffectAmplitude for slot 2."
         },
         "101": {
           "name": "EffectValueMultiplier[0]",
           "type": "float",
           "sql_column": "EffectValueMultiplier",
-          "notes": "-"
+          "notes": "Formula multiplier for slot 0. Applied to effect value calculation. Used by some damage/healing spells."
         },
         "102": {
           "name": "EffectValueMultiplier[1]",
           "type": "float",
           "sql_column": "EffectValueMultiplier",
-          "notes": "-"
+          "notes": "EffectValueMultiplier for slot 1."
         },
         "103": {
           "name": "EffectValueMultiplier[2]",
           "type": "float",
           "sql_column": "EffectValueMultiplier",
-          "notes": "-"
+          "notes": "EffectValueMultiplier for slot 2."
         },
         "104": {
           "name": "EffectChainTarget[0]",
           "type": "uint32",
           "sql_column": "EffectChainTarget",
-          "notes": "-"
+          "notes": "Max chain targets for slot 0. If >0 spell chains to this many nearby eligible units from primary target."
         },
         "105": {
           "name": "EffectChainTarget[1]",
           "type": "uint32",
           "sql_column": "EffectChainTarget",
-          "notes": "-"
+          "notes": "EffectChainTarget for slot 1."
         },
         "106": {
           "name": "EffectChainTarget[2]",
           "type": "uint32",
           "sql_column": "EffectChainTarget",
-          "notes": "-"
+          "notes": "EffectChainTarget for slot 2."
         },
         "107": {
           "name": "EffectItemType[0]",
           "type": "uint32",
           "sql_column": "EffectItemType",
-          "notes": "-"
+          "notes": "ItemClass filter for slot 0. References ItemClass enum (17 classes). Used by effects requiring specific item type equip/use."
         },
         "108": {
           "name": "EffectItemType[1]",
           "type": "uint32",
           "sql_column": "EffectItemType",
-          "notes": "-"
+          "notes": "EffectItemType for slot 1."
         },
         "109": {
           "name": "EffectItemType[2]",
           "type": "uint32",
           "sql_column": "EffectItemType",
-          "notes": "-"
+          "notes": "EffectItemType for slot 2."
         },
         "110": {
           "name": "EffectMiscValue[0]",
@@ -9023,25 +9023,25 @@
           "name": "EffectMiscValue[1]",
           "type": "int32",
           "sql_column": "EffectMiscValue",
-          "notes": "-"
+          "notes": "EffectMiscValue for slot 1 (same polymorphic semantics as slot 0)."
         },
         "112": {
           "name": "EffectMiscValue[2]",
           "type": "int32",
           "sql_column": "EffectMiscValue",
-          "notes": "-"
+          "notes": "EffectMiscValue for slot 2 (same polymorphic semantics as slot 0)."
         },
         "113": {
           "name": "EffectMiscValueB[0]",
           "type": "int32",
           "sql_column": "EffectMiscValueB",
-          "notes": "-"
+          "notes": "Secondary polymorphic value for slot 0. Less commonly used. Meaning depends on Effect+Aura combo."
         },
         "114": {
           "name": "EffectMiscValueB[1]",
           "type": "int32",
           "sql_column": "EffectMiscValueB",
-          "notes": "-"
+          "notes": "EffectMiscValueB for slot 1."
         },
         "115": {
           "name": "EffectTriggerSpell[0]",
@@ -9056,55 +9056,55 @@
           "name": "EffectTriggerSpell[0]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "-"
+          "notes": "Duplicate of EffectTriggerSpell[0] in registry. Likely EffectMiscValueB[2] mislabeled."
         },
         "117": {
           "name": "EffectTriggerSpell[1]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "-"
+          "notes": "EffectTriggerSpell for slot 1."
         },
         "118": {
           "name": "EffectTriggerSpell[2]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "-"
+          "notes": "EffectTriggerSpell for slot 2."
         },
         "119": {
           "name": "EffectPointsPerComboPoint[0]",
           "type": "float",
           "sql_column": "EffectPointsPerComboPoint",
-          "notes": "-"
+          "notes": "Value per combo point for slot 0. Used by Rogue combo-finishing moves (Eviscerate, etc.)."
         },
         "120": {
           "name": "EffectPointsPerComboPoint[1]",
           "type": "float",
           "sql_column": "EffectPointsPerComboPoint",
-          "notes": "-"
+          "notes": "EffectPointsPerComboPoint for slot 1."
         },
         "121": {
           "name": "EffectPointsPerComboPoint[2]",
           "type": "float",
           "sql_column": "EffectPointsPerComboPoint",
-          "notes": "-"
+          "notes": "EffectPointsPerComboPoint for slot 2."
         },
         "122": {
           "name": "EffectSpellClassMask[0]",
           "type": "flag96",
           "sql_column": "EffectSpellClassMask",
-          "notes": "-"
+          "notes": "Spell class filter for slot 0. flag96 (96 bits, 3 masks of 32). Only effects targeting spells of these classes will trigger."
         },
         "123": {
           "name": "EffectSpellClassMask[1]",
           "type": "flag96",
           "sql_column": "EffectSpellClassMask",
-          "notes": "-"
+          "notes": "EffectSpellClassMask for slot 1."
         },
         "124": {
           "name": "EffectSpellClassMask[2]",
           "type": "flag96",
           "sql_column": "EffectSpellClassMask",
-          "notes": "-"
+          "notes": "EffectSpellClassMask for slot 2."
         },
         "125": {
           "name": "EffectSpellClassMask[3]",
@@ -13254,7 +13254,7 @@
           "name": "Class",
           "type": "uint32",
           "sql_column": "class",
-          "notes": "enum ItemClass",
+          "notes": "Item class determines which fields are relevant for this item. 0=Consumable(FoodType,spellid_1-5), 1=Container(ContainerSlots), 2=Weapon(dmg_min/max/delay/stat_type), 3=Gem(GemProperties,socketBonus), 4=Armor(armor,block,stat_type,socketColor/socketBonus), 5=Reagent(no special fields), 6=Projectile(ammo_type), 7=TradeGoods, 8=Generic, 9=Recipe(spellid_1-5=learning spells), 10=Money, 11=Quiver(ContainerSlots), 12=Quest(startquest), 13=Key, 14=Permanent, 15=Miscellaneous, 16=Glyph(GemProperties)",
           "references": "ChrClassesEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -13263,7 +13263,7 @@
           "name": "SubClass",
           "type": "uint32",
           "sql_column": "subclass",
-          "notes": "enum ItemSubClass*"
+          "notes": "Subclass meaning depends on class value. Weapon(2): 0=1H_Axe,1=2H_Axe,2=1H_Mace,3=2H_Mace,4=1H_Sword,5=2H_Sword,6=Polearm,7=Spear,8=Staff,9=1H_Weapon,10=2H_Weapon,11=Bow,12=Gun,13=Fist,14=Misc,15=Dagger,16=Thrown,17=Crossbow,18=Wand,19=Fishing_Pole. Armor(4): 0=Misc,1=Cloth,2=Leather,3=Mail,4=Plate,5=Buckler,6=Shield,7=Libram,8=Idol,9=Totem,10=Sigil"
         },
         "SoundOverrideSubclass": {
           "name": "SoundOverrideSubclass",
@@ -13416,13 +13416,13 @@
           "name": "ContainerSlots",
           "type": "uint32",
           "sql_column": "ContainerSlots",
-          "notes": ""
+          "notes": "Only relevant for class=1(Container) and class=11(Quiver). Number of bag slots."
         },
         "stat_type1..10": {
           "name": "ItemStat",
           "type": "_ItemStat[10]",
           "sql_column": "stat_type1..10",
-          "notes": "See sub-struct below"
+          "notes": "Only relevant for class=2(Weapon) and class=4(Armor). Each entry has stat_type(ItemModType: 1=Strength,2=Agi,3=Sta,4=Int,5=Spi,6=Stam,7=ArmorPct,8=ResH,9=ResF,10=ResS,11=ResN,12=ResA) and stat_value."
         },
         "ScalingStatDistribution": {
           "name": "ScalingStatDistribution",
@@ -13443,13 +13443,13 @@
           "name": "Damage",
           "type": "_Damage[2]",
           "sql_column": "dmg_min1..2, dmg_max1..2, dmg_type1..2",
-          "notes": "See sub-struct below"
+          "notes": "Only relevant for class=2(Weapon). Weapon damage range. Min/Max can be 0 for some weapon types. Damage type references SpellSchool enum (1=Holy,2=Fire,3=Nature,4=Frost,5=Shadow,6=Physical)."
         },
         "Armor": {
           "name": "Armor",
           "type": "uint32",
           "sql_column": "Armor",
-          "notes": ""
+          "notes": "Only relevant for class=4(Armor). Armor rating value."
         },
         "HolyRes": {
           "name": "HolyRes",
@@ -13491,13 +13491,13 @@
           "name": "Delay",
           "type": "uint32",
           "sql_column": "delay",
-          "notes": ""
+          "notes": "Only relevant for class=2(Weapon). Weapon swing time in milliseconds."
         },
         "ammo_type": {
           "name": "AmmoType",
           "type": "uint32",
           "sql_column": "ammo_type",
-          "notes": ""
+          "notes": "Only relevant for class=2(Weapon) subclass in (11=Bow,15=Gun,18=Crossbow). 0=Ammo_Type_Any,1=Bullet(Arrow)."
         },
         "RangedModRange": {
           "name": "RangedModRange",
@@ -13599,7 +13599,7 @@
           "name": "Block",
           "type": "uint32",
           "sql_column": "block",
-          "notes": ""
+          "notes": "Only relevant for class=4(Armor). Shield block value."
         },
         "itemset": {
           "name": "ItemSet",
@@ -13653,13 +13653,13 @@
           "name": "Socket",
           "type": "_Socket[3]",
           "sql_column": "socketColor_1..3",
-          "notes": "See sub-struct below"
+          "notes": "Only relevant for class=2(Weapon) and class=4(Armor). References SocketColors.dbc. 0=None,1=Meta(orange),2=Red(yellow),3=Blue(black),4=Yellow(prismatic)."
         },
         "socketBonus": {
           "name": "socketBonus",
           "type": "uint32",
           "sql_column": "socketBonus",
-          "notes": "SpellItemEnchantment.dbc (Socket bonus enchantment when all sockets filled)",
+          "notes": "Only for equipment with sockets filled. References SpellItemEnchantment.dbc ID. Applied when all socketColor slots have gems inserted.",
           "references": "SpellItemEnchantmentEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -13668,7 +13668,7 @@
           "name": "GemProperties",
           "type": "uint32",
           "sql_column": "GemProperties",
-          "notes": "GemProperties.dbc (Prismatic socket gem restriction)",
+          "notes": "Only relevant for class=3(Gem) and class=16(Glyph). References GemProperties.dbc. Prismatic socket gem restriction for gems; spell category for glyphs.",
           "references": "GemPropertiesEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
@@ -13728,7 +13728,7 @@
           "name": "FoodType",
           "type": "uint32",
           "sql_column": "FoodType",
-          "notes": ""
+          "notes": "Only relevant for class=0(Consumable) subclass=5(Food&Drink). Value references FoodType enum (0=Beast/Fish,1=Draft,2=Dessert,3=Bread/Bakery,4=Fruit/Vegetable)."
         },
         "minMoneyLoot": {
           "name": "MinMoneyLoot",
