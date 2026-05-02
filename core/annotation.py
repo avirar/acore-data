@@ -316,23 +316,33 @@ def _convert_filter_for_dbc(
     filter_data: Dict,
     reg_entry: Dict,
     dbc_name: str
-) -> Tuple[Dict[int, Any], List[str]]:
+) -> Tuple[Dict[int, Any], List[str], Optional[Dict[int, List[int]]]]:
     """Convert filter dict with field names to DBC-compatible numeric indices.
-    
+
+    When a filter key matches the bare SQL column name of an indexed field family
+    (e.g., 'EffectMiscValue' matching EffectMiscValue[0/1/2]), all slots are OR'd.
+    Single-index and bracket-notation keys match only their specific slot.
+
     Args:
         registry: Registry instance for _resolve_filter_key
         filter_data: Filter dictionary {name or index: value}
         reg_entry: Registry entry
         dbc_name: DBC name
-        
+
     Returns:
-        Tuple of (converted_filter, notes)
+        Tuple of (converted_filter, notes, or_groups)
+        - converted_filter: {int_index: value} for AND matching
+        - notes: list of informational strings
+        - or_groups: None if no OR groups; else {primary_idx: [list_of_all_matching_indices]}
+          where the primary index is used in converted_filter but post-filtering should
+          also match records where any sibling index equals the value.
     """
     if not filter_data:
-        return {}, []
+        return {}, [], None
 
     converted = {}
     notes = []
+    or_groups: Dict[int, List[int]] = {}
 
     for key, value in filter_data.items():
         idx, resolved_name, note = registry._resolve_filter_key(
@@ -342,4 +352,9 @@ def _convert_filter_for_dbc(
         if note:
             notes.append(f"  {note}")
 
-    return converted, notes
+        # Check for multi-slot OR expansion
+        or_primary, or_siblings = registry._find_sibling_indices(key, dbc_name)
+        if or_siblings:
+            or_groups[idx] = [idx] + or_siblings
+
+    return converted, notes, or_groups if or_groups else None

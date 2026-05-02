@@ -115,10 +115,18 @@ class Registry:
         return None
 
     def _find_similar_field_names(self, key: str, reg_entry: Dict) -> List[str]:
-        """Find field names similar to the given key using fuzzy matching."""
+        """Find field names similar to the given key using relevance-ranked fuzzy matching.
+
+        Compact display: bracket-indexed families shown as `BaseName[0-2]` (one suggestion slot).
+        Groups by base family name so distinct fields get representation instead of
+        a single family consuming all 12 slots via [0],[1],[2] variants.
+        """
         fields = reg_entry.get("fields", {})
         key_lower = str(key).lower()
-        suggestions = []
+
+        # Group field names by base family: e.g., EffectItemType[0/1/2] + EffectItemType -> family "effectitemtype"
+        # Each entry: {highest_score, display_name, slot_indices}
+        families: Dict[str, Dict] = {}
 
         for idx_str, info in fields.items():
             field_name = info.get("name", "")
@@ -128,28 +136,114 @@ class Registry:
                 if not name:
                     continue
 
-                n_lower = name.lower()
-
-                if key_lower in n_lower or n_lower in key_lower:
-                    suggestions.append(name)
+                score = self._score_for_name(name, key_lower)
+                if score <= 0.0:
                     continue
 
-                if len(key_lower) >= 3 and n_lower.startswith(key_lower[:3]):
-                    suggestions.append(name)
+                n_lower = name.lower()
 
-        seen = set()
-        unique: List[str] = []
-        for s in suggestions:
-            if s.lower() not in seen:
-                seen.add(s.lower())
-                unique.append(s)
+                # Determine base family key: strip bracket notation for grouping
+                bracket_match = re.match(r'^([^\[]+)\[(\d+)\]$', n_lower)
+                family_key = bracket_match.group(1).lower() if bracket_match else n_lower
+                slot_idx = int(bracket_match.group(2)) if bracket_match else None
 
-        return unique[:10]
+                if family_key not in families:
+                    families[family_key] = {"score": 0, "name": "", "slots": []}
+
+                fam = families[family_key]
+                if score > fam["score"]:
+                    fam["score"] = score
+                    fam["name"] = name
+                if slot_idx is not None and slot_idx not in fam["slots"]:
+                    fam["slots"].append(slot_idx)
+
+        # Sort families by score descending
+        ranked = sorted(families.values(), key=lambda f: -f["score"])
+
+        # Build compact display list
+        result = []
+        for fam in ranked[:12]:
+            if fam["slots"]:
+                slots = sorted(fam["slots"])
+                compact = f"{fam['name'].split('[')[0]}[{slots[0]}-{slots[-1]}]" if len(slots) > 1 else f"{fam['name'].split('[')[0]}[{slots[0]}]"
+                result.append(compact)
+            else:
+                result.append(fam["name"])
+
+        return result
+
+    def _score_for_name(self, name: str, key_lower: str) -> float:
+        """Compute relevance score for a suggestion name against the search key."""
+        n_lower = name.lower()
+        if key_lower == n_lower:
+            return 10.0
+
+        score = 0.0
+
+        # Substring containment — penalize short matches that barely cover the key
+        if key_lower in n_lower or n_lower in key_lower:
+            ratio = len(min(key_lower, n_lower, key=len)) / max(len(key_lower), len(n_lower))
+            score = max(score, 5.0 if ratio > 0.6 else 2.0)
+
+        # Base name match (strips trailing slot/underscore number)
+        norm = re.match(r'^(.+?)_(\d+)$', key_lower) or re.match(r'^(.+?)\[(\d+)\]$', key_lower)
+        if norm:
+            base = norm.group(1)
+            if base in n_lower or n_lower.startswith(base):
+                score = max(score, 3.0)
+
+        # Prefix match (weak signal)
+        if len(key_lower) >= 3 and n_lower.startswith(key_lower[:3]):
+            score = max(score, 1.0)
+
+        # Fuzzy: SequenceMatcher for misspellings/near-misses
+        ratio = difflib.SequenceMatcher(None, key_lower, n_lower).ratio()
+        if ratio > 0.45:
+            fuzzy_score = ratio * 3.0  # maps 0.45-1.0 → ~1.35-3.0
+            score = max(score, fuzzy_score)
+
+        return score
+
+    def _find_sibling_indices(self, key: str, dbc_name: str) -> Tuple[Optional[int], List[int]]:
+        """Find sibling array slots for a filter key that matches a bare base field name.
+
+        If the key matches multiple array slots in the DBC cache (e.g., EffectMiscValue → indices 110, 111, 112),
+        returns (primary_index, [sibling_indices]).
+
+        Returns (None, []) if the key doesn't need multi-slot OR expansion.
+        """
+        key_lower = str(key).lower().strip()
+        dbc_cache = self._field_name_cache.get(dbc_name.lower(), {})
+
+        matches = dbc_cache.get(key_lower, [])
+        if len(matches) < 2:
+            return None, []
+
+        # Check if all matches are for the same SQL column (array field family)
+        sql_cols = set()
+        indices = []
+        for m in matches:
+            sql_cols.add(m.get("sql_column", ""))
+            indices.append(m["index"])
+
+        if len(sql_cols) == 1 and indices:
+            primary = min(indices)
+            siblings = [i for i in sorted(indices) if i != primary]
+            return primary, siblings
+
+        return None, []
 
     def _resolve_filter_key(
         self, key, reg_entry: Dict, dbc_name: str, all_tables: Set[str]
     ) -> Tuple[int, str, Optional[str]]:
-        """Resolve filter key to DBC field index. Returns (index, resolved_name, note)."""
+        """Resolve filter key to DBC field index. Returns (index, resolved_name, note).
+
+        Supports multiple notations:
+        - Integer index: "110" → field at position 110
+        - C struct bracket: "EffectMiscValue[0]" → exact match
+        - SQL underscore alias: "EffectMiscValue_1" → EffectMiscValue[0] (1-based→0-based)
+        - SQL column name: "EffectMiscValue" → first slot (with note about ambiguity)
+        """
         try:
             idx = int(key)
             return idx, str(idx), None
@@ -166,7 +260,7 @@ class Registry:
         key_str = str(key)
         key_lower = key_str.lower().strip()
 
-        # Check field name cache first
+        # Check field name cache first (exact match on bracket notation or SQL column)
         dbc_cache = self._field_name_cache.get(dbc_lower, {})
 
         if key_lower in dbc_cache:
@@ -194,11 +288,39 @@ class Registry:
                 if field_name.lower() == f"{base_field.lower()}[{array_idx}]":
                     return int(idx_str), key_str, None
 
-        # Fuzzy match
+        # SQL underscore alias: FieldName_N → FieldName[N-1] (1-based to 0-based)
+        underscore_match = re.match(r'^(.+?)_(\d+)$', key_str)
+        if underscore_match:
+            base_field = underscore_match.group(1)
+            slot_number = int(underscore_match.group(2))
+            # Convert 1-based (SQL convention) to 0-based (DBC bracket notation)
+            zero_based_slot = slot_number - 1
+            bracket_form = f"{base_field}[{zero_based_slot}]"
+            bracket_lower = bracket_form.lower()
+
+            if bracket_lower in dbc_cache:
+                matches = dbc_cache[bracket_lower]
+                if len(matches) == 1:
+                    return matches[0]["index"], matches[0].get("original_name", bracket_form), None
+
+            # Also try direct array match against fields
+            fields = reg_entry.get("fields", {})
+            for idx_str, info in fields.items():
+                field_name = info.get("name", "")
+                if field_name.lower() == bracket_lower:
+                    return int(idx_str), bracket_form, None
+
+        # Fuzzy match with improved suggestions
         suggestions = self._find_similar_field_names(key, reg_entry)
         error = f"Filter key '{key}' not found in {dbc_name}."
         if suggestions:
-            error += f"\n  Did you mean: {', '.join(suggestions[:5])}"
+            # Add underscore alias hint to relevant suggestions
+            error += f"\n  Did you mean: {', '.join(suggestions[:8])}"
+            if underscore_match:
+                base_field = underscore_match.group(1)
+                matching_bracket = [s for s in suggestions if s.lower().startswith(base_field.lower() + "[")]
+                if matching_bracket:
+                    error += f"\n  (Used 1-based slot notation. Try {matching_bracket[0]} or {base_field}_1, {base_field}_2, ...)"
         error += f"\n\n  Use lookup(name='{dbc_name}') for complete field list."
         raise ValueError(error)
 
