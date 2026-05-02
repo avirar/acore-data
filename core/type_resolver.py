@@ -147,6 +147,14 @@ def resolve_type_fields(
     if sql_table == "conditions":
         return _resolve_condition_fields(server, reg_entry, rows, resolve_filter, resolve_max)
 
+    # Special case: smart_scripts triple-polymorphic resolution
+    if sql_table == "smart_scripts":
+        return _resolve_smart_script_fields(server, reg_entry, rows, resolve_filter, resolve_max)
+
+    # Special case: achievement_criteria_data polymorphic resolution
+    if sql_table == "achievement_criteria_data":
+        return _resolve_achievement_criteria_fields(server, reg_entry, rows, resolve_filter, resolve_max)
+
     # Generic resolution for all other tables
     return _resolve_generic(server, reg_entry, rows, resolve_filter, resolve_max)
 
@@ -681,6 +689,636 @@ def _resolve_condition_values(
             result["comparison"] = _COMPARISON_TYPES.get(int(value3), f"RAW({value3})")
 
     return result if result else None
+
+
+# SAI event_type enum names (SmartEvent)
+_SAI_EVENT_NAMES = {
+    0: "UPDATE_IC", 1: "UPDATE_OOC", 2: "HEALTH_PCT", 3: "MANA_PCT",
+    4: "AGGRO", 5: "KILL", 6: "DEATH", 7: "EVADE", 8: "SPELLHIT",
+    9: "RANGE", 10: "OOC_LOS", 11: "RESPAWN", 12: "TARGET_HEALTH_PCT",
+    13: "VICTIM_CASTING", 14: "FRIENDLY_HEALTH", 15: "FRIENDLY_IS_CC",
+    16: "FRIENDLY_MISSING_BUFF", 17: "SUMMONED_UNIT", 18: "TARGET_MANA_PCT",
+    19: "ACCEPTED_QUEST", 20: "REWARD_QUEST", 21: "REACHED_HOME",
+    22: "RECEIVE_EMOTE", 23: "HAS_AURA", 24: "TARGET_BUFFED",
+    25: "RESET", 26: "IC_LOS", 27: "PASSENGER_BOARDED",
+    28: "PASSENGER_REMOVED", 29: "CHARMED", 30: "CHARMED_TARGET",
+    31: "SPELLHIT_TARGET", 32: "DAMAGED", 33: "DAMAGED_TARGET",
+    34: "MOVEMENTINFORM", 35: "SUMMON_DESPAWNED", 36: "CORPSE_REMOVED",
+    37: "AI_INIT", 38: "DATA_SET", 39: "ESCORT_START", 40: "ESCORT_REACHED",
+    41: "TRANSPORT_ADDPLAYER", 42: "TRANSPORT_ADDCREATURE", 43: "TRANSPORT_REMOVE_PLAYER",
+    44: "TRANSPORT_RELOCATE", 45: "INSTANCE_PLAYER_ENTER",
+    46: "AREATRIGGER_ONTRIGGER",
+    47: "QUEST_ACCEPTED", 48: "QUEST_OBJ_COMPLETION", 49: "QUEST_COMPLETION",
+    50: "QUEST_REWARDED", 51: "QUEST_FAIL",
+    52: "TEXT_OVER", 53: "RECEIVE_HEAL",
+    54: "JUST_SUMMONED", 55: "ESCORT_PAUSED", 56: "ESCORT_RESUMED",
+    57: "ESCORT_STOPPED", 58: "ESCORT_ENDED", 59: "TIMED_EVENT_TRIGGERED",
+    60: "UPDATE", 61: "LINK", 62: "GOSSIP_SELECT", 63: "JUST_CREATED",
+    64: "GOSSIP_HELLO", 65: "FOLLOW_COMPLETED", 66: "EVENT_PHASE_CHANGE",
+    67: "IS_BEHIND_TARGET", 68: "GAME_EVENT_START", 69: "GAME_EVENT_END",
+    70: "GO_STATE_CHANGED", 71: "GO_EVENT_INFORM", 72: "ACTION_DONE",
+    73: "ON_SPELLCLICK", 74: "FRIENDLY_HEALTH_PCT",
+    75: "DISTANCE_CREATURE", 76: "DISTANCE_GAMEOBJECT",
+    77: "COUNTER_SET", 82: "SUMMONED_UNIT_DIES",
+    101: "NEAR_PLAYERS", 102: "NEAR_PLAYERS_NEGATION",
+    103: "NEAR_UNIT", 104: "NEAR_UNIT_NEGATION",
+    105: "AREA_CASTING", 106: "AREA_RANGE", 107: "SUMMONED_UNIT_EVADE",
+    108: "WAYPOINT_REACHED", 109: "WAYPOINT_ENDED",
+    110: "IS_IN_MELEE_RANGE",
+}
+
+# SAI action_type enum names (SmartAction) — covering all known values
+_SAI_ACTION_NAMES = {
+    0: "NONE", 1: "TALK", 2: "SET_FACTION", 3: "MORPH_TO_ENTRY_OR_MODEL",
+    4: "SOUND", 5: "PLAY_EMOTE", 6: "FAIL_QUEST", 7: "OFFER_QUEST",
+    8: "SET_REACT_STATE", 9: "ACTIVATE_GOBJECT", 10: "RANDOM_EMOTE",
+    11: "CAST", 12: "SUMMON_CREATURE", 13: "THREAT_SINGLE_PCT",
+    14: "THREAT_ALL_PCT", 15: "CALL_AREAEXPLOREDOREVENTHAPPENS",
+    17: "SET_EMOTE_STATE", 18: "SET_UNIT_FLAG", 19: "REMOVE_UNIT_FLAG",
+    20: "AUTO_ATTACK", 21: "ALLOW_COMBAT_MOVEMENT", 22: "SET_EVENT_PHASE",
+    23: "INC_EVENT_PHASE", 24: "EVADE", 25: "FLEE_FOR_ASSIST",
+    26: "CALL_GROUPEVENTHAPPENS", 27: "COMBAT_STOP",
+    28: "REMOVEAURASFROMSPELL", 29: "FOLLOW", 30: "RANDOM_PHASE",
+    31: "RANDOM_PHASE_RANGE", 32: "RESET_GOBJECT",
+    33: "CALL_KILLEDMONSTER", 34: "SET_INST_DATA", 35: "SET_INST_DATA64",
+    36: "UPDATE_TEMPLATE", 37: "DIE", 38: "SET_IN_COMBAT_WITH_ZONE",
+    39: "CALL_FOR_HELP", 40: "SET_SHEATH", 41: "FORCE_DESPAWN",
+    42: "SET_INVINCIBILITY_HP_LEVEL", 43: "MOUNT_TO_ENTRY_OR_MODEL",
+    44: "SET_INGAME_PHASE_MASK", 45: "SET_DATA", 46: "MOVE_FORWARD",
+    47: "SET_VISIBILITY", 48: "SET_ACTIVE", 49: "ATTACK_START",
+    50: "SUMMON_GO", 51: "KILL_UNIT", 52: "ACTIVATE_TAXI",
+    53: "ESCORT_START", 54: "ESCORT_PAUSE", 55: "ESCORT_STOP",
+    56: "ADD_ITEM", 57: "REMOVE_ITEM", 58: "INSTALL_AI_TEMPLATE",
+    59: "SET_RUN", 60: "SET_FLY", 61: "SET_SWIM", 62: "TELEPORT",
+    63: "SET_COUNTER", 64: "STORE_TARGET_LIST", 65: "ESCORT_RESUME",
+    66: "SET_ORIENTATION", 67: "CREATE_TIMED_EVENT", 68: "PLAYMOVIE",
+    69: "MOVE_TO_POS", 70: "RESPAWN_TARGET", 71: "EQUIP",
+    72: "CLOSE_GOSSIP", 73: "TRIGGER_TIMED_EVENT", 74: "REMOVE_TIMED_EVENT",
+    75: "ADD_AURA", 76: "OVERRIDE_SCRIPT_BASE_OBJECT",
+    77: "RESET_SCRIPT_BASE_OBJECT", 78: "CALL_SCRIPT_RESET",
+    79: "SET_RANGED_MOVEMENT", 80: "CALL_TIMED_ACTIONLIST",
+    81: "SET_NPC_FLAG", 82: "ADD_NPC_FLAG", 83: "REMOVE_NPC_FLAG",
+    84: "SIMPLE_TALK", 85: "SELF_CAST", 86: "CROSS_CAST",
+    87: "CALL_RANDOM_TIMED_ACTIONLIST", 88: "CALL_RANDOM_RANGE_TIMED_ACTIONLIST",
+    89: "RANDOM_MOVE", 90: "SET_UNIT_FIELD_BYTES_1", 91: "REMOVE_UNIT_FIELD_BYTES_1",
+    92: "INTERRUPT_SPELL", 93: "SEND_GO_CUSTOM_ANIM", 94: "SET_DYNAMIC_FLAG",
+    95: "ADD_DYNAMIC_FLAG", 96: "REMOVE_DYNAMIC_FLAG", 97: "JUMP_TO_POS",
+    98: "SEND_GOSSIP_MENU", 99: "GO_SET_LOOT_STATE",
+    100: "SEND_TARGET_TO_TARGET", 101: "SET_HOME_POS", 102: "SET_HEALTH_REGEN",
+    103: "SET_ROOT", 104: "SET_GO_FLAG", 105: "ADD_GO_FLAG",
+    106: "REMOVE_GO_FLAG", 107: "SUMMON_CREATURE_GROUP",
+    108: "SET_POWER", 109: "ADD_POWER", 110: "REMOVE_POWER",
+    111: "GAME_EVENT_STOP", 112: "GAME_EVENT_START",
+    113: "START_CLOSEST_WAYPOINT", 114: "RISE_UP", 115: "RANDOM_SOUND",
+    116: "SET_CORPSE_DELAY", 117: "DISABLE_EVADE", 118: "GO_SET_GO_STATE",
+    121: "SET_SIGHT_DIST", 122: "FLEE", 123: "ADD_THREAT",
+    124: "LOAD_EQUIPMENT", 125: "TRIGGER_RANDOM_TIMED_EVENT",
+    126: "REMOVE_ALL_GAMEOBJECTS", 131: "SPAWN_SPAWNGROUP",
+    132: "DESPAWN_SPAWNGROUP", 134: "INVOKER_CAST",
+    135: "PLAY_CINEMATIC", 136: "SET_MOVEMENT_SPEED", 142: "SET_HEALTH_PCT",
+    201: "MOVE_TO_POS_TARGET", 203: "EXIT_VEHICLE",
+    204: "SET_UNIT_MOVEMENT_FLAGS", 205: "SET_COMBAT_DISTANCE",
+    206: "DISMOUNT", 207: "SET_HOVER", 208: "ADD_IMMUNITY",
+    209: "REMOVE_IMMUNITY", 210: "FALL", 211: "SET_EVENT_FLAG_RESET",
+    212: "STOP_MOTION", 213: "NO_ENVIRONMENT_UPDATE",
+    214: "ZONE_UNDER_ATTACK", 215: "LOAD_GRID", 216: "MUSIC",
+    217: "RANDOM_MUSIC", 218: "CUSTOM_CAST", 219: "CONE_SUMMON",
+    220: "PLAYER_TALK", 221: "VORTEX_SUMMON", 222: "CU_ENCOUNTER_START",
+    223: "DO_ACTION", 224: "ATTACK_STOP", 225: "SET_GUID",
+    226: "SCRIPTED_SPAWN", 227: "SET_SCALE", 228: "SUMMON_RADIAL",
+    229: "PLAY_SPELL_VISUAL", 230: "FOLLOW_GROUP",
+    231: "ORIENTATION_TARGET", 232: "WAYPOINT_START",
+    233: "WAYPOINT_DATA_RANDOM", 234: "MOVEMENT_STOP",
+    235: "MOVEMENT_PAUSE", 236: "MOVEMENT_RESUME",
+    237: "WORLD_SCRIPT", 238: "DISABLE_REWARD", 239: "SET_ANIM_TIER",
+    240: "SET_GOSSIP_MENU", 241: "SUMMON_GAMEOBJECT_GROUP",
+}
+
+# SAI target_type enum names (SmartTarget)
+_SAI_TARGET_NAMES = {
+    0: "NONE", 1: "SELF", 2: "VICTIM",
+    3: "HOSTILE_SECOND_AGGRO", 4: "HOSTILE_LAST_AGGRO",
+    5: "HOSTILE_RANDOM", 6: "HOSTILE_RANDOM_NOT_TOP",
+    7: "ACTION_INVOKER", 8: "POSITION",
+    9: "CREATURE_RANGE", 10: "CREATURE_GUID", 11: "CREATURE_DISTANCE",
+    12: "STORED", 13: "GAMEOBJECT_RANGE", 14: "GAMEOBJECT_GUID",
+    15: "GAMEOBJECT_DISTANCE", 16: "INVOKER_PARTY",
+    17: "PLAYER_RANGE", 18: "PLAYER_DISTANCE",
+    19: "CLOSEST_CREATURE", 20: "CLOSEST_GAMEOBJECT",
+    21: "CLOSEST_PLAYER", 22: "ACTION_INVOKER_VEHICLE",
+    23: "OWNER_OR_SUMMONER", 24: "THREAT_LIST",
+    25: "CLOSEST_ENEMY", 26: "CLOSEST_FRIENDLY",
+    27: "LOOT_RECIPIENTS", 28: "FARTHEST",
+    29: "VEHICLE_PASSENGER",
+    201: "PLAYER_WITH_AURA", 202: "RANDOM_POINT",
+    203: "ROLE_SELECTION", 204: "SUMMONED_CREATURES",
+    205: "INSTANCE_STORAGE", 206: "FORMATION",
+}
+
+# SAI source_type enum names
+_SAI_SOURCE_TYPE_NAMES = {
+    0: "CREATURE", 1: "GAMEOBJECT", 2: "AREATRIGGER", 9: "TIMED_ACTIONLIST",
+}
+
+# AchievementCriteriaData type enum names (AchievementCriteriaDataType)
+_AC_TYPE_NAMES = {
+    0: "TYPE_NONE",
+    1: "TYPE_T_CREATURE",
+    2: "TYPE_T_PLAYER_CLASS_RACE",
+    3: "TYPE_T_PLAYER_LESS_HEALTH",
+    4: "TYPE_T_PLAYER_DEAD",
+    5: "TYPE_S_AURA",
+    6: "TYPE_S_AREA",
+    7: "TYPE_T_AURA",
+    8: "TYPE_VALUE",
+    9: "TYPE_T_LEVEL",
+    10: "TYPE_T_GENDER",
+    11: "TYPE_SCRIPT",
+    12: "TYPE_MAP_DIFFICULTY",
+    13: "TYPE_MAP_PLAYER_COUNT",
+    14: "TYPE_T_TEAM",
+    15: "TYPE_S_DRUNK",
+    16: "TYPE_HOLIDAY",
+    17: "TYPE_BG_LOSS_TEAM_SCORE",
+    18: "TYPE_INSTANCE_SCRIPT",
+    19: "TYPE_S_EQUIPED_ITEM",
+    20: "TYPE_MAP_ID",
+    21: "TYPE_S_PLAYER_CLASS_RACE",
+    22: "TYPE_NTH_BIRTHDAY",
+    23: "TYPE_S_KNOWN_TITLE",
+    24: "TYPE_BG_WIN_TEAM_SCORE",
+    25: "TYPE_S_ITEM_QUALITY",
+}
+
+# Race enum for value2 resolution in TYPE_T_PLAYER_CLASS_RACE, TYPE_S_PLAYER_CLASS_RACE
+_AC_RACE_NAMES = {
+    1: "Human", 2: "Orc", 3: "Dwarf", 4: "NightElf", 5: "Undead", 6: "Tauren",
+    7: "Gnome", 8: "Troll", 10: "BloodElf", 11: "Draenei",
+}
+
+# Comparison type for TYPE_VALUE (value2)
+_AC_COMP_TYPES = {0: ">=", 1: "<=", 2: "==", 3: "!=", 4: "bitand"}
+
+# Drunk state enum (for TYPE_S_DRUNK)
+_AC_DRUNK_STATES = {0: "normal", 1: "slightly_tipsy", 2: "very_drunk", 3: "drunk"}
+
+
+def _resolve_achievement_criteria_fields(
+    server,
+    reg_entry: Dict,
+    rows: List[Dict[str, Any]],
+    resolve_filter: Any,
+    resolve_max: int = 10,
+) -> Dict[str, Any]:
+    """Resolve achievement_criteria_data polymorphic fields.
+
+    Translates type to enum name (e.g., TYPE_T_CREATURE).
+    Resolves value1 based on type (creature/spell/area/map references).
+    Resolves value2 where applicable (race, effect_index, comp_type).
+    """
+    if not rows or not resolve_filter:
+        return {}
+
+    if isinstance(resolve_filter, list):
+        allowed = set(resolve_filter)
+    elif resolve_filter is True:
+        allowed = {"dbc", "sql", "loot"}
+    else:
+        return {}
+
+    resolved = {}
+    for row in rows:
+        criteria_id = row.get("criteria_id") or _get_row_pk(row)
+        type_val = row.get("type", 0) or 0
+        value1 = row.get("value1", 0) or 0
+        value2 = row.get("value2", 0) or 0
+
+        entry_resolved = {
+            "type_name": _AC_TYPE_NAMES.get(type_val, f"UNKNOWN({type_val})"),
+        }
+
+        # Resolve value1 based on type
+        if value1:
+            if type_val == 1 and "sql" in allowed:
+                cn = _resolve_sql_ref(server, "creature_template", value1, "entry")
+                entry_resolved["value1"] = {"meaning": "creature_entry", "raw": value1, "resolved_to": cn}
+
+            elif type_val in (5, 7) and "dbc" in allowed:
+                sn = _resolve_dbc_ref(server, "Spell", value1)
+                entry_resolved["value1"] = {"meaning": "spell_id", "raw": value1, "resolved_to": sn}
+                if value2:
+                    entry_resolved["value2"] = {"meaning": "effect_index", "raw": value2}
+
+            elif type_val == 6 and "dbc" in allowed:
+                an = _resolve_dbc_ref(server, "AreaTable", value1)
+                entry_resolved["value1"] = {"meaning": "area_id", "raw": value1, "resolved_to": an}
+
+            elif type_val == 20 and "dbc" in allowed:
+                mn = _resolve_dbc_ref(server, "Map", value1)
+                entry_resolved["value1"] = {"meaning": "map_id", "raw": value1, "resolved_to": mn}
+
+            elif type_val == 16 and "dbc" in allowed:
+                hn = _resolve_dbc_ref(server, "Holiday", value1)
+                entry_resolved["value1"] = {"meaning": "holiday_id", "raw": value1, "resolved_to": hn}
+
+            else:
+                entry_resolved["value1"] = {"raw": value1}
+
+        # Resolve value2 for specific types
+        if value2 and type_val in (2, 21):
+            race_name = _AC_RACE_NAMES.get(value2)
+            entry_resolved["value2"] = {
+                "meaning": "race_id",
+                "raw": value2,
+                "name": race_name or f"Race({value2})",
+            }
+
+        if type_val == 8 and value2:
+            comp = _AC_COMP_TYPES.get(value2)
+            entry_resolved["value2"] = {
+                "meaning": "comparison_type",
+                "raw": value2,
+                "name": comp or f"COMP({value2})",
+            }
+
+        if type_val == 15 and value2:
+            drunk = _AC_DRUNK_STATES.get(value2)
+            entry_resolved["value2"] = {
+                "meaning": "drunk_state",
+                "raw": value2,
+                "name": drunk or f"DRUNK({value2})",
+            }
+
+        if type_val == 10 and value2:
+            entry_resolved["value2"] = {"meaning": "gender", "raw": value2, "name": ["male", "female", "neutral"][value2 - 1] if 1 <= value2 <= 3 else f"Gender({value2})"}
+
+        if type_val == 14 and value2:
+            entry_resolved["value2"] = {"meaning": "team_id", "raw": value2, "name": {"469": "Alliance", "67": "Horde"}.get(str(value2), f"Team({value2})")}
+
+        if type_val == 12 and value2:
+            entry_resolved["value2"] = {"meaning": "difficulty", "raw": value2}
+
+        if entry_resolved.get("value1") or entry_resolved.get("value2") or criteria_id:
+            resolved[str(criteria_id)] = entry_resolved
+
+    return resolved
+
+
+def _resolve_smart_script_fields(
+    server,
+    reg_entry: Dict,
+    rows: List[Dict[str, Any]],
+    resolve_filter: Any,
+    resolve_max: int = 10,
+) -> Dict[str, Any]:
+    """Resolve smart_scripts triple-polymorphic fields.
+
+    Translates event_type, action_type, target_type to enum names.
+    Resolves event_param1-6 based on event_type (spell/quest/creature refs).
+    Resolves action_param1-6 based on action_type (spell/creature/GO/quest refs).
+    Resolves target_param1-4 based on target_type (creature/GO entry refs).
+    Resolves entryorguid based on source_type.
+    """
+    if not rows or not resolve_filter:
+        return {}
+
+    if isinstance(resolve_filter, list):
+        allowed = set(resolve_filter)
+    elif resolve_filter is True:
+        allowed = {"dbc", "sql", "loot"}
+    else:
+        return {}
+
+    resolved = {}
+    for row in rows:
+        entryorguid = row.get("entryorguid", 0) or 0
+        source_type = row.get("source_type", 0) or 0
+        event_type = row.get("event_type", 0) or 0
+        action_type = row.get("action_type", 0) or 0
+        target_type = row.get("target_type", 0) or 0
+
+        entry_resolved = {}
+
+        # --- Entry/guid resolution based on source_type ---
+        if entryorguid and "sql" in allowed:
+            entry_label = _resolve_sai_entry(server, source_type, entryorguid)
+            if entry_label:
+                entry_resolved["entryorguid"] = {
+                    "raw": entryorguid,
+                    "source_type_name": _SAI_SOURCE_TYPE_NAMES.get(source_type, f"UNKNOWN({source_type})"),
+                    "resolved_to": entry_label,
+                }
+
+        # --- Enum name translation for all three axes ---
+        event_name = _SAI_EVENT_NAMES.get(event_type)
+        action_name = _SAI_ACTION_NAMES.get(action_type)
+        target_name = _SAI_TARGET_NAMES.get(target_type)
+
+        if event_name:
+            entry_resolved["event_type"] = {"raw": event_type, "name": event_name}
+        if action_name:
+            entry_resolved["action_type"] = {"raw": action_type, "name": action_name}
+        if target_name:
+            entry_resolved["target_type"] = {"raw": target_type, "name": target_name}
+
+        # --- Event param resolution (by event_type) ---
+        if "sql" in allowed or "dbc" in allowed:
+            ep1 = row.get("event_param1", 0) or 0
+            ep2 = row.get("event_param2", 0) or 0
+            ep3 = row.get("event_param3", 0) or 0
+
+            # Spell events: param1=SpellID
+            if event_type in (8, 23, 24, 31) and ep1:
+                spell_name = _resolve_dbc_ref(server, "Spell", ep1)
+                entry_resolved["event_param1"] = {"meaning": "SpellId", "raw": ep1, "resolved_to": spell_name}
+
+            # Quest events: param1=QuestID
+            if event_type in (19, 20) and ep1:
+                quest_name = _resolve_sql_ref(server, "quest_template", ep1, "ID")
+                entry_resolved["event_param1"] = {"meaning": "QuestId", "raw": ep1, "resolved_to": quest_name}
+
+            # Respawn event: param2=MapId (type=1), param3=ZoneId (type=2)
+            if event_type == 11:
+                resp_parts = {}
+                if ep2 and ep1 == 1:
+                    map_name = _resolve_dbc_ref(server, "Map", ep2)
+                    resp_parts["map_id"] = {"raw": ep2, "resolved_to": map_name}
+                if ep3 and ep1 == 2:
+                    area_name = _resolve_dbc_ref(server, "AreaTable", ep3)
+                    resp_parts["zone_id"] = {"raw": ep3, "resolved_to": area_name}
+                if resp_parts:
+                    entry_resolved["event_params_respawn"] = resp_parts
+
+            # Kill event: param1=CreatureId (0=all), param2-4=Cooldown
+            if event_type == 5 and ep1:
+                cn = _resolve_sql_ref(server, "creature_template", ep1, "entry")
+                entry_resolved["event_param1"] = {"meaning": "CreatureId (0=all)", "raw": ep1, "resolved_to": cn}
+
+            # Summoned/summon-despawned unit: param1=CreatureId
+            if event_type in (17, 35, 82) and ep1:
+                crit_name = _resolve_sql_ref(server, "creature_template", ep1, "entry")
+                entry_resolved["event_param1"] = {"meaning": "CreatureId", "raw": ep1, "resolved_to": crit_name}
+
+            # Gossip select: param1=MenuID, param2=OptionID
+            if event_type == 62 and ep1:
+                gossip_parts = {}
+                gossip_parts["menu_id"] = {"raw": ep1}
+                try:
+                    gname = _resolve_sql_ref(server, "gossip_menu", ep1, "entry")
+                    gossip_parts["menu_id"]["resolved_to"] = gname
+                except Exception:
+                    pass
+                if ep2:
+                    gossip_parts["option_id"] = {"raw": ep2}
+                entry_resolved["event_params_gossip"] = gossip_parts
+
+            # Emote event: param1=EmoteId (from Emotes.dbc)
+            if event_type == 22 and ep1:
+                emote_name = _resolve_dbc_ref(server, "Emotes", ep1)
+                entry_resolved["event_param1"] = {"meaning": "EmoteId", "raw": ep1, "resolved_to": emote_name}
+
+            # Game event: param1=eventEntry
+            if event_type in (68, 69) and ep1:
+                try:
+                    ge = _resolve_sql_ref(server, "game_event", ep1, "eventEntry")
+                    entry_resolved["event_param1"] = {"meaning": "game_event.eventEntry", "raw": ep1, "resolved_to": ge}
+                except Exception:
+                    entry_resolved["event_param1"] = {"meaning": "game_event.eventEntry", "raw": ep1}
+
+            # Distance creature/GO: param2=entry
+            if event_type == 75 and ep2:
+                cn = _resolve_sql_ref(server, "creature_template", ep2, "entry")
+                entry_resolved["event_param2"] = {"meaning": "creature_template.entry", "raw": ep2, "resolved_to": cn}
+            if event_type == 76 and ep2:
+                gn = _resolve_sql_ref(server, "gameobject_template", ep2, "entry")
+                entry_resolved["event_param2"] = {"meaning": "gameobject_template.entry", "raw": ep2, "resolved_to": gn}
+
+            # Victim casting: param3=SpellId
+            if event_type == 13 and (ep3 or 0):
+                s = ep3 or 0
+                if s:
+                    sn = _resolve_dbc_ref(server, "Spell", s)
+                    entry_resolved["event_param3"] = {"meaning": "SpellId", "raw": s, "resolved_to": sn}
+
+            # Friendly missing buff: param1=SpellId
+            if event_type == 16 and ep1:
+                sn = _resolve_dbc_ref(server, "Spell", ep1)
+                entry_resolved["event_param1"] = {"meaning": "SpellId", "raw": ep1, "resolved_to": sn}
+
+        # --- Action param resolution (by action_type) ---
+        if "sql" in allowed or "dbc" in allowed:
+            ap1 = row.get("action_param1", 0) or 0
+            ap2 = row.get("action_param2", 0) or 0
+            ap3 = row.get("action_param3", 0) or 0
+            ap4 = row.get("action_param4", 0) or 0
+
+            # CAST: param1=SpellId
+            if action_type == 11 and ap1:
+                spell_name = _resolve_dbc_ref(server, "Spell", ap1)
+                entry_resolved["action_param1"] = {"meaning": "SpellId", "raw": ap1, "resolved_to": spell_name}
+
+            # SUMMON_CREATURE: param1=creature_template.entry
+            if action_type == 12 and ap1:
+                cn = _resolve_sql_ref(server, "creature_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "creature_entry", "raw": ap1, "resolved_to": cn}
+
+            # QUEST actions: param1=quest_id
+            if action_type in (6, 7, 15, 26) and ap1:
+                qn = _resolve_sql_ref(server, "quest_template", ap1, "ID")
+                entry_resolved["action_param1"] = {"meaning": "QuestId", "raw": ap1, "resolved_to": qn}
+
+            # CALL_KILLEDMONSTER: param1=creature_template.entry
+            if action_type == 33 and ap1:
+                cn = _resolve_sql_ref(server, "creature_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "RequiredNpcOrGo (creature)", "raw": ap1, "resolved_to": cn}
+
+            # MORPH/MOUNT: param1=creature_template.entry
+            if action_type in (3, 43) and ap1:
+                cn = _resolve_sql_ref(server, "creature_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "creature_entry", "raw": ap1, "resolved_to": cn}
+
+            # UPDATE_TEMPLATE: param1=creature_template.entry
+            if action_type == 36 and ap1:
+                cn = _resolve_sql_ref(server, "creature_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "creature_entry", "raw": ap1, "resolved_to": cn}
+
+            # FOLLOW: param3=creature_template.entry
+            if action_type == 29 and ap3:
+                cn = _resolve_sql_ref(server, "creature_template", ap3, "entry")
+                entry_resolved["action_param3"] = {"meaning": "End_creature_entry", "raw": ap3, "resolved_to": cn}
+
+            # SUMMON_GO: param1=gameobject_template.entry
+            if action_type == 50 and ap1:
+                gn = _resolve_sql_ref(server, "gameobject_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "gameobject_entry", "raw": ap1, "resolved_to": gn}
+
+            # TALK/SIMPLE_TALK: param1=creature_text.GroupID
+            if action_type in (1, 84) and ap1:
+                try:
+                    cn = _resolve_sql_ref(server, "creature_text", ap1, "GroupID")
+                    entry_resolved["action_param1"] = {"meaning": "creature_text.GroupID", "raw": ap1, "resolved_to": cn}
+                except Exception:
+                    pass
+
+            # SOUND/MUSIC: param1=SoundEntriesDLC_ID
+            if action_type in (4, 216) and ap1:
+                sn = _resolve_dbc_ref(server, "SoundEntries", ap1)
+                entry_resolved["action_param1"] = {"meaning": "SoundId", "raw": ap1, "resolved_to": sn}
+
+            # PLAY_EMOTE/SET_EMOTE_STATE: param1=EmoteId (from Emotes.dbc)
+            if action_type in (5, 17) and ap1:
+                en = _resolve_dbc_ref(server, "Emotes", ap1)
+                entry_resolved["action_param1"] = {"meaning": "EmoteId", "raw": ap1, "resolved_to": en}
+
+            # ACTIVATE_TAXI: param1=TaxiNodes
+            if action_type == 52 and ap1:
+                tn = _resolve_dbc_ref(server, "TaxiNodes", ap1)
+                entry_resolved["action_param1"] = {"meaning": "TaxiNodeID", "raw": ap1, "resolved_to": tn}
+
+            # ESCORT_START: param2=waypoints.entry, param4=quest_template.id
+            if action_type == 53:
+                escort_parts = {}
+                if ap2:
+                    try:
+                        wn = _resolve_sql_ref(server, "waypoints", ap2, "entry")
+                        escort_parts["waypoints_entry"] = {"raw": ap2, "resolved_to": wn}
+                    except Exception:
+                        escort_parts["waypoints_entry"] = {"raw": ap2}
+                if ap4:
+                    qn = _resolve_sql_ref(server, "quest_template", ap4, "ID")
+                    escort_parts["quest_id"] = {"raw": ap4, "resolved_to": qn}
+                if escort_parts:
+                    entry_resolved["action_params_escorts"] = escort_parts
+
+            # ADD_ITEM/REMOVE_ITEM: param1=item_template.entry
+            if action_type in (56, 57) and ap1:
+                iname = _resolve_sql_ref(server, "item_template", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "item_entry", "raw": ap1, "resolved_to": iname}
+
+            # SELF_CAST/CROSS_CAST/INVOKER_CAST: param1=SpellId
+            if action_type in (85, 86, 134) and ap1:
+                sn = _resolve_dbc_ref(server, "Spell", ap1)
+                entry_resolved["action_param1"] = {"meaning": "SpellId", "raw": ap1, "resolved_to": sn}
+
+            # ADD_AURA/REMOVEAURASFROMSPELL: param1=SpellId
+            if action_type in (75, 28) and ap1:
+                sn = _resolve_dbc_ref(server, "Spell", ap1)
+                entry_resolved["action_param1"] = {"meaning": "SpellId", "raw": ap1, "resolved_to": sn}
+
+            # INTERRUPT_SPELL: param2=SpellId
+            if action_type == 92 and ap2:
+                sn = _resolve_dbc_ref(server, "Spell", ap2)
+                entry_resolved["action_param2"] = {"meaning": "SpellId", "raw": ap2, "resolved_to": sn}
+
+            # SEND_GOSSIP_MENU: param1=gossip_menu.entry, param2=text_id
+            if action_type == 98 and ap1:
+                gossip_parts = {}
+                gn = _resolve_sql_ref(server, "gossip_menu", ap1, "entry")
+                gossip_parts["menu_id"] = {"raw": ap1, "resolved_to": gn}
+                if ap2:
+                    try:
+                        tn = _resolve_sql_ref(server, "npc_text", ap2, "ID")
+                        gossip_parts["text_id"] = {"raw": ap2, "resolved_to": tn}
+                    except Exception:
+                        try:
+                            tn = _resolve_sql_ref(server, "creature_text", ap2, "GroupID")
+                            gossip_parts["text_id"] = {"raw": ap2, "resolved_to": tn}
+                        except Exception:
+                            gossip_parts["text_id"] = {"raw": ap2}
+                entry_resolved["action_params_gossip"] = gossip_parts
+
+            # GAME_EVENT_START/STOP: param1=eventEntry
+            if action_type in (111, 112) and ap1:
+                try:
+                    ge = _resolve_sql_ref(server, "game_event", ap1, "eventEntry")
+                    entry_resolved["action_param1"] = {"meaning": "game_event.eventEntry", "raw": ap1, "resolved_to": ge}
+                except Exception:
+                    entry_resolved["action_param1"] = {"meaning": "game_event.eventEntry", "raw": ap1}
+
+            # SET_GOSSIP_MENU: param1=gossipMenuId
+            if action_type == 240 and ap1:
+                gn = _resolve_sql_ref(server, "gossip_menu", ap1, "entry")
+                entry_resolved["action_param1"] = {"meaning": "gossip_menu.entry", "raw": ap1, "resolved_to": gn}
+
+        # --- Target param resolution (by target_type) ---
+        if "sql" in allowed:
+            tp1 = row.get("target_param1", 0) or 0
+
+            # Creature by entry (range/distance/closest)
+            if target_type in (9, 11, 19) and tp1:
+                cn = _resolve_sql_ref(server, "creature_template", tp1, "entry")
+                entry_resolved["target_param1"] = {"meaning": "creature_entry", "raw": tp1, "resolved_to": cn}
+
+            # Creature by guid
+            if target_type == 10 and tp1:
+                abs_guid = abs(tp1)
+                cn = _resolve_sql_ref(server, "creature_template", (row.get("target_param2", 0) or 0), "entry")
+                entry_resolved["target_param1"] = {"meaning": "creature_guid", "raw": tp1, "resolved_to": f"guid:{abs_guid}" + (f", template: {cn}" if cn else "")}
+
+            # GO by entry (range/distance/closest)
+            if target_type in (13, 15, 20) and tp1:
+                gn = _resolve_sql_ref(server, "gameobject_template", tp1, "entry")
+                entry_resolved["target_param1"] = {"meaning": "gameobject_entry", "raw": tp1, "resolved_to": gn}
+
+            # GO by guid
+            if target_type == 14 and tp1:
+                abs_guid = abs(tp1)
+                entry_resolved["target_param1"] = {"meaning": "gameobject_guid", "raw": tp1, "resolved_to": f"guid:{abs_guid}"}
+
+            # Player with aura: param1=spellID
+            if target_type == 201 and tp1:
+                sn = _resolve_dbc_ref(server, "Spell", tp1)
+                entry_resolved["target_param1"] = {"meaning": "SpellId (aura)", "raw": tp1, "resolved_to": sn}
+
+        # --- Position coordinates annotation ---
+        tx = row.get("target_x")
+        ty = row.get("target_y")
+        tz = row.get("target_z")
+        if target_type == 8 and any(v is not None and v != 0 for v in [tx, ty, tz]):
+            entry_resolved["position"] = {
+                "type_name": "POSITION",
+                "x": tx,
+                "y": ty,
+                "z": tz,
+                "orientation": row.get("target_o"),
+            }
+
+        # Skip empty entries — only include if we resolved something meaningful
+        if entry_resolved:
+            pk = str(abs(entryorguid)) + "_" + str(row.get("source_type", 0)) + "_" + str(row.get("id", 0))
+            resolved[pk] = entry_resolved
+
+    return resolved
+
+
+def _resolve_sai_entry(server, source_type: int, entryorguid: int) -> Optional[str]:
+    """Resolve entryorguid based on source_type and sign."""
+    if entryorguid == 0:
+        return None
+
+    pos = abs(entryorguid)
+    if source_type == 0:  # Creature
+        if entryorguid > 0:
+            name = _resolve_sql_ref(server, "creature_template", pos, "entry")
+            return f"creature (entry={pos}) -> {name}" if name else f"creature (entry={pos})"
+        else:
+            return f"creature (guid={entryorguid})"
+    elif source_type == 1:  # Gameobject
+        if entryorguid > 0:
+            name = _resolve_sql_ref(server, "gameobject_template", pos, "entry")
+            return f"gameobject (entry={pos}) -> {name}" if name else f"gameobject (entry={pos})"
+        else:
+            return f"gameobject (guid={entryorguid})"
+    elif source_type == 2:  # Areatrigger
+        try:
+            name = _resolve_sql_ref(server, "areatrigger_scripts", pos, "entry")
+            return f"areatrigger (entry={pos}) -> {name}" if name else f"areatrigger (entry={pos})"
+        except Exception:
+            return f"areatrigger (entry={pos})"
+    elif source_type == 9:  # TimedActionList
+        return f"timed_actionlist (entry={entryorguid})"
+
+    return None
 
 
 def _resolve_gameobject_fields(

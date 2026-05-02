@@ -531,6 +531,237 @@ class TestConditionResolution(unittest.TestCase):
         self.assertNotIn("error", result)
 
 
+class TestSmartScriptResolution(unittest.TestCase):
+    """Test smart_scripts triple-polymorphic resolution."""
+
+    def _sai_resolved(self, result):
+        """Get $resolved_fields from metadata for a smart_scripts query result."""
+        meta = result.get("metadata", {})
+        return meta.get("$resolved_fields", {})
+
+    def test_cast_action_resolves_spell(self):
+        """action_type=11 (CAST) should resolve param1 as Spell name."""
+        # entryorguid=-201800 has CAST actions with real spell IDs
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"entryorguid": -201800, "action_type": 11},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._sai_resolved(result)
+        # Each resolved entry should have action_param1 with spell name
+        has_spell = False
+        for pk, data in resolved.items():
+            ap1 = data.get("action_param1", {})
+            if ap1.get("resolved_to") and "Spell" in str(ap1.get("resolved_to", "")):
+                has_spell = True
+                break
+        self.assertTrue(has_spell, "CAST action should resolve param1 as Spell name")
+
+    def test_update_ic_translates_event_type(self):
+        """event_type=0 should resolve to 'UPDATE_IC' enum name."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"entryorguid": -201800, "event_type": 0},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._sai_resolved(result)
+        has_name = False
+        for pk, data in resolved.items():
+            et = data.get("event_type", {})
+            if et.get("name") == "UPDATE_IC":
+                has_name = True
+                break
+        self.assertTrue(has_name, "event_type=0 should translate to UPDATE_IC")
+
+    def test_talk_action_resolves_creature_text(self):
+        """action_type=1 (TALK) on LINK event should resolve param1."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"entryorguid": -209188, "action_type": 1},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_summon_creature_resolves_entry(self):
+        """action_type=12 (SUMMON_CREATURE) should resolve param1 as creature name."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"action_type": 12, "action_param1": 26923},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._sai_resolved(result)
+        has_creature = False
+        for pk, data in resolved.items():
+            ap1 = data.get("action_param1", {})
+            if ap1.get("resolved_to") and "creature_template" in str(ap1.get("resolved_to", "")):
+                has_creature = True
+                break
+        self.assertTrue(has_creature, "SUMMON_CREATURE should resolve param1 as creature")
+
+    def test_link_event_translates_enum(self):
+        """event_type=61 (LINK) should translate to enum name."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"entryorguid": -209187, "event_type": 61},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._sai_resolved(result)
+        has_link = False
+        for pk, data in resolved.items():
+            et = data.get("event_type", {})
+            if et.get("name") == "LINK":
+                has_link = True
+                break
+        self.assertTrue(has_link, "event_type=61 should translate to LINK")
+
+    def test_source_type_resolves_entryorguid(self):
+        """source_type=0 with negative entryorguid should annotate creature guid."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"entryorguid": -201800, "source_type": 0},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._sai_resolved(result)
+        has_guid = False
+        for pk, data in resolved.items():
+            eo = data.get("entryorguid", {})
+            if eo and ("guid" in str(eo.get("resolved_to", "")) or "source_type_name" in eo):
+                has_guid = True
+                break
+        self.assertTrue(has_guid, "source_type=0 negative entryorguid should annotate guid")
+
+    def test_summon_go_action_resolves_entry(self):
+        """action_type=50 (SUMMON_GO) should resolve param1 as gameobject name."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"action_type": 50, "action_param1": 182659},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_multi_row_filter_resolves(self):
+        """Multi-row smart_scripts filter with resolve should work."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"source_type": 0},
+            "resolve": True,
+            "limit": 10,
+        })
+        self.assertNotIn("error", result)
+
+    def test_target_closest_creature_resolves_entry(self):
+        """target_type=19 (CLOSEST_CREATURE) should resolve param1."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"target_type": 19},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+    def test_quest_offer_action_resolves_quest(self):
+        """action_type=7 (OFFER_QUEST) should resolve param1 as quest name."""
+        result = call_query({
+            "name": "smart_scripts",
+            "filter": {"action_type": 7, "action_param1": 3904},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+
+
+class TestAchievementCriteriaResolution(unittest.TestCase):
+    """Test achievement_criteria_data polymorphic resolution."""
+
+    def _ac_resolved(self, result):
+        """Get $resolved_fields from metadata for an achievement query result."""
+        meta = result.get("metadata", {})
+        return meta.get("$resolved_fields", {})
+
+    def test_type_creature_resolves_value1(self):
+        """type=1 (T_CREATURE) should resolve value1 as creature name."""
+        # criteria_id=3615 has type=1, value1=1412
+        result = call_query({
+            "name": "achievement_criteria_data",
+            "filter": {"criteria_id": 3615},
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._ac_resolved(result)
+        has_creature = False
+        for pk, data in resolved.items():
+            if "value1" in data and "creature_template" in str(data.get("value1", "")):
+                has_creature = True
+                break
+        self.assertTrue(has_creature, "T_CREATURE type should resolve value1 as creature")
+
+    def test_type_aura_resolves_spell(self):
+        """type=5 (S_AURA) should resolve value1 as spell name."""
+        # criteria_id=3826 has single row: type=5, value1=26157
+        result = call_query({
+            "name": "achievement_criteria_data",
+            "filter": {"criteria_id": 3826},
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._ac_resolved(result)
+        has_spell = False
+        for pk, data in resolved.items():
+            if "value1" in data and "Spell" in str(data.get("value1", "")):
+                has_spell = True
+                break
+        self.assertTrue(has_spell, "S_AURA type should resolve value1 as spell")
+
+    def test_type_map_difficulty_translates_enum(self):
+        """type=12 (MAP_DIFFICULTY) should translate type to enum name."""
+        result = call_query({
+            "name": "achievement_criteria_data",
+            "filter": {"type": 12},
+            "resolve": True,
+            "limit": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._ac_resolved(result)
+        has_name = False
+        for pk, data in resolved.items():
+            if data.get("type_name") == "TYPE_MAP_DIFFICULTY":
+                has_name = True
+                break
+        self.assertTrue(has_name, "type=12 should translate to TYPE_MAP_DIFFICULTY")
+
+    def test_type_map_id_resolves_value1(self):
+        """type=20 (MAP_ID) should resolve value1 as map name."""
+        # criteria_id=1820 has type=20, value1=529
+        result = call_query({
+            "name": "achievement_criteria_data",
+            "filter": {"criteria_id": 1820},
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+
+    def test_multi_row_filter_resolves(self):
+        """Multi-row achievement_criteria filter with resolve should work."""
+        result = call_query({
+            "name": "achievement_criteria_data",
+            "filter": {"type": 1},
+            "resolve": True,
+            "limit": 10,
+        })
+        self.assertNotIn("error", result)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
