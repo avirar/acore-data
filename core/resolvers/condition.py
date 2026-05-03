@@ -1,0 +1,245 @@
+"""Resolve conditions table with polymorphic field interpretation.
+
+Translates SourceTypeOrReferenceId and ConditionTypeOrReference to enum names,
+resolves SourceEntry based on source type (spell/quest/item/creature),
+resolves ConditionValue1 based on condition type (aura spell, quest, item, etc.).
+"""
+from typing import Any, Dict, List, Optional
+
+from ..enums import _SOURCE_TYPE_NAMES, _CONDITION_TYPE_NAMES
+from .ref_utils import resolve_dbc_ref, resolve_sql_ref
+
+# Comparison type enum lookup
+_COMP_TYPES = {0: ">=", 1: "<=", 2: "==", 3: "!="}
+
+
+def _get_row_pk(row: Dict) -> str:
+    """Get primary key value from row."""
+    for pk in ["entry", "ID", "Id", "id", "guid"]:
+        if pk in row:
+            return row[pk]
+    return str(id(row))
+
+
+def resolve_condition_fields(
+    server,
+    reg_entry: Dict,
+    rows: List[Dict[str, Any]],
+    resolve_filter: Any,
+    resolve_max: int = 10,
+) -> Dict[str, Any]:
+    """Resolve conditions table with polymorphic field interpretation."""
+    if not rows or not resolve_filter:
+        return {}
+
+    if isinstance(resolve_filter, list):
+        allowed = set(resolve_filter)
+    elif resolve_filter is True:
+        allowed = {"dbc", "sql", "loot"}
+    else:
+        return {}
+
+    resolved = {}
+    for row in rows:
+        pk = _get_row_pk(row)
+
+        source_type = row.get("SourceTypeOrReferenceId", 0) or 0
+        condition_type = row.get("ConditionTypeOrReference", 0) or 0
+        source_entry = row.get("SourceEntry", 0) or 0
+        source_group = row.get("SourceGroup", 0) or 0
+        cond_value1 = row.get("ConditionValue1", 0) or 0
+        cond_value2 = row.get("ConditionValue2", 0) or 0
+        cond_value3 = row.get("ConditionValue3", 0) or 0
+
+        entry_resolved = {
+            "source_type_name": _SOURCE_TYPE_NAMES.get(source_type, f"UNKNOWN({source_type})"),
+            "condition_type_name": _CONDITION_TYPE_NAMES.get(condition_type, f"UNKNOWN({condition_type})"),
+        }
+
+        # Handle reference templates (negative values)
+        if source_type < 0:
+            entry_resolved["source_type_name"] = f"REFERENCE_TEMPLATE({abs(source_type)})"
+            entry_resolved["raw_source_type"] = source_type
+
+        if condition_type < 0:
+            entry_resolved["condition_type_name"] = f"REFERENCE_TO_CONDITION({abs(condition_type)})"
+            entry_resolved["raw_condition_type"] = condition_type
+            condition_type = 0  # Don't attempt value resolution for references
+
+        # --- Resolve SourceEntry based on SourceType ---
+        if source_entry and "sql" in allowed:
+            resolved_source = _resolve_condition_source(server, source_type, source_entry, source_group)
+            if resolved_source:
+                entry_resolved["source_entry"] = resolved_source
+
+        # --- Resolve ConditionValue1-3 based on ConditionType ---
+        if cond_value1 and "sql" in allowed:
+            resolved_values = _resolve_condition_values(server, condition_type, cond_value1, cond_value2, cond_value3)
+            if resolved_values:
+                entry_resolved["condition_values"] = resolved_values
+
+        # --- Effect bitmask annotation for SPELL_IMPLICIT_TARGET ---
+        if source_type == 13 and source_group:
+            effects = []
+            if source_group & 1:
+                effects.append("effect0")
+            if source_group & 2:
+                effects.append("effect1")
+            if source_group & 4:
+                effects.append("effect2")
+            entry_resolved["source_group"] = f"effect_mask[{','.join(effects)}]"
+
+        if pk and (entry_resolved.get("source_entry") or entry_resolved.get("condition_values")):
+            resolved[pk] = entry_resolved
+
+    return resolved
+
+
+def _resolve_condition_source(server, source_type: int, source_entry: int, source_group: int) -> Optional[Dict]:
+    """Resolve SourceEntry based on SourceTypeOrReferenceId."""
+    # Spell sources — resolve via Spell DBC first, fall back to SQL quest_template (some spell-like IDs are quests)
+    if source_type in (13, 17, 24):
+        name = resolve_dbc_ref(server, "Spell", source_entry) or resolve_sql_ref(server, "quest_template", source_entry, "ID")
+        return {"type": "spell", "id": source_entry, "name": name}
+
+    if source_type in (18, 21):
+        spell_name = resolve_dbc_ref(server, "Spell", source_entry) or resolve_sql_ref(server, "quest_template", source_entry, "ID")
+        creature_name = resolve_sql_ref(server, "creature_template", source_group, "entry")
+        return {
+            "spell": {"type": "spell", "id": source_entry, "name": spell_name},
+            "trigger_by": {"type": "creature", "id": source_group, "name": creature_name},
+        }
+
+    # Quest sources
+    if source_type == 19:
+        name = resolve_sql_ref(server, "quest_template", source_entry, "ID")
+        return {"type": "quest", "id": source_entry, "name": name}
+
+    # Gossip/menu sources
+    if source_type in (14, 15):
+        name = resolve_sql_ref(server, "gossip_menu_option", source_entry, "menu_id")
+        return {"type": "gossip", "id": source_entry, "name": name}
+
+    if source_type == 20:
+        creature_name = resolve_sql_ref(server, "creature_template", source_entry, "entry")
+        return {"type": "creature_gossip", "id": source_entry, "name": creature_name}
+
+    # Creature template vehicle / respawn
+    if source_type in (16, 29):
+        name = resolve_sql_ref(server, "creature_template", source_entry, "entry")
+        return {"type": "creature", "id": source_entry, "name": name}
+
+    return None
+
+
+def _resolve_condition_values(
+    server, condition_type: int, value1: int, value2: int, value3: int
+) -> Optional[Dict]:
+    """Resolve ConditionValue1-3 based on ConditionTypeOrReference."""
+    result = {}
+
+    # --- Spell references in conditions ---
+    if condition_type == 1:  # AURA
+        name = resolve_dbc_ref(server, "Spell", value1) or resolve_sql_ref(server, "quest_template", value1, "ID")
+        result["spell"] = {"type": "aura_spell", "id": value1, "name": name}
+        if value2:
+            result["effect_index"] = int(value2)
+
+    elif condition_type == 25:  # SPELL_LEARNED
+        name = resolve_dbc_ref(server, "Spell", value1) or resolve_sql_ref(server, "quest_template", value1, "ID")
+        result["spell"] = {"type": "learned_spell", "id": value1, "name": name}
+
+    # --- Quest references in conditions ---
+    elif condition_type in (8, 9, 14, 28, 43):  # QUESTREWARDED, QUESTTAKEN, QUEST_NONE, QUEST_COMPLETE, DAILY_QUEST_DONE
+        quest_names = {8: "rewarded", 9: "taken", 14: "quest_none", 28: "completed", 43: "daily_done"}
+        name = resolve_sql_ref(server, "quest_template", value1, "ID")
+        result["quest"] = {"type": quest_names[condition_type], "id": value1, "name": name}
+
+    elif condition_type == 47:  # QUESTSTATE
+        name = resolve_sql_ref(server, "quest_template", value1, "ID")
+        states = []
+        if value2 & 1: states.append("not_taken")
+        if value2 & 2: states.append("completed")
+        if value2 & 8: states.append("in_progress")
+        if value2 & 32: states.append("failed")
+        if value2 & 64: states.append("rewarded")
+        result["quest"] = {"type": "state", "id": value1, "name": name}
+        if states:
+            result["states"] = states
+
+    elif condition_type == 48:  # QUEST_OBJ_PROGRESS
+        name = resolve_sql_ref(server, "quest_template", value1, "ID")
+        result["quest"] = {"type": "objective", "id": value1, "name": name}
+        if value2:
+            result["objective_index"] = int(value2)
+        if value3:
+            result["progress_required"] = int(value3)
+
+    elif condition_type == 101:  # QUEST_SATISFY_EXCLUSIVE
+        name = resolve_sql_ref(server, "quest_template", value1, "ID")
+        result["quest"] = {"type": "exclusive", "id": value1, "name": name}
+
+    # --- Item references in conditions ---
+    elif condition_type == 2:  # ITEM
+        name = resolve_sql_ref(server, "item_template", value1, "entry")
+        result["item"] = {"type": "has_item", "id": value1, "name": name}
+        if value2:
+            result["count_required"] = int(value2)
+
+    elif condition_type == 3:  # ITEM_EQUIPPED
+        name = resolve_sql_ref(server, "item_template", value1, "entry")
+        result["item"] = {"type": "equipped_item", "id": value1, "name": name}
+
+    # --- Creature references in conditions ---
+    elif condition_type == 29:  # NEAR_CREATURE
+        name = resolve_sql_ref(server, "creature_template", value1, "entry")
+        result["creature"] = {"type": "nearby_creature", "id": value1, "name": name}
+        if value2:
+            result["max_distance"] = int(value2)
+
+    elif condition_type == 30:  # NEAR_GAMEOBJECT
+        name = resolve_sql_ref(server, "gameobject_template", value1, "entry")
+        result["gameobject"] = {"type": "nearby_go", "id": value1, "name": name}
+        if value2:
+            result["max_distance"] = int(value2)
+
+    # --- OBJECT_ENTRY_GUID (complex TypeID-based resolution) ---
+    elif condition_type == 31:  # OBJECT_ENTRY_GUID
+        type_id = int(value1)
+        type_names = {0: "ITEM", 1: "CREATURE", 2: "GAMEOBJECT", 3: "DYNAMIC_OBJECT",
+                      5: "GAMEOBJECT", 6: "PLAYER", 7: "VEHICLE"}
+        result["type_id"] = {"raw": type_id, "name": type_names.get(type_id, f"TYPE({type_id})")}
+        if value2 and type_id in (1,):
+            name = resolve_sql_ref(server, "creature_template", value2, "entry")
+            result["target_entity"] = {"type": "creature", "id": value2, "name": name}
+        elif value2 and type_id in (0,):
+            name = resolve_sql_ref(server, "item_template", value2, "entry")
+            result["target_entity"] = {"type": "item", "id": value2, "name": name}
+        elif value2:
+            result["target_entity"] = {"id": value2, "type_id": type_id}
+
+    # --- Level comparison ---
+    elif condition_type == 27:  # LEVEL
+        result["level"] = int(value1)
+        if value2:
+            result["comparison"] = _COMP_TYPES.get(int(value2), f"RAW({value2})")
+
+    # --- HP comparisons ---
+    elif condition_type == 37:  # HP_VAL
+        result["hp_value"] = int(value1)
+        if value2:
+            result["comparison"] = _COMP_TYPES.get(int(value2), f"RAW({value2})")
+    elif condition_type == 38:  # HP_PCT
+        result["hp_percent"] = int(value1)
+        if value2:
+            result["comparison"] = _COMP_TYPES.get(int(value2), f"RAW({value2})")
+
+    # --- Distance to target ---
+    elif condition_type == 35:  # DISTANCE_TO
+        result["distance"] = int(value2)
+        if value1:
+            result["target_slot"] = int(value1)
+        if value3:
+            result["comparison"] = _COMP_TYPES.get(int(value3), f"RAW({value3})")
+
+    return result if result else None
