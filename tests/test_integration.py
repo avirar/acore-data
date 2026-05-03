@@ -32,7 +32,7 @@ def call_query(args):
         "params": {"name": "query", "arguments": args},
     }
     p = subprocess.run(
-        ["python3", SERVER_SCRIPT],
+        [sys.executable, SERVER_SCRIPT],
         input=json.dumps(payload),
         capture_output=True,
         timeout=TIMEOUT,
@@ -53,7 +53,7 @@ def call_tool(name, args):
         "params": {"name": name, "arguments": args},
     }
     p = subprocess.run(
-        ["python3", SERVER_SCRIPT],
+        [sys.executable, SERVER_SCRIPT],
         input=json.dumps(payload),
         capture_output=True,
         timeout=TIMEOUT,
@@ -312,7 +312,7 @@ class TestRegression(unittest.TestCase):
             "params": {},
         }
         p = subprocess.run(
-            ["python3", SERVER_SCRIPT],
+            [sys.executable, SERVER_SCRIPT],
             input=json.dumps(payload),
             capture_output=True,
             timeout=5,
