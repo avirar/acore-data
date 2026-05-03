@@ -953,6 +953,90 @@ class TestSQLToolConfig(unittest.TestCase):
         self.assertEqual(parsed["count"], 1)
 
 
+class TestSpellResolution(unittest.TestCase):
+    """Test Spell -> Conditions cross-reference resolver."""
+
+    def _spell_resolved(self, result):
+        """Get $resolved_fields from metadata for a spell query result."""
+        meta = result.get("metadata", {})
+        return meta.get("$resolved_fields", {})
+
+    def test_spell_with_conditions_includes_requirements(self):
+        """Spell 48649 (191 conditions) should include conditions with count and requirements."""
+        result = call_query({
+            "name": "Spell",
+            "id": 48649,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._spell_resolved(result)
+        entry = resolved.get("48649", {})
+        conds = entry.get("conditions")
+        self.assertIsNotNone(conds, "Spell 48649 should have conditions in resolved output")
+        self.assertEqual(conds["count"], 191, "Should report correct condition count")
+        self.assertIn("requirements", conds, "Should include formatted requirements")
+
+    def test_spell_object_entry_guid_structured_values(self):
+        """OBJECT_ENTRY_GUID conditions should resolve to structured target_entity dict."""
+        result = call_query({
+            "name": "Spell",
+            "id": 3730,
+            "resolve": True,
+            "resolve_max": 5,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._spell_resolved(result)
+        entry = resolved.get("3730", {})
+        conds = entry.get("conditions", {}).get("requirements", [])
+        self.assertGreater(len(conds), 0, "Spell 3730 should have conditions")
+        # First condition is OBJECT_ENTRY_GUID (type=31) with UNIT type target
+        first = conds[0]
+        self.assertEqual(first["type"], "OBJECT_ENTRY_GUID")
+        vals = first.get("values", {})
+        self.assertIn("target_entity", vals, "Should have structured target_entity")
+        te = vals["target_entity"]
+        self.assertIn("id", te, "target_entity should have id")
+        self.assertEqual(te["id"], 15263)
+
+    def test_spell_with_no_conditions(self):
+        """Spell 118 (Polymorph) has no spell conditions -> no 'conditions' key."""
+        result = call_query({
+            "name": "Spell",
+            "id": 118,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._spell_resolved(result)
+        entry = resolved.get("118", {})
+        self.assertNotIn("conditions", entry, "Spell without conditions should not have 'conditions' key")
+
+    def test_spell_no_resolve_skips_conditions(self):
+        """resolve=False should not fetch or attach conditions."""
+        result = call_query({
+            "name": "Spell",
+            "id": 48649,
+            "resolve": False,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._spell_resolved(result)
+        self.assertEqual(resolved, {}, "No resolution should produce empty $resolved_fields")
+
+    def test_spell_resolve_max_warning(self):
+        """resolve_max=N on spell with >N conditions should include warning message."""
+        result = call_query({
+            "name": "Spell",
+            "id": 48649,
+            "resolve": True,
+            "resolve_max": 3,
+        })
+        self.assertNotIn("error", result)
+        resolved = self._spell_resolved(result)
+        conds = resolved.get("48649", {}).get("conditions", {})
+        self.assertIn("warning", conds, "Should include warning when conditions exceed resolve_max")
+        self.assertIn("191", conds["warning"], "Warning should mention total condition count")
+        self.assertEqual(len(conds["requirements"]), 3, "Should show exactly resolve_max requirements")
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
