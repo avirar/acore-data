@@ -161,9 +161,16 @@ def _annotate_single_record(
         if filter_indices is not None and idx_int not in filter_indices:
             continue
 
-        # Skip null values in compact mode
-        if compact and value is None:
-            continue
+        # Skip null, zero, and empty string values in compact mode
+        if compact:
+            if value is None:
+                continue
+            # Skip zero values for numeric fields (but keep empty strings)
+            if isinstance(value, (int, float)) and value == 0:
+                continue
+            # Also skip empty strings in compact mode
+            if value == "":
+                continue
 
         field_info = fields_meta.get(str(idx_int), {})
 
