@@ -116,22 +116,30 @@ def resolve_type_fields(
     if not rows or not resolve_filter:
         return {}
 
-    # Check resolver registry first (for modularized resolvers that don't need registry entry)
-    from .resolvers import get_resolver
-    registered = get_resolver(sql_table)
-    if registered:
+    # Set up per-request memoization cache to avoid duplicate ref lookups
+    from .resolvers.ref_utils import set_ref_cache, clear_ref_cache
+    req_cache = {}
+    set_ref_cache(req_cache)
+
+    try:
+        # Check resolver registry first (for modularized resolvers that don't need registry entry)
+        from .resolvers import get_resolver
+        registered = get_resolver(sql_table)
+        if registered:
+            reg_entry = _find_registry_entry(server, sql_table)
+            if reg_entry and "type_field_mappings" in reg_entry:
+                return registered(server, reg_entry, rows, resolve_filter, resolve_max)
+            # Some resolvers (smart_scripts, quest_template) have hardcoded logic without registry
+            return registered(server, reg_entry or {}, rows, resolve_filter, resolve_max)
+
         reg_entry = _find_registry_entry(server, sql_table)
-        if reg_entry and "type_field_mappings" in reg_entry:
-            return registered(server, reg_entry, rows, resolve_filter, resolve_max)
-        # Some resolvers (smart_scripts, quest_template) have hardcoded logic without registry
-        return registered(server, reg_entry or {}, rows, resolve_filter, resolve_max)
+        if not reg_entry:
+            return {}
 
-    reg_entry = _find_registry_entry(server, sql_table)
-    if not reg_entry:
-        return {}
-
-    # Generic resolution for all other tables
-    return _resolve_generic(server, reg_entry, rows, resolve_filter, resolve_max)
+        # Generic resolution for all other tables
+        return _resolve_generic(server, reg_entry, rows, resolve_filter, resolve_max)
+    finally:
+        clear_ref_cache()
 
 
 def _resolve_generic(
