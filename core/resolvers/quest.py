@@ -5,6 +5,7 @@ For each quest row, automatically includes:
 - Ender:   NPCs/GOs that accept this quest (creature_questender, gameobject_questender)
 - POIs:    Point-of-interest coordinates from quest_poi + quest_poi_points
 - Chain:   prevQuestID, nextQuestID, breadcrumbForQuestId from quest_template_addon
+- Items:   RequiredItemId1..6, StartItem, RewardItem1..4, RewardChoiceItemId1..6 names
 
 On top of the generic field resolution (faction, spell, item refs).
 
@@ -13,7 +14,7 @@ IDs across all quest rows, Pass 2 resolves them in bulk via single queries per t
 """
 from typing import Any, Dict, List
 
-from .ref_utils import resolve_sql_ref, batch_resolve_sql
+from .ref_utils import resolve_sql_ref, batch_resolve_sql, resolve_dbc_ref
 
 
 def _get_row_pk(row: Dict) -> str:
@@ -138,6 +139,7 @@ def resolve_quest_fields(
     all_npc_ids = set()
     all_go_ids = set()
     all_quest_chain_ids = set()
+    all_item_ids = set()
 
     for r in se_data["npc_starters"] + se_data["npc_enders"]:
         nid = r.get("id", 0)
@@ -153,10 +155,23 @@ def resolve_quest_fields(
             if val:
                 all_quest_chain_ids.add(val)
 
+    _ITEM_FIELDS = (
+        ["StartItem"]
+        + [f"RequiredItemId{i}" for i in range(1, 7)]
+        + [f"RewardItem{i}" for i in range(1, 5)]
+        + [f"RewardChoiceItemID{i}" for i in range(1, 7)]
+    )
+    for row in rows:
+        for col in _ITEM_FIELDS:
+            val = row.get(col, 0) or 0
+            if val:
+                all_item_ids.add(int(val))
+
     # --- Pass 2: Batch resolve entity names ---
     npc_map = batch_resolve_sql(server, "creature_template", list(all_npc_ids), "entry") if all_npc_ids else {}
     go_map = batch_resolve_sql(server, "gameobject_template", list(all_go_ids), "entry") if all_go_ids else {}
     quest_chain_map = batch_resolve_sql(server, "quest_template", list(all_quest_chain_ids), "ID") if all_quest_chain_ids else {}
+    item_map = batch_resolve_sql(server, "item_template", list(all_item_ids), "entry") if all_item_ids else {}
 
     # --- Pass 3: Build resolved output ---
     # Index starter/ender data by quest ID
@@ -246,6 +261,23 @@ def resolve_quest_fields(
             if breadcrumb_id:
                 chain["breadcrumb_for"] = {"id": breadcrumb_id, "name": quest_chain_map.get(breadcrumb_id, f"quest_template [{breadcrumb_id}]")}
 
+        # --- Items ---
+        items = {}
+        for col in _ITEM_FIELDS:
+            val = row.get(col, 0) or 0
+            if val:
+                items[col] = {"id": int(val), "name": item_map.get(int(val), f"item_template [{val}] (not found)")}
+        # Deduplicate: if StartItem is same as a RequiredItemId, just note it
+        start_item_id = row.get("StartItem", 0) or 0
+        if start_item_id and items.get("StartItem"):
+            src_item = items["StartItem"]
+            req_match = any(
+                row.get(f"RequiredItemId{i}", 0) == start_item_id
+                for i in range(1, 7)
+            )
+            if req_match:
+                src_item["note"] = "quest source item (same as a required item)"
+
         # Merge enriched data into resolved entry
         enriched = {}
         if starters:
@@ -256,6 +288,8 @@ def resolve_quest_fields(
             enriched["pois"] = pois
         if chain:
             enriched["chain"] = chain
+        if items:
+            enriched["items"] = items
 
         merged = {**entry_resolved, **enriched}
         if merged:
