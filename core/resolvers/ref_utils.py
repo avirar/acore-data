@@ -171,7 +171,7 @@ def batch_resolve_sql(
     placeholder = "%s"
     placeholders = ", ".join([placeholder] * len(ids))
 
-    query = f"SELECT {id_col}, name, LogTitle, entry FROM {table} WHERE {id_col} IN ({placeholders})"
+    query = f"SELECT * FROM {table} WHERE {id_col} IN ({placeholders})"
 
     try:
         rows, _ = server.database._query_database(query, params=tuple(ids))
