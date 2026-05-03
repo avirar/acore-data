@@ -8,11 +8,46 @@ Pre-warms per-request cache with batch SQL lookups before row iteration.
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
-from ..enums import _SOURCE_TYPE_NAMES, _CONDITION_TYPE_NAMES
+from ..enums import (
+    _SOURCE_TYPE_NAMES, _CONDITION_TYPE_NAMES, _TYPEID_NAMES, _TYPEMASK_NAMES,
+    _CLASS_NAMES, _RACE_NAMES, _GENDER_NAMES,
+)
 from .ref_utils import resolve_dbc_ref, resolve_sql_ref
 
-# Comparison type enum lookup
+# Comparison type enum lookup (from ConditionMgr.h)
 _COMP_TYPES = {0: ">=", 1: "<=", 2: "==", 3: "!="}
+
+# ErrorType enum for spell cast failure feedback (ConditionMgr.h / SpellMgr.cpp)
+_ERROR_TYPE_NAMES = {
+    0: "SPELL_CAST_OK",
+    1: "SPELL_FAILED_UNKNOWN",
+    2: "SPELL_FAILED_NO_CHARGES",
+    3: "SPELL_FAILED_NOT_MOUNTED",
+    4: "SPELL_FAILED_NOT_IN_Arena",
+    5: "SPELL_FAILED_EQUIPPED_ITEM",
+    6: "SPELL_FAILED_EQUIPPED_ITEM_CLASS",
+    7: "SPELL_FAILED_DOESNTOWN_REAGENT",
+    8: "SPELL_FAILED_NOT_DEAD",
+    9: "SPELL_FAILED_NOT_SLEEPING",
+    10: "SPELL_FAILED_POSSESSSED",
+    11: "SPELL_FAILED_NOT_ALIVE",
+    12: "SPELL_FAILED_HOSTILE",
+    13: "SPELL_FAILED_FRIENDLY",
+    14: "SPELL_FAILED_NO_POWER",
+    15: "SPELL_FAILED_TARGETAURAFILTER",
+    16: "SPELL_FAILED_IMMUNE",
+    17: "SPELL_FAILED_RESISTED",
+    18: "SPELL_FAILED_LEVEL",
+    19: "SPELL_FAILED_MIN_REPUTATION",
+    20: "SPELL_FAILED_NO_TARGETS",
+    21: "SPELL_FAILED_DISPEL_TYPE",
+    22: "SPELL_FAILED_TOO_FAR_BEHIND",
+    23: "SPELL_FAILED_FACING_TARGET",
+    24: "SPELL_FAILED_DISTANCE",
+    25: "SPELL_FAILED_NOT_STANDING",
+    26: "SPELL_FAILED_MOD_CAST_OUT_OF_COMBAT",
+    27: "SPELL_FAILED_HEALTH",
+}
 
 
 def _get_row_pk(row: Dict) -> str:
@@ -66,10 +101,12 @@ def _collect_condition_ids(rows):
             ids[("gameobject_template", "entry")].add(value1)
         if condition_type == 31 and value2:
             type_id = int(value1)
-            if type_id == 1:
+            if type_id in (3, 4):  # UNIT or PLAYER
                 ids[("creature_template", "entry")].add(value2)
-            elif type_id == 0:
+            elif type_id == 1:  # ITEM
                 ids[("item_template", "entry")].add(value2)
+            elif type_id in (5, 6):  # GAMEOBJECT or DYNAMICOBJECT
+                ids[("gameobject_template", "entry")].add(value2)
 
     return dict(ids)
 
@@ -148,6 +185,30 @@ def resolve_condition_fields(
             resolved_values = _resolve_condition_values(server, condition_type, cond_value1, cond_value2, cond_value3)
             if resolved_values:
                 entry_resolved["condition_values"] = resolved_values
+
+        # Also resolve types that don't need SQL but still have meaningful output (ALIVE, CLASS, RACE, GENDER)
+        elif not cond_value1 and condition_type in (36, 15, 16, 20):
+            resolved_values = _resolve_condition_values(server, condition_type, cond_value1, cond_value2, cond_value3)
+            if resolved_values:
+                entry_resolved["condition_values"] = resolved_values
+
+        # --- NegativeCondition annotation (inverts the condition logic) ---
+        neg_cond = row.get("NegativeCondition", 0) or 0
+        if neg_cond:
+            entry_resolved["negative_condition"] = True
+            existing_type = entry_resolved.get("condition_type_name", "")
+            entry_resolved["condition_type_name"] = f"NOT_{existing_type}"
+
+        # --- ErrorType/ErrorTextId annotation (spell cast failure feedback) ---
+        error_type = row.get("ErrorType", 0) or 0
+        if error_type:
+            entry_resolved["error_type"] = {
+                "raw": error_type,
+                "name": _ERROR_TYPE_NAMES.get(error_type, f"SPELL_FAILED({error_type})"),
+            }
+        error_text_id = row.get("ErrorTextId", 0) or 0
+        if error_text_id:
+            entry_resolved["error_text_lang_id"] = error_text_id
 
         # --- Effect bitmask annotation for SPELL_IMPLICIT_TARGET ---
         if source_type == 13 and source_group:
@@ -277,23 +338,50 @@ def _resolve_condition_values(
     # --- OBJECT_ENTRY_GUID (complex TypeID-based resolution) ---
     elif condition_type == 31:  # OBJECT_ENTRY_GUID
         type_id = int(value1)
-        type_names = {0: "ITEM", 1: "CREATURE", 2: "GAMEOBJECT", 3: "DYNAMIC_OBJECT",
-                      5: "GAMEOBJECT", 6: "PLAYER", 7: "VEHICLE"}
-        result["type_id"] = {"raw": type_id, "name": type_names.get(type_id, f"TYPE({type_id})")}
-        if value2 and type_id in (1,):
+        result["type_id"] = {"raw": type_id, "name": _TYPEID_NAMES.get(type_id, f"TYPE({type_id})")}
+        if value2 and type_id in (3, 4):  # UNIT or PLAYER
             name = resolve_sql_ref(server, "creature_template", value2, "entry")
             result["target_entity"] = {"type": "creature", "id": value2, "name": name}
-        elif value2 and type_id in (0,):
+        elif value2 and type_id == 1:  # ITEM
             name = resolve_sql_ref(server, "item_template", value2, "entry")
             result["target_entity"] = {"type": "item", "id": value2, "name": name}
+        elif value2 and type_id in (5, 6):  # GAMEOBJECT or DYNAMICOBJECT
+            name = resolve_sql_ref(server, "gameobject_template", value2, "entry")
+            result["target_entity"] = {"type": "gameobject", "id": value2, "name": name}
         elif value2:
             result["target_entity"] = {"id": value2, "type_id": type_id}
+
+    # Type mask check (object's TypeMask must match)
+    elif condition_type == 32:  # TYPE_MASK
+        result["type_mask"] = {
+            "raw": int(value1),
+            "name": _TYPEMASK_NAMES.get(int(value1), f"MASK(0x{value1:X})"),
+            "bitmask": f"0x{value1:04X}",
+        }
 
     # --- Level comparison ---
     elif condition_type == 27:  # LEVEL
         result["level"] = int(value1)
         if value2:
             result["comparison"] = _COMP_TYPES.get(int(value2), f"RAW({value2})")
+
+    # --- Enum-only conditions (no SQL ref needed) ---
+    elif condition_type == 15:  # CLASS
+        result["class_id"] = {"raw": int(value1), "name": _CLASS_NAMES.get(int(value1), f"CLASS({value1})")}
+    elif condition_type == 16:  # RACE
+        result["race_id"] = {"raw": int(value1), "name": _RACE_NAMES.get(int(value1), f"RACE({value1})")}
+    elif condition_type == 20:  # GENDER
+        result["gender"] = {"raw": int(value1), "name": _GENDER_NAMES.get(int(value1), f"GENDER({value1})")}
+    elif condition_type == 24:  # CREATURE_TYPE
+        result["creature_type_id"] = int(value1)
+    elif condition_type in (22, 23):  # MAPID / AREAID
+        dbc_name = "Map" if condition_type == 22 else "AreaTable"
+        name = resolve_dbc_ref(server, dbc_name, value1)
+        field = "map_id" if condition_type == 22 else "area_id"
+        result[field] = {"raw": int(value1), "name": name}
+    elif condition_type in (26, 19):  # PHASEMASK / SPAWNMASK
+        mask_name = "phase_mask" if condition_type == 26 else "spawn_mask"
+        result[mask_name] = {"raw": int(value1), "bitmask": f"0x{value1:08X}"}
 
     # --- HP comparisons ---
     elif condition_type == 37:  # HP_VAL
@@ -312,5 +400,9 @@ def _resolve_condition_values(
             result["target_slot"] = int(value1)
         if value3:
             result["comparison"] = _COMP_TYPES.get(int(value3), f"RAW({value3})")
+
+    # --- ALIVE status check (NegativeCondition=1 means must be dead) ---
+    elif condition_type == 36:
+        result["status"] = "alive" if not value1 else "dead"
 
     return result if result else None
