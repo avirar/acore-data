@@ -628,13 +628,14 @@ def get_schema() -> Dict[str, Any]:
                     ],
                     "description": (
                         "Resolve cross-reference fields to their targets. "
-                        "Use true to resolve all, or ['dbc', 'sql', 'loot'] to pick types. "
+                        "Use true to resolve all, or ['dbc', 'sql', 'loot', 'enum'] to pick types. "
                         "Works for ALL tables with cross-reference metadata in the registry: "
                         "gameobject_template (type-aware data[0-19]), "
                         "creature_template (faction, lootid, spell1-8, mapId...), "
-                        "SpellEntry (Category, DurationIndex, RangeIndex, EffectTriggerSpell...), "
+                        "SpellEntry (Category, DurationIndex, RangeIndex, Effect[0..2] with enum names...), "
                         "Quest (RewardSpell, RequiredSkill, ZoneOrSort...), "
-                        "and 200+ other entries. DBC and SQL lookups resolve to names/labels."
+                        "and 200+ other entries. DBC and SQL lookups resolve to names/labels. "
+                        "Enum resolves spell effects (Effect=24 -> 'CREATE_ITEM') when 'enum' is included."
                     )
                 },
                 "resolve_max": {
