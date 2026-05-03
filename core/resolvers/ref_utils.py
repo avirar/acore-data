@@ -101,6 +101,49 @@ def resolve_sql_ref(
     return result
 
 
+def batch_resolve_sql(
+    server,
+    table: str,
+    ids: list,
+    id_col: str = "ID",
+) -> Dict[int, str]:
+    """Resolve multiple SQL references in a single query.
+
+    Returns dict mapping {id: "table [name]"} for each found ID,
+    and {id: "table [id] (not found)"} for IDs not found.
+    """
+    if not ids:
+        return {}
+
+    placeholder = "%s"
+    placeholders = ", ".join([placeholder] * len(ids))
+
+    query = f"SELECT {id_col}, name, LogTitle, entry FROM {table} WHERE {id_col} IN ({placeholders})"
+
+    try:
+        rows, _ = server.database._query_database(query, params=tuple(ids))
+    except Exception:
+        return {}
+
+    found = {}
+    for row in (rows or []):
+        row_id = row.get(id_col)
+        if row_id is None:
+            continue
+        name_val = None
+        for col in ["name", "LogTitle", "entry"]:
+            if col in row and row[col]:
+                name_val = row[col]
+                break
+        found[row_id] = f"{table} [{name_val}]" if name_val else f"{table} [{row_id}]"
+
+    for rid in ids:
+        if rid not in found:
+            found[rid] = f"{table} [{rid}] (not found)"
+
+    return found
+
+
 def resolve_loot_ref(
     server,
     table: str,
