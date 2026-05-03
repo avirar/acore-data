@@ -2,9 +2,34 @@
 Shared reference resolution utilities for resolver modules.
 
 Provides functions to resolve DBC references, SQL references, and loot templates
-by ID. Used by all table-specific resolver modules.
+by ID. Used by all table-specific resolver modules. Includes optional per-request
+memoization to avoid duplicate lookups within a single resolve operation.
 """
 from typing import Any, Dict, Optional
+
+# Module-level cache for per-request memoization. Set via set_ref_cache() before
+# a batch of resolve calls, then cleared via clear_ref_cache() afterward.
+_active_cache: Optional[Dict[str, str]] = None
+
+
+def set_ref_cache(cache: Dict[str, str]) -> None:
+    """Set the active cache dict for per-request memoization."""
+    global _active_cache
+    _active_cache = cache
+
+
+def clear_ref_cache() -> None:
+    """Clear the active cache reference after a resolve operation completes."""
+    global _active_cache
+    _active_cache = None
+
+
+def _cache_key_sql(table: str, ref_id: int, id_col: str) -> str:
+    return f"sql:{table}:{ref_id}:{id_col}"
+
+
+def _cache_key_dbc(dbc_name: str, ref_id: int, id_col: str) -> str:
+    return f"dbc:{dbc_name}:{ref_id}:{id_col}"
 
 
 def resolve_dbc_ref(
@@ -14,22 +39,30 @@ def resolve_dbc_ref(
     id_col: str = "ID",
 ) -> Optional[str]:
     """Resolve a DBC reference by ID to its name/title."""
+    key = _cache_key_dbc(dbc_name, ref_id, id_col)
+    if _active_cache is not None and key in _active_cache:
+        return _active_cache[key]
+
     try:
         reader = server._load_dbc(dbc_name)
 
         record = reader.get_record_by_id(ref_id)
         if not record:
-            return f"{dbc_name} [{ref_id}] (not found)"
-
-        # Try to find a name/title string field
-        for idx, value in record.items():
-            if isinstance(value, str) and value:
-                return f"{dbc_name} [{value}]"
-
-        # No string name found - return ID-based reference
-        return f"{dbc_name} [{ref_id}]"
+            result = f"{dbc_name} [{ref_id}] (not found)"
+        else:
+            for idx, value in record.items():
+                if isinstance(value, str) and value:
+                    result = f"{dbc_name} [{value}]"
+                    break
+            else:
+                result = f"{dbc_name} [{ref_id}]"
     except Exception:
         return None
+
+    if _active_cache is not None:
+        _active_cache[key] = result
+
+    return result
 
 
 def resolve_sql_ref(
@@ -39,6 +72,10 @@ def resolve_sql_ref(
     id_col: str = "ID",
 ) -> Optional[str]:
     """Resolve an SQL reference by ID to its key identifying field."""
+    key = _cache_key_sql(table, ref_id, id_col)
+    if _active_cache is not None and key in _active_cache:
+        return _active_cache[key]
+
     try:
         rows, _ = server.database._query_database(
             f"SELECT * FROM {table} WHERE {id_col} = %s LIMIT 1",
@@ -47,15 +84,21 @@ def resolve_sql_ref(
 
         if rows:
             row = rows[0]
-            # Find a meaningful identifier from the result
             for col in ["name", "LogTitle", "entry", "ID"]:
                 if col in row and row[col]:
-                    return f"{table} [{row[col]}]"
-            return f"{table} [{ref_id}]"
-
-        return f"{table} [{ref_id}] (not found)"
+                    result = f"{table} [{row[col]}]"
+                    break
+            else:
+                result = f"{table} [{ref_id}]"
+        else:
+            result = f"{table} [{ref_id}] (not found)"
     except Exception:
         return None
+
+    if _active_cache is not None:
+        _active_cache[key] = result
+
+    return result
 
 
 def resolve_loot_ref(
