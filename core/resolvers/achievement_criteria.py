@@ -64,9 +64,10 @@ def resolve_achievement_criteria(
         return {}
 
     # Pre-warm cache with batch SQL lookups to avoid N+1 pattern
-    collected = _collect_ac_ids(rows)
-    if collected:
-        _prewarm_ac_cache(server, collected)
+    if "sql" in allowed:
+        collected = _collect_ac_ids(rows)
+        if collected:
+            _prewarm_ac_cache(server, collected)
 
     resolved = {}
     for row in rows:

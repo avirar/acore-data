@@ -3,19 +3,20 @@
 ## Phases
 
 - [x] Phase 0-7 (completed previously)
-- [ ] Phase 8A: Persistent TTL cache in ref_utils.py
-- [ ] Phase 8B: Batch resolve_loot_ref item lookups
-- [ ] Phase 8C: Pre-warm smart_scripts cache
-- [ ] Phase 8D: Pre-warm _resolve_generic + remaining resolvers
+- [x] Phase 8A: Persistent TTL cache in ref_utils.py — `2700b1c`
+- [x] Phase 8B: Batch resolve_loot_ref item lookups — `06289ca`
+- [x] Phase 8C: Pre-warm smart_scripts cache — `1d6552c`
+- [x] Phase 8D: Pre-warm _resolve_generic + remaining resolvers — `b51d459`
+- [x] Cleanup: guard `if "sql" in allowed`, remove dead batch_cache.py, update this file (uncommitted)
 
 ## Test Results
 
 | Phase | Status | Tests | Commit |
 |---|---|---|---|
-| 8A TTL Cache | pending | - | - |
-| 8B Batch Loot | pending | - | - |
-| 8C Smart Scripts | pending | - | - |
-| 8D Remaining | pending | - | - |
+| 8A TTL Cache | done | +5 unit tests | 2700b1c |
+| 8B Batch Loot | done | 90 pass | 06289ca |
+| 8C Smart Scripts | done | 90 pass | 1d6552c |
+| 8D Remaining | done | 90 pass | b51d459 |
 
 ## Performance Target
 

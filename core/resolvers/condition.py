@@ -105,9 +105,10 @@ def resolve_condition_fields(
         return {}
 
     # Pre-warm cache with batch SQL lookups to avoid N+1 pattern
-    collected = _collect_condition_ids(rows)
-    if collected:
-        _prewarm_condition_cache(server, collected)
+    if "sql" in allowed:
+        collected = _collect_condition_ids(rows)
+        if collected:
+            _prewarm_condition_cache(server, collected)
 
     resolved = {}
     for row in rows:
