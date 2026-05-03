@@ -259,7 +259,10 @@ class Database:
                 conn = self._get_connection(db)
                 cur = conn.cursor()
                 try:
-                    cur.execute(sql, params or ())
+                    if params:
+                        cur.execute(sql, params)
+                    else:
+                        cur.execute(sql)
                     rows = cur.fetchall()
                 finally:
                     cur.close()

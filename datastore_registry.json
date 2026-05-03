@@ -14016,7 +14016,7 @@
           "notes": " (Item required to start quest (quest item))",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "LogTitle": {
           "name": "Title",
@@ -14153,7 +14153,7 @@
           "notes": " (Items required to complete quest turn-in)",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "RequiredItemCount1..6": {
           "name": "RequiredItemCount",
@@ -14168,7 +14168,7 @@
           "notes": " (Items rewarded automatically (non-choosable))",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "ItemDropQuantity1..4": {
           "name": "ItemDropQuantity",
@@ -14207,7 +14207,7 @@
           "notes": " (Items player can choose as quest reward)",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "RewardChoiceItemCount1..6": {
           "name": "RewardChoiceItemCount",
@@ -14222,7 +14222,7 @@
           "notes": " (Items rewarded automatically (guaranteed, non-choosable))",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "RewardItemIdCount1..4": {
           "name": "RewardItemIdCount",
@@ -17925,7 +17925,7 @@
           "notes": "",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "entryorguid"
+          "reference_column": "entry"
         },
         "reference": {
           "name": "reference",
@@ -18720,7 +18720,7 @@
           "sql_column": "ItemID",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "entryorguid"
+          "reference_column": "entry"
         },
         "sender": {
           "name": "sender",
@@ -22628,7 +22628,7 @@
           "sql_column": "alliance_id",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "1": {
           "name": "alliance_comment",
@@ -22641,7 +22641,7 @@
           "sql_column": "horde_id",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "3": {
           "name": "horde_comment",
@@ -26090,7 +26090,7 @@
           "sql_column": "item_guid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "2": {
           "name": "entry",
@@ -27853,7 +27853,7 @@
           "sql_column": "item_guid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         }
       },
       "loader_function": "",
@@ -28256,7 +28256,7 @@
           "sql_column": "itemid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "entryorguid"
+          "reference_column": "entry"
         },
         "2": {
           "name": "count",
@@ -28331,7 +28331,7 @@
           "sql_column": "item_guid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "1": {
           "name": "player_guid",
@@ -28366,7 +28366,7 @@
           "sql_column": "itemGuid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "1": {
           "name": "allowedPlayers",
@@ -28794,7 +28794,7 @@
           "sql_column": "item_guid",
           "references": "ItemTemplate",
           "reference_type": "object_manager",
-          "reference_column": "ID"
+          "reference_column": "entry"
         },
         "2": {
           "name": "receiver",

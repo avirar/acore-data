@@ -142,7 +142,25 @@ def resolve_sql_ref(
             else:
                 result = f"{table} [{ref_id}]"
         else:
-            result = f"{table} [{ref_id}] (not found)"
+            # Fallback: try common alternate PK columns if original failed
+            for alt_col in ["entry", "ID", "id"]:
+                if alt_col == id_col:
+                    continue
+                rows, _ = server.database._query_database(
+                    f"SELECT * FROM {table} WHERE {alt_col} = %s LIMIT 1",
+                    params=(ref_id,),
+                )
+                if rows:
+                    row = rows[0]
+                    for col in ["name", "LogTitle", "entry"]:
+                        if col in row and row[col]:
+                            result = f"{table} [{row[col]}]"
+                            break
+                    else:
+                        result = f"{table} [{ref_id}]"
+                    break
+            else:
+                result = f"{table} [{ref_id}] (not found)"
     except Exception:
         return None
 

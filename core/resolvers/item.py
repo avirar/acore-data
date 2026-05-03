@@ -177,6 +177,11 @@ def resolve_item_fields(
 
         # Merge base + enrichment
         entry_resolved = base_resolved.get(entry, {})
+        
+        # Suppress generic class resolution - item resolver provides correct item_type
+        if "class" in entry_resolved:
+            del entry_resolved["class"]
+        
         merged = {**entry_resolved, **enriched}
         if merged:
             resolved[entry] = merged

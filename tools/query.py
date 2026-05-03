@@ -18,6 +18,7 @@ from core.annotation import (
     _convert_filter_for_dbc as _convert_filter_for_dbc_impl,
     _dbc_filter_to_sql_where,
     _escape_like_pattern,
+    compact_sql_rows,
 )
 from core.type_resolver import resolve_type_fields
 
@@ -316,6 +317,7 @@ def _query_sql(
     id_value = args.get("id")
     filter_data = args.get("filter")
     limit = args.get("limit", 100)
+    compact = args.get("compact", True)
     resolve_filter = args.get("resolve", False)
     resolve_max = args.get("resolve_max", 10)
 
@@ -405,13 +407,6 @@ def _query_sql(
     if reg_entry.get("referenced_by"):
         metadata["referenced_by"] = reg_entry["referenced_by"]
 
-    if rows:
-        metadata["columns"] = list(rows[0].keys())
-    elif server.database.db_available:
-        schema = server.database._get_table_schema(sql_table)
-        if schema:
-            metadata["columns"] = [c["COLUMN_NAME"] for c in schema]
-
     mgr = reg_entry.get("manager_singleton", "")
     if mgr:
         metadata["manager_singleton"] = mgr
@@ -419,6 +414,19 @@ def _query_sql(
     if resolved:
         metadata["$resolved_fields"] = resolved
         metadata["type_resolved"] = True
+
+    # Apply compact filtering to SQL results (before setting columns)
+    if compact and rows:
+        pk_col = metadata.get("primary_key", "")
+        rows = compact_sql_rows(rows, {pk_col} if pk_col else None)
+
+    # Set columns after compaction to reflect actual returned fields
+    if rows:
+        metadata["columns"] = list(rows[0].keys())
+    elif server.database.db_available:
+        schema = server.database._get_table_schema(sql_table)
+        if schema:
+            metadata["columns"] = [c["COLUMN_NAME"] for c in schema]
 
     return {"result": rows or [], "count": len(rows or []), "metadata": metadata}
 
