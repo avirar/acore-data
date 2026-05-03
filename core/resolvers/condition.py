@@ -3,7 +3,9 @@
 Translates SourceTypeOrReferenceId and ConditionTypeOrReference to enum names,
 resolves SourceEntry based on source type (spell/quest/item/creature),
 resolves ConditionValue1 based on condition type (aura spell, quest, item, etc.).
+Pre-warms per-request cache with batch SQL lookups before row iteration.
 """
+from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 from ..enums import _SOURCE_TYPE_NAMES, _CONDITION_TYPE_NAMES
@@ -19,6 +21,69 @@ def _get_row_pk(row: Dict) -> str:
         if pk in row:
             return row[pk]
     return str(id(row))
+
+
+def _collect_condition_ids(rows):
+    """Collect all SQL IDs across rows grouped by (table, id_col)."""
+    ids = defaultdict(set)
+    for row in rows:
+        source_type = row.get("SourceTypeOrReferenceId", 0) or 0
+        condition_type = row.get("ConditionTypeOrReference", 0) or 0
+        source_entry = row.get("SourceEntry", 0) or 0
+        source_group = row.get("SourceGroup", 0) or 0
+        value1 = row.get("ConditionValue1", 0) or 0
+        value2 = row.get("ConditionValue2", 0) or 0
+
+        # Source entry SQL refs (DBC fallbacks also collect quest_template)
+        if source_type in (13, 17, 24) and source_entry:
+            ids[("quest_template", "ID")].add(source_entry)
+        if source_type in (18, 21):
+            if source_entry:
+                ids[("quest_template", "ID")].add(source_entry)
+            if source_group:
+                ids[("creature_template", "entry")].add(source_group)
+        if source_type == 19 and source_entry:
+            ids[("quest_template", "ID")].add(source_entry)
+        if source_type in (14, 15) and source_entry:
+            ids[("gossip_menu_option", "menu_id")].add(source_entry)
+        if source_type == 20 and source_entry:
+            ids[("creature_template", "entry")].add(source_entry)
+        if source_type in (16, 29) and source_entry:
+            ids[("creature_template", "entry")].add(source_entry)
+
+        # Condition value SQL refs
+        if condition_type in (1, 25) and value1:
+            ids[("quest_template", "ID")].add(value1)
+        if condition_type in (8, 9, 14, 28, 43) and value1:
+            ids[("quest_template", "ID")].add(value1)
+        if condition_type in (47, 48, 101) and value1:
+            ids[("quest_template", "ID")].add(value1)
+        if condition_type in (2, 3) and value1:
+            ids[("item_template", "entry")].add(value1)
+        if condition_type == 29 and value1:
+            ids[("creature_template", "entry")].add(value1)
+        if condition_type == 30 and value1:
+            ids[("gameobject_template", "entry")].add(value1)
+        if condition_type == 31 and value2:
+            type_id = int(value1)
+            if type_id == 1:
+                ids[("creature_template", "entry")].add(value2)
+            elif type_id == 0:
+                ids[("item_template", "entry")].add(value2)
+
+    return dict(ids)
+
+
+def _prewarm_condition_cache(server, collected_ids):
+    """Batch-resolve collected condition IDs into per-request cache."""
+    from .ref_utils import batch_resolve_sql as brs, _active_cache
+    for (table, id_col), id_set in collected_ids.items():
+        if not id_set:
+            continue
+        batch = brs(server, table, list(id_set), id_col)
+        if _active_cache is not None:
+            for rid, name in batch.items():
+                _active_cache[f"sql:{table}:{rid}:{id_col}"] = name
 
 
 def resolve_condition_fields(
@@ -38,6 +103,11 @@ def resolve_condition_fields(
         allowed = {"dbc", "sql", "loot"}
     else:
         return {}
+
+    # Pre-warm cache with batch SQL lookups to avoid N+1 pattern
+    collected = _collect_condition_ids(rows)
+    if collected:
+        _prewarm_condition_cache(server, collected)
 
     resolved = {}
     for row in rows:
