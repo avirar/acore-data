@@ -2,7 +2,8 @@
 Database module for acore-data.
 
 Handles multi-database connections, table discovery, smart routing,
-and SQL query execution.
+and SQL query execution. Uses pymysql for connection management.
+Falls back to subprocess mysql CLI if pymysql is unavailable.
 """
 
 import sys
@@ -12,6 +13,15 @@ import re
 import difflib
 from typing import Dict, Any, List, Optional, Tuple, Union, Set
 from pathlib import Path
+
+try:
+    import pymysql
+    from decimal import Decimal as _DecimalType
+    _USE_PYMYSQL = True
+except ImportError:
+    pymysql = None  # type: ignore[assignment]
+    _USE_PYMYSQL = False
+    print("Warning: pymysql not installed. Falling back to subprocess mysql CLI.", file=sys.stderr)
 
 
 class Database:
@@ -39,6 +49,9 @@ class Database:
         self._table_to_db_cache: Dict[str, List[str]] = {}
         self._schema_cache: Dict[str, Optional[List[Dict]]] = {}
         self._pk_cache: Dict[str, str] = {}
+
+        # Connection cache (pymysql)
+        self._connections: Dict[str, Any] = {}
 
         # Database priority order for routing
         self._db_priority_order = [
@@ -74,6 +87,39 @@ class Database:
         self.db_host = self.db_host or "localhost"
         self.db_user = self.db_user or "root"
         self.db_password = self.db_password or ""
+
+    def _get_connection(self, db_name: str):
+        """Get (or create) a pymysql connection for the given database."""
+        if db_name not in self._connections:
+            try:
+                conn = pymysql.connect(
+                    host=self.db_host,
+                    port=int(self.db_port),
+                    user=self.db_user,
+                    password=self.db_password,
+                    database=db_name,
+                    cursorclass=pymysql.cursors.DictCursor,
+                    connect_timeout=10,
+                    charset="utf8mb4",
+                )
+                self._connections[db_name] = conn
+            except pymysql.err.OperationalError:
+                # Connection failed — might be wrong credentials or down
+                raise
+        return self._connections[db_name]
+
+    def _is_connection_alive(self, db_name: str) -> bool:
+        """Check if a cached connection is still alive."""
+        try:
+            conn = self._connections.get(db_name)
+            if conn is None:
+                return False
+            conn.ping(reconnect=False)
+            return True
+        except Exception:
+            # Dead — remove so _get_connection retries
+            self._connections.pop(db_name, None)
+            return False
 
     def _check_db_connection(self) -> None:
         """Check if database connection is available."""
@@ -170,16 +216,51 @@ class Database:
 
         return None
 
+    def _normalize_value(self, val) -> Any:
+        """Normalize pymysql value types to match previous subprocess behavior."""
+        if isinstance(val, _DecimalType):
+            # Convert Decimal to int (if whole) or float
+            if val == val.to_integral_value():
+                return int(val)
+            return float(val)
+        return val
+
     def _query_database(
         self, sql: str, db_name: Optional[str] = None
     ) -> Tuple[Optional[List[Dict]], Optional[str]]:
         """
         Execute SQL query and return results with headers.
-        
-        OPTIMIZATION: Run query once WITH headers instead of twice.
-        Split first row as column names.
+
+        Uses pymysql connections (persistent per database) when available,
+        falls back to subprocess mysql CLI as a last resort.
         """
         db = db_name or self.db_name
+
+        if _USE_PYMYSQL:
+            try:
+                if not self._is_connection_alive(db):
+                    self._connections.pop(db, None)
+
+                conn = self._get_connection(db)
+                cur = conn.cursor()
+                cur.execute(sql)
+                rows = cur.fetchall()
+                cur.close()
+
+                # Normalize value types (Decimal -> int/float)
+                result = []
+                for row in rows:
+                    result.append({k: self._normalize_value(v) for k, v in row.items()})
+                return result, None
+
+            except pymysql.err.OperationalError as e:
+                # Connection lost or auth error — clear cache for retry
+                self._connections.pop(db, None)
+                return None, str(e)
+            except Exception as e:
+                return None, str(e)
+
+        # Fallback: subprocess mysql CLI (when pymysql is not available)
         try:
             cmd = [
                 "mysql",
@@ -242,16 +323,16 @@ class Database:
     def _extract_tables_from_sql(self, sql: str) -> List[str]:
         """Extract table names from SQL query."""
         tables = []
-        
+
         # FROM clause
         from_match = re.search(r"\bFROM\s+(\w+)", sql, re.IGNORECASE)
         if from_match:
             tables.append(from_match.group(1).lower())
-        
+
         # JOIN clauses
         join_matches = re.findall(r"\bJOIN\s+(\w+)", sql, re.IGNORECASE)
         tables.extend(t.lower() for t in join_matches)
-        
+
         return tables
 
     def _suggest_similar_tables(self, table_name: str) -> List[str]:
