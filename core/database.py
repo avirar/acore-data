@@ -110,6 +110,7 @@ class Database:
                     cursorclass=pymysql.cursors.DictCursor,
                     connect_timeout=10,
                     charset="utf8mb4",
+                    autocommit=True,
                 )
                 self._connections[db_name] = conn
             except pymysql.err.OperationalError:
@@ -257,21 +258,19 @@ class Database:
 
                 conn = self._get_connection(db)
                 cur = conn.cursor()
-                cur.execute(sql, params or ())
-                rows = cur.fetchall()
-                cur.close()
+                try:
+                    cur.execute(sql, params or ())
+                    rows = cur.fetchall()
+                finally:
+                    cur.close()
 
-                # Normalize value types (Decimal -> int/float)
                 result = []
                 for row in rows:
                     result.append({k: self._normalize_value(v) for k, v in row.items()})
                 return result, None
 
-            except pymysql.err.OperationalError as e:
-                # Connection lost or auth error — clear cache for retry
-                self._connections.pop(db, None)
-                return None, str(e)
             except Exception as e:
+                self._connections.pop(db, None)
                 return None, str(e)
 
         # Fallback: subprocess mysql CLI (when pymysql is not available)

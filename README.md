@@ -122,16 +122,41 @@ sql(query="SELECT * FROM creature_templat LIMIT 1")
 
 ## Type Resolver
 
-The `resolve` parameter on `query` enables type-aware field resolution for tables whose fields change meaning based on a type column. The primary use case is `gameobject_template`, where `data[0-19]` mean different things for each of the 36 `GAMEOBJECT_TYPE` constants (DOOR, CHEST, GOOBER, TRAP, SPELLCASTER, etc.).
-
-Resolution types:
+The `resolve` parameter on `query` enables type-aware field resolution for tables whose fields change meaning based on a type column. Resolution types:
 - **`"dbc"`** — resolve to DBC entries (e.g. `LockEntry`, `SpellEntry`, `MapEntry`)
 - **`"sql"`** — resolve to SQL tables (e.g. `quest_template`, `gossip_menu`, `page_text`)
 - **`"loot"`** — expand loot templates into item lists with names
 
+### Registry-driven resolution
+
+Any table with cross-reference metadata in `datastore_registry.json` gets automatic field resolution via `_resolve_generic()`. Fields like faction, lootId, spellId are resolved to their target entries by name.
+
+### Specialized table resolvers
+
+In addition to generic registry-driven resolution, these tables have dedicated resolver modules that enrich results with custom data:
+
+| Table | Resolver module | What it resolves |
+|-------|-----------------|------------------|
+| `gameobject_template` | `resolvers/gameobject.py` | type-aware `data[0-19]` annotation (lockId, lootId, spellId …) |
+| `smart_scripts` | `resolvers/smart_scripts.py` | EVENT_ID/ACTION_ID/TARGET_ID → enum names + value meaning |
+| `quest_template` | `resolvers/quest.py` | starter/ender NPCs, POIs, quest chain (prev/next/breadcrumb) |
+| `conditions` | `resolvers/condition.py` | polymorphic SourceType → entity name, ConditionType (~49 types: AURA, QUEST, ITEM, ALIVE, CLASS, etc.), TYPEID/GENDER/RACE enums |
+| `achievement_criteria_data` | `resolvers/achievement_criteria.py` | CriterionType-specific field interpretation |
+| `item_template` | `resolvers/item.py` | loot template for openable items (`Flags & 0x04`) |
+| `Spell` (DBC) | `resolvers/spell.py` | cast conditions from `conditions` table with full enum resolution |
+
 ```
-query(name="gameobject_template", id=12345, resolve=true)
-→ data[1] annotated as "lockId → LockEntry", data[3] as "spellId → SpellEntry", etc.
+query(name="quest_template", id=4512, resolve=true)
+→ Start/ender NPCs, chain info, POIs, plus faction/spell/item refs
+
+query(name="Spell", id=15698, resolve=true)
+→ Cast conditions: "OBJECT_ENTRY_GUID(UNIT)=creature_template [Cursed Ooze], NOT_ALIVE"
+
+query(name="item_template", id=11912, resolve=["loot"])
+→ Openable item → 6x Empty Cursed Jar, 6x Empty Tainted Jar
+
+query(name="conditions", filter={"SourceTypeOrReferenceId": 17, "SourceEntry": 15698}, resolve=true)
+→ Polymorphic: source type name, condition type enum, resolved entity names
 
 query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 → Expand loot template into up to 20 item names
@@ -142,7 +167,7 @@ query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 ### Requirements
 
 - Python 3.9+
-- No external Python dependencies
+- `pymysql` — installed via `requirements.txt` into `.venv`
 - Access to an AzerothCore MySQL instance (for SQL tools)
 - DBC binary files and `DBCfmt.h` from the AzerothCore source/build
 
@@ -163,15 +188,21 @@ When `DB_HOST` and `DB_USER` are empty, the server attempts auto-detection from 
 ### Running
 
 ```bash
-python3 server.py
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python3 server.py
 ```
 
-The server reads JSON-RPC requests from stdin and writes responses to stdout. It is designed to be launched by an MCP client (e.g. Claude Desktop, Cursor, or any MCP-compatible tool).
+**IMPORTANT:** The server MUST be launched with the `.venv` Python (`.venv/bin/python3`), NOT the system `python3`. The system Python won't have `pymysql`, causing silent fallback to the `mysql` CLI subprocess — which doesn't support parameterized queries and breaks all SQL lookups.
+
+If run via an MCP client, point the command at the venv's Python:
+```json
+"command": ["/path/to/acore-data/.venv/bin/python3", "server.py"]
+```
 
 To test manually:
 
 ```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | python3 server.py
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/python3 server.py
 ```
 
 ## Testing
@@ -193,16 +224,27 @@ python3 tests/test_helpers.py
 ```
 acore-data/
 ├── server.py                    # MCP server entry point (JSON-RPC over stdio)
-├── datastore_registry.json      # Static metadata for all 462 datastores
-├── requirements.txt             # Python >= 3.9, no external deps
+├── datastore_registry.json      # Static metadata for all ~467 datastores
+├── requirements.txt             # pymysql >= 1.1, pytest >= 7.0
 │
 ├── core/
 │   ├── annotation.py            # DBC field annotation, filter conversion, schema errors
-│   ├── database.py              # MySQL connection, table discovery, smart routing
+│   ├── database.py              # MySQL connection (pymysql), table discovery, smart routing
 │   ├── dbc.py                   # WDBC binary file reader
+│   ├── enums.py                 # Shared enum dicts: condition types, SOURCE_TYPE, TYPEID …
 │   ├── formats.py               # DBCfmt.h parser (format strings → field types)
 │   ├── registry.py              # Datastore registry: name resolution, fuzzy matching
-│   └── type_resolver.py         # Type-aware field resolution (gameobject_template etc.)
+│   ├── type_resolver.py         # Dispatcher + generic registry-driven resolution engine
+│   └── resolvers/               # Specialized table-specific resolver modules
+│       ├── __init__.py          # Resolver registry (table_name → func)
+│       ├── gameobject.py        # data[0-19] annotation for GAMEOBJECT_TYPE subtypes
+│       ├── smart_scripts.py     # EVENT_ID/ACTION_ID/TARGET_ID enum + value meaning
+│       ├── quest.py             # Starter/ender NPCs, POIs, chain info (prev/next/breadcrumb)
+│       ├── condition.py         # Polymorphic: SourceType → entity, ConditionType (~49 types), TYPEID/GENDER/RACE enums
+│       ├── achievement_criteria.py  # CriterionType-specific field interpretation
+│       ├── item.py              # Loot template for openable items (Flags & 0x04)
+│       ├── spell.py             # Cast conditions from `conditions` table with full enum resolution
+│       └── ref_utils.py         # Shared helpers: resolve_dbc_ref, resolve_sql_ref, batch_resolve_sql, resolve_loot_ref
 │
 ├── tools/
 │   ├── query.py                 # Unified query tool (DBC + SQL + overlay merge)
@@ -211,8 +253,8 @@ acore-data/
 │   └── sql.py                   # Raw SQL execution with routing and suggestions
 │
 ├── tests/
-│   ├── test_integration.py      # 24 integration tests (live DB)
-│   └── test_helpers.py          # 15 unit tests
+│   ├── test_integration.py      # Integration tests (live DB)
+│   └── test_helpers.py          # Unit tests
 │
 ├── docs/datastores/             # Technical reference for AzerothCore datastore internals
 │   ├── README.md                # Overview of DBC pipeline, SQL overlay, format strings
