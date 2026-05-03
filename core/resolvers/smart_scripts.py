@@ -2,9 +2,11 @@
 smart_scripts table resolver.
 
 Handles triple-polymorphic field resolution: event_type, action_type, target_type
-each have their own enum translation and param resolution logic.
+each have their own enum translation and param resolution logic. Uses pre-warming
+cache to batch-resolve all SQL references across all rows before the main loop.
 """
-from typing import Any, Dict, List, Optional
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ..enums import (
     _SAI_EVENT_NAMES,
@@ -14,7 +16,118 @@ from ..enums import (
     _TEXT_EMOTE_NAMES,
     _ANIM_EMOTE_NAMES,
 )
-from .ref_utils import resolve_dbc_ref, resolve_sql_ref
+from .ref_utils import resolve_dbc_ref, resolve_sql_ref, batch_resolve_sql, set_ref_cache
+
+
+def _collect_sai_ids(rows: List[Dict[str, Any]]) -> Dict[Tuple[str, str], Set[int]]:
+    """Pre-collect all SQL IDs across rows grouped by (table, id_col).
+
+    Mirrors the resolver's branching logic but only collects IDs.
+    Used for batch pre-warming before the main resolution loop.
+    """
+    ids = defaultdict(set)
+    for row in rows:
+        entryorguid = row.get("entryorguid", 0) or 0
+        source_type = row.get("source_type", 0) or 0
+        event_type = row.get("event_type", 0) or 0
+        action_type = row.get("action_type", 0) or 0
+        target_type = row.get("target_type", 0) or 0
+
+        # Source entry resolution
+        pos = abs(entryorguid)
+        if source_type == 0 and entryorguid > 0:
+            ids[("creature_template", "entry")].add(pos)
+        elif source_type == 1 and entryorguid > 0:
+            ids[("gameobject_template", "entry")].add(pos)
+        elif source_type == 2:
+            ids[("areatrigger_scripts", "entry")].add(pos)
+
+        ep1 = row.get("event_param1", 0) or 0
+        ep2 = row.get("event_param2", 0) or 0
+        ep3 = row.get("event_param3", 0) or 0
+
+        # Event param SQL refs
+        if event_type in (19, 20) and ep1:
+            ids[("quest_template", "ID")].add(ep1)
+        if event_type == 5 and ep1:
+            ids[("creature_template", "entry")].add(ep1)
+        if event_type in (17, 35, 82) and ep1:
+            ids[("creature_template", "entry")].add(ep1)
+        if event_type == 62 and ep1:
+            ids[("gossip_menu", "entry")].add(ep1)
+        if event_type in (68, 69) and ep1:
+            ids[("game_event", "eventEntry")].add(ep1)
+        if event_type == 75 and ep2:
+            ids[("creature_template", "entry")].add(ep2)
+        if event_type == 76 and ep2:
+            ids[("gameobject_template", "entry")].add(ep2)
+
+        ap1 = row.get("action_param1", 0) or 0
+        ap2 = row.get("action_param2", 0) or 0
+        ap3 = row.get("action_param3", 0) or 0
+        ap4 = row.get("action_param4", 0) or 0
+
+        # Action param SQL refs
+        if action_type == 12 and ap1:
+            ids[("creature_template", "entry")].add(ap1)
+        if action_type in (6, 7, 15, 26) and ap1:
+            ids[("quest_template", "ID")].add(ap1)
+        if action_type == 33 and ap1:
+            ids[("creature_template", "entry")].add(ap1)
+        if action_type in (3, 43) and ap1:
+            ids[("creature_template", "entry")].add(ap1)
+        if action_type == 36 and ap1:
+            ids[("creature_template", "entry")].add(ap1)
+        if action_type == 29 and ap3:
+            ids[("creature_template", "entry")].add(ap3)
+        if action_type == 50 and ap1:
+            ids[("gameobject_template", "entry")].add(ap1)
+        if action_type in (1, 84) and ap1:
+            ids[("creature_text", "GroupID")].add(ap1)
+        if action_type == 53:
+            if ap2:
+                ids[("waypoints", "entry")].add(ap2)
+            if ap4:
+                ids[("quest_template", "ID")].add(ap4)
+        if action_type in (56, 57) and ap1:
+            ids[("item_template", "entry")].add(ap1)
+        if action_type == 98:
+            if ap1:
+                ids[("gossip_menu", "entry")].add(ap1)
+            if ap2:
+                ids[("npc_text", "ID")].add(ap2)
+                ids[("creature_text", "GroupID")].add(ap2)
+        if action_type in (111, 112) and ap1:
+            ids[("game_event", "eventEntry")].add(ap1)
+        if action_type == 240 and ap1:
+            ids[("gossip_menu", "entry")].add(ap1)
+
+        tp1 = row.get("target_param1", 0) or 0
+        # Target param SQL refs
+        if target_type in (9, 11, 19) and tp1:
+            ids[("creature_template", "entry")].add(tp1)
+        if target_type == 10 and tp1:
+            tp2 = row.get("target_param2", 0) or 0
+            if tp2:
+                ids[("creature_template", "entry")].add(tp2)
+        if target_type in (13, 15, 20) and tp1:
+            ids[("gameobject_template", "entry")].add(tp1)
+
+    return dict(ids)
+
+
+def _prewarm_sai_cache(server, collected_ids: Dict[Tuple[str, str], Set[int]]) -> None:
+    """Batch-resolve all collected IDs into the per-request cache."""
+    for (table, id_col), id_set in collected_ids.items():
+        if not id_set:
+            continue
+        batch = batch_resolve_sql(server, table, list(id_set), id_col)
+        # Check if _active_cache is set and inject results
+        from .ref_utils import _active_cache
+        if _active_cache is not None:
+            for rid, name in batch.items():
+                cache_key = f"sql:{table}:{rid}:{id_col}"
+                _active_cache[cache_key] = name
 
 
 def resolve_sai_entry(server, source_type: int, entryorguid: int) -> Optional[str]:
@@ -71,6 +184,10 @@ def resolve_smart_scripts(
         allowed = {"dbc", "sql", "loot"}
     else:
         return {}
+
+    # Pre-warm per-request cache with batch SQL lookups
+    if "sql" in allowed:
+        _prewarm_sai_cache(server, _collect_sai_ids(rows))
 
     resolved = {}
     for row in rows:
