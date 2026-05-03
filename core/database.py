@@ -11,7 +11,7 @@ import json
 import subprocess
 import re
 import difflib
-from typing import Dict, Any, List, Optional, Tuple, Union, Set
+from typing import Dict, Any, List, Optional, Tuple, Union, Set, Pattern
 from pathlib import Path
 
 try:
@@ -22,6 +22,15 @@ except ImportError:
     pymysql = None  # type: ignore[assignment]
     _USE_PYMYSQL = False
     print("Warning: pymysql not installed. Falling back to subprocess mysql CLI.", file=sys.stderr)
+
+# Valid MySQL identifier pattern: letters, digits, underscores only.
+# Enforced for table/column names which cannot use %s parameterization.
+_SAFE_IDENTIFIER_RE: Pattern[str] = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
+
+
+def _is_safe_identifier(name: str) -> bool:
+    """Check that a table or column name contains only safe MySQL identifier chars."""
+    return bool(_SAFE_IDENTIFIER_RE.match(name))
 
 
 class Database:
@@ -226,13 +235,18 @@ class Database:
         return val
 
     def _query_database(
-        self, sql: str, db_name: Optional[str] = None
+        self, sql: str, db_name: Optional[str] = None, params: Optional[Tuple] = None
     ) -> Tuple[Optional[List[Dict]], Optional[str]]:
         """
         Execute SQL query and return results with headers.
 
         Uses pymysql connections (persistent per database) when available,
         falls back to subprocess mysql CLI as a last resort.
+
+        Args:
+            sql: SQL query string with %s placeholders for parameterized values
+            db_name: Target database name
+            params: Optional tuple of values for %s placeholders
         """
         db = db_name or self.db_name
 
@@ -243,7 +257,7 @@ class Database:
 
                 conn = self._get_connection(db)
                 cur = conn.cursor()
-                cur.execute(sql)
+                cur.execute(sql, params or ())
                 rows = cur.fetchall()
                 cur.close()
 
@@ -382,17 +396,19 @@ class Database:
         self._schema_cache[table_name] = None
 
         pk_rows, _ = self._query_database(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE "
-            f"WHERE TABLE_SCHEMA = '{self.db_name}' AND TABLE_NAME = '{table_name}' "
-            f"AND CONSTRAINT_NAME = 'PRIMARY'"
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE "
+            "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s "
+            "AND CONSTRAINT_NAME = 'PRIMARY'",
+            params=(self.db_name, table_name),
         )
         pk_col = pk_rows[0]["COLUMN_NAME"] if pk_rows else None
 
         rows, _ = self._query_database(
-            f"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY "
-            f"FROM INFORMATION_SCHEMA.COLUMNS "
-            f"WHERE TABLE_SCHEMA = '{self.db_name}' AND TABLE_NAME = '{table_name}' "
-            f"ORDER BY ORDINAL_POSITION"
+            "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY "
+            "FROM INFORMATION_SCHEMA.COLUMNS "
+            "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s "
+            "ORDER BY ORDINAL_POSITION",
+            params=(self.db_name, table_name),
         )
 
         if rows:
