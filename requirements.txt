@@ -1,2 +1,2 @@
-python >= 3.9
-# No external dependencies
+pymysql>=1.1
+pytest>=7.0
