@@ -6,9 +6,10 @@ based on gameobject type (Door, Button, Questgiver, Chest, etc.).
 from typing import Any, Dict, List
 
 from ..enums import GO_TYPE_NAMES
+from .ref_utils import resolve_dbc_ref, resolve_loot_ref, resolve_sql_ref
 
 
-def _resolve_gameobject_fields(
+def resolve_gameobject_fields(
     server,
     reg_entry: Dict,
     rows: List[Dict[str, Any]],
@@ -16,12 +17,6 @@ def _resolve_gameobject_fields(
     resolve_max: int = 10,
 ) -> Dict[str, Any]:
     """Resolve gameobject_template type-specific fields from registry."""
-    # Import core helpers (to avoid circular imports)
-    from ..type_resolver import (
-        _resolve_dbc_ref,
-        _resolve_loot_ref,
-        _resolve_sql_ref,
-    )
 
     type_mappings = reg_entry.get("type_field_mappings", {})
     if not type_mappings:
@@ -69,21 +64,21 @@ def _resolve_gameobject_fields(
             if ref_type == "dbc" and "dbc" in allowed_refs:
                 dbc_name = field_info.get("target", "")
                 id_col = field_info.get("id_col", "ID")
-                resolved_value = _resolve_dbc_ref(server, dbc_name, raw_value, id_col)
+                resolved_value = resolve_dbc_ref(server, dbc_name, raw_value, id_col)
                 if resolved_value:
                     entry_resolved["resolved_to"] = resolved_value
 
             elif ref_type == "sql" and "sql" in allowed_refs:
                 table = field_info.get("target", "")
                 id_col = field_info.get("id_col", "entry") or "entry"
-                resolved_value = _resolve_sql_ref(server, table, raw_value, id_col)
+                resolved_value = resolve_sql_ref(server, table, raw_value, id_col)
                 if resolved_value:
                     entry_resolved["resolved_to"] = resolved_value
 
             elif ref_type == "loot" and "loot" in allowed_refs:
                 table = field_info.get("target", "gameobject_loot_template")
                 id_col = field_info.get("id_col", "Entry")
-                loot_items = _resolve_loot_ref(server, table, raw_value, id_col, resolve_max)
+                loot_items = resolve_loot_ref(server, table, raw_value, id_col, resolve_max)
                 if loot_items is not None:
                     entry_resolved.update(loot_items)
 
@@ -92,8 +87,3 @@ def _resolve_gameobject_fields(
         resolved[entry_value] = row_resolved
 
     return resolved if resolved else {}
-
-
-# Register with resolver dispatch
-from . import register_resolver
-register_resolver("gameobject_template", _resolve_gameobject_fields)
