@@ -897,6 +897,62 @@ class TestDBCvsSQLHints(unittest.TestCase):
         self.assertTrue("result" in result or "error" in result)
 
 
+class TestSQLToolConfig(unittest.TestCase):
+    """Test ACORE_SQL_TOOL_MODE config (full/readonly/disabled)."""
+
+    @staticmethod
+    def _call_with_env(method, params, extra_env=None):
+        """Call a tool with custom environment variables."""
+        env = {**_ENV}
+        if extra_env:
+            env.update(extra_env)
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params or {},
+        }
+        p = subprocess.run(
+            [sys.executable, SERVER_SCRIPT],
+            input=json.dumps(payload),
+            capture_output=True,
+            timeout=TIMEOUT,
+            text=True,
+            cwd=_WORKDIR,
+            env=env,
+        )
+        r = json.loads(p.stdout)
+        return r
+
+    def test_sql_tool_disabled_excludes_from_list(self):
+        """ACORE_SQL_TOOL_MODE=disabled should remove sql tool from tools/list."""
+        result = self._call_with_env("tools/list", {}, {"ACORE_SQL_TOOL_MODE": "disabled"})
+        tool_names = [t["name"] for t in result["result"]["tools"]]
+        self.assertNotIn("sql", tool_names, "sql tool should be hidden when disabled")
+
+    def test_sql_tool_readonly_blocks_insert(self):
+        """ACORE_SQL_TOOL_MODE=readonly should reject INSERT statements."""
+        result = self._call_with_env(
+            "tools/call",
+            {"name": "sql", "arguments": {"query": "INSERT INTO creature_template (entry, name) VALUES (999999, 'Test')"}},
+            {"ACORE_SQL_TOOL_MODE": "readonly"},
+        )
+        parsed = json.loads(result["result"]["content"][0]["text"])
+        self.assertIn("isError", parsed, "INSERT should be blocked in readonly mode")
+        self.assertIn("Readonly", parsed.get("error", ""))
+
+    def test_sql_tool_readonly_allows_select(self):
+        """ACORE_SQL_TOOL_MODE=readonly should allow SELECT queries."""
+        result = self._call_with_env(
+            "tools/call",
+            {"name": "sql", "arguments": {"query": "SELECT 1 as test"}},
+            {"ACORE_SQL_TOOL_MODE": "readonly"},
+        )
+        parsed = json.loads(result["result"]["content"][0]["text"])
+        self.assertNotIn("error", parsed, "SELECT should work in readonly mode")
+        self.assertEqual(parsed["count"], 1)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)

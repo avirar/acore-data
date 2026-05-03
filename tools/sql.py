@@ -13,17 +13,18 @@ from typing import Dict, Any, List, Optional
 def sql_tools(server):
     """
     Execute raw SQL query with smart database routing.
-    
+
     Args:
         server: Server instance with database module
-        
+
     Returns:
         {"result": [...], "count": N} or {"error": "...", "isError": True}
-        
+
     Features:
       - Smart multi-database routing (acore_world, acore_characters, acore_auth)
       - Typo suggestions for tables and columns
       - Safety: blocks DROP, TRUNCATE, ALTER, GRANT, REVOKE
+      - Configurable via ACORE_SQL_TOOL_MODE=full|readonly|disabled
     """
     query = server.args.get("query", "").strip()
 
@@ -40,8 +41,17 @@ def sql_tools(server):
             "isError": True,
         }
 
-    # Safety: block destructive statements
     query_upper = query.upper().strip()
+
+    # Readonly mode: only allow SELECT statements
+    from tools import get_sql_mode
+    if get_sql_mode() == "readonly" and not query_upper.startswith("SELECT"):
+        return {
+            "error": f"Readonly mode: '{query_upper.split()[0]}' is not allowed. Set ACORE_SQL_TOOL_MODE=full for write access.",
+            "isError": True,
+        }
+
+    # Safety: block destructive statements
     for forbidden in ["DROP ", "TRUNCATE ", "ALTER ", "GRANT ", "REVOKE "]:
         if query_upper.startswith(forbidden):
             return {
