@@ -43,11 +43,106 @@ _SOURCE_TYPE_NAMES = {
 }
 
 _CONDITION_TYPE_NAMES = {
-    0: "NONE", 1: "AURA", 2: "ITEM", 3: "ITEM_EQUIPPED", 4: "ZONEID",
-    5: "REPUTATION_RANK", 6: "TEAM", 7: "SKILL", 8: "QUESTREWARDED",
-    9: "QUESTTAKEN", 10: "DRUNKENSTATE", 11: "WORLD_STATE",
-    12: "ACTIVE_EVENT", 13: "INSTANCE_INFO", 14: "QUEST_NONE",
+    0:  "NONE",
+    1:  "AURA",
+    2:  "ITEM",
+    3:  "ITEM_EQUIPPED",
+    4:  "ZONEID",
+    5:  "REPUTATION_RANK",
+    6:  "TEAM",
+    7:  "SKILL",
+    8:  "QUESTREWARDED",
+    9:  "QUESTTAKEN",
+    10: "DRUNKENSTATE",
+    11: "WORLD_STATE",
+    12: "ACTIVE_EVENT",
+    13: "INSTANCE_INFO",
+    14: "QUEST_NONE",
+    15: "CLASS",
+    16: "RACE",
+    17: "ACHIEVEMENT",
+    18: "TITLE",
+    19: "SPAWNMASK",
+    20: "GENDER",
+    21: "UNIT_STATE",
+    22: "MAPID",
+    23: "AREADID",
+    24: "CREATURE_TYPE",
+    25: "SPELL",
+    26: "PHASEMASK",
+    27: "LEVEL",
+    28: "QUEST_COMPLETE",
+    29: "NEAR_CREATURE",
+    30: "NEAR_GAMEOBJECT",
+    31: "OBJECT_ENTRY_GUID",
+    32: "TYPE_MASK",
+    33: "RELATION_TO",
+    34: "REACTION_TO",
+    35: "DISTANCE_TO",
+    36: "ALIVE",
+    37: "HP_VAL",
+    38: "HP_PCT",
+    39: "REALM_ACHIEVEMENT",
+    40: "IN_WATER",
+    41: "TERRAIN_SWAP",
+    42: "STAND_STATE",
+    43: "DAILY_QUEST_DONE",
+    44: "CHARMED",
+    45: "PET_TYPE",
+    46: "TAXI",
+    47: "QUESTSTATE",
+    48: "QUEST_OBJECTIVE_PROGRESS",
+    49: "DIFFICULTY_ID",
+    # AC custom conditions (100-105)
+    100: "AC_START",
+    101: "QUEST_SATISFY_EXCLUSIVE",
+    102: "HAS_AURA_TYPE",
+    103: "WORLD_SCRIPT",
+    104: "AI_DATA",
+    105: "PLAYER_QUEUED_RANDOM_DUNGEON",
 }
+
+# TYPEID enum (ObjectGuid.h) — used by CONDITION_OBJECT_ENTRY_GUID (type=31)
+_TYPEID_NAMES = {
+    0: "OBJECT",
+    1: "ITEM",
+    2: "CONTAINER",
+    3: "UNIT",
+    4: "PLAYER",
+    5: "GAMEOBJECT",
+    6: "DYNAMICOBJECT",
+    7: "CORPSE",
+}
+
+# TYPEMASK enum (ObjectGuid.h) — used by CONDITION_TYPE_MASK (type=32)
+_TYPEMASK_NAMES = {
+    0x0001: "OBJECT",
+    0x0002: "ITEM",
+    0x0006: "CONTAINER",
+    0x0008: "UNIT",
+    0x0010: "PLAYER",
+    0x0020: "GAMEOBJECT",
+    0x0040: "DYNAMICOBJECT",
+    0x0080: "CORPSE",
+    0x00F0: "SEER",  # PLAYER | UNIT | DYNAMICOBJECT
+}
+
+# Class enum (SharedDefines.h) — used by CONDITION_CLASS (type=15)
+_CLASS_NAMES = {
+    0: "NONE", 1: "WARRIOR", 2: "PALADIN", 3: "HUNTER", 4: "ROGUE",
+    5: "PRIEST", 6: "DEATH_KNIGHT", 7: "SHAMAN", 8: "MAGE",
+    9: "WARLOCK", 11: "DRUID",
+}
+
+# Race enum (SharedDefines.h) — used by CONDITION_RACE (type=16)
+_RACE_NAMES = {
+    0: "NONE", 1: "HUMAN", 2: "ORC", 3: "DWARF", 4: "NIGHTELF",
+    5: "UNDEAD", 6: "TAUREN", 7: "GNOME", 8: "TROLL",
+    10: "BLOODELF", 11: "DRAENEI",
+}
+
+# Gender enum (SharedDefines.h) — used by CONDITION_GENDER (type=20)
+_GENDER_NAMES = {0: "MALE", 1: "FEMALE", 2: "NONE"}
 
 
 # ============================================================================
