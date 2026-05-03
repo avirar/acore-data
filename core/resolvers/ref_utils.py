@@ -217,19 +217,27 @@ def resolve_loot_ref(
         total_items = len(items)
         display_items = []
 
-        for item_row in items[:resolve_max]:
+        # Collect all item IDs for batch resolution
+        item_ids = []
+        limited_items = items[:resolve_max] if resolve_max else items
+        for item_row in limited_items:
+            item_id = item_row.get("Item", 0)
+            if item_id:
+                item_ids.append(item_id)
+
+        # Batch resolve item names in a single query
+        name_map = batch_resolve_sql(server, "item_template", item_ids, "entry")
+
+        for item_row in limited_items:
             item_id = item_row.get("Item", 0)
             if not item_id:
                 continue
 
-            # Resolve item name
-            item_rows, _ = server.database._query_database(
-                "SELECT entry, name FROM item_template WHERE entry = %s LIMIT 1",
-                params=(item_id,),
-            )
+            resolved_str = name_map.get(item_id, "")
+            # Extract name from "item_template [name]" format
             item_name = ""
-            if item_rows:
-                item_name = item_rows[0].get("name", "")
+            if resolved_str and resolved_str.startswith("item_template ["):
+                item_name = resolved_str[len("item_template ["):-1] if resolved_str.endswith("]") else ""
 
             display_items.append({
                 "Item": item_id,
