@@ -3,6 +3,7 @@ Tool modules for acore-data MCP server.
 
 Four tools: query, lookup, list, sql
 """
+import os
 
 from tools import query as query_tool
 from tools import lookup as lookup_tool
@@ -10,11 +11,25 @@ from tools import list as list_tool
 from tools import sql as sql_tool
 
 
+# SQL tool mode: full (default), readonly, disabled
+_SQL_MODE = os.environ.get("ACORE_SQL_TOOL_MODE", "full").lower()
+
+
+def get_sql_mode() -> str:
+    """Get current SQL tool mode."""
+    return _SQL_MODE
+
+
 def get_tool_schemas() -> list:
     """Get all tool schemas for MCP."""
-    return [
+    schemas = [
         query_tool.get_schema(),
         lookup_tool.get_schema(),
         list_tool.get_schema(),
-        sql_tool.get_schema(),
     ]
+
+    # Only include sql tool if not disabled
+    if _SQL_MODE != "disabled":
+        schemas.append(sql_tool.get_schema())
+
+    return schemas
