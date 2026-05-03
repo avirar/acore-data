@@ -208,6 +208,25 @@ def _resolve_generic(
     else:
         return {}
 
+    # Pre-warm per-request cache with batch SQL lookups
+    if "sql" in allowed:
+        from collections import defaultdict as dd
+        sql_groups = dd(set)
+        for r in resolvable:
+            if r["resolve_category"] != "sql":
+                continue
+            for row in rows:
+                raw_value = _get_row_value(row, r["sql_col"], r["field_name"])
+                if raw_value is not None and raw_value != 0:
+                    sql_groups[(r["lookup_name"], r["ref_col"])].add(raw_value)
+        # Batch resolve and inject into cache
+        for (table, id_col), id_set in sql_groups.items():
+            from .resolvers.ref_utils import batch_resolve_sql as brs, _active_cache
+            batch = brs(server, table, list(id_set), id_col)
+            if _active_cache is not None:
+                for rid, name in batch.items():
+                    _active_cache[f"sql:{table}:{rid}:{id_col}"] = name
+
     resolved = {}
     for row in rows:
         pk = _get_row_pk(row)

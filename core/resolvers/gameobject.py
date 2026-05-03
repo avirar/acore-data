@@ -1,12 +1,14 @@
 """Resolve gameobject_template type-specific fields.
 
 Uses type_field_mappings from the registry to resolve data[0-19] columns
-based on gameobject type (Door, Button, Questgiver, Chest, etc.).
+based on gameobject type (Door, Button, Questgiver, Chest, etc.). Pre-warms
+per-request cache with batch SQL lookups before row iteration.
 """
+from collections import defaultdict
 from typing import Any, Dict, List
 
 from ..enums import GO_TYPE_NAMES
-from .ref_utils import resolve_dbc_ref, resolve_loot_ref, resolve_sql_ref
+from .ref_utils import resolve_dbc_ref, resolve_loot_ref, resolve_sql_ref, _active_cache
 
 
 def resolve_gameobject_fields(
@@ -22,6 +24,43 @@ def resolve_gameobject_fields(
     if not type_mappings:
         return {}
 
+    if isinstance(resolve_filter, list):
+        allowed_refs = set(resolve_filter)
+    elif resolve_filter is True:
+        allowed_refs = {"dbc", "sql", "loot"}
+    else:
+        return {}
+
+    # Pre-warm cache: collect all SQL IDs across rows from type_field_mappings
+    if "sql" in allowed_refs:
+        sql_groups = defaultdict(set)
+        for row in rows:
+            go_type = row.get("type", 0)
+            field_map = type_mappings.get(str(go_type), {})
+            if not field_map:
+                continue
+            for data_col, field_info in field_map.items():
+                ref_type = field_info.get("resolve_type", "")
+                if ref_type != "sql":
+                    continue
+                raw_value = row.get(data_col)
+                if raw_value is None:
+                    for key in row:
+                        if key.lower() == data_col.lower():
+                            raw_value = row[key]
+                            break
+                if raw_value is not None and raw_value != 0:
+                    table = field_info.get("target", "")
+                    id_col = field_info.get("id_col", "entry") or "entry"
+                    sql_groups[(table, id_col)].add(raw_value)
+        # Batch resolve and inject into cache
+        for (table, id_col), id_set in sql_groups.items():
+            from .ref_utils import batch_resolve_sql as brs
+            batch = brs(server, table, list(id_set), id_col)
+            if _active_cache is not None:
+                for rid, name in batch.items():
+                    _active_cache[f"sql:{table}:{rid}:{id_col}"] = name
+
     resolved = {}
     for row in rows:
         entry_value = row.get("entry")
@@ -34,13 +73,6 @@ def resolve_gameobject_fields(
             continue
 
         row_resolved = {"type_name": type_name}
-
-        if isinstance(resolve_filter, list):
-            allowed_refs = set(resolve_filter)
-        elif resolve_filter is True:
-            allowed_refs = {"dbc", "sql", "loot"}
-        else:
-            continue
 
         for data_col, field_info in field_map.items():
             raw_value = row.get(data_col)

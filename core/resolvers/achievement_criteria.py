@@ -3,7 +3,9 @@
 Translates type to enum name (e.g., TYPE_T_CREATURE).
 Resolves value1 based on type (creature/spell/area/map references).
 Resolves value2 where applicable (race, effect_index, comp_type).
+Pre-warms per-request cache with batch SQL lookups before row iteration.
 """
+from collections import defaultdict
 from typing import Any, Dict, List
 
 from ..enums import _AC_TYPE_NAMES, _AC_RACE_NAMES, _AC_COMP_TYPES, _AC_DRUNK_STATES
@@ -16,6 +18,31 @@ def _get_row_pk(row: Dict) -> str:
         if pk in row:
             return row[pk]
     return str(id(row))
+
+
+def _collect_ac_ids(rows):
+    """Collect all SQL IDs across rows grouped by (table, id_col)."""
+    ids = defaultdict(set)
+    for row in rows:
+        type_val = row.get("type", 0) or 0
+        value1 = row.get("value1", 0) or 0
+
+        if type_val == 1 and value1:
+            ids[("creature_template", "entry")].add(value1)
+
+    return {k: v for k, v in ids.items() if v}
+
+
+def _prewarm_ac_cache(server, collected_ids):
+    """Batch-resolve collected achievement criteria IDs into per-request cache."""
+    from .ref_utils import batch_resolve_sql as brs, _active_cache
+    for (table, id_col), id_set in collected_ids.items():
+        if not id_set:
+            continue
+        batch = brs(server, table, list(id_set), id_col)
+        if _active_cache is not None:
+            for rid, name in batch.items():
+                _active_cache[f"sql:{table}:{rid}:{id_col}"] = name
 
 
 def resolve_achievement_criteria(
@@ -35,6 +62,11 @@ def resolve_achievement_criteria(
         allowed = {"dbc", "sql", "loot"}
     else:
         return {}
+
+    # Pre-warm cache with batch SQL lookups to avoid N+1 pattern
+    collected = _collect_ac_ids(rows)
+    if collected:
+        _prewarm_ac_cache(server, collected)
 
     resolved = {}
     for row in rows:
