@@ -151,5 +151,49 @@ class TestResolveSqlColumn(unittest.TestCase):
             self.assertIn("entry", err.lower())
 
 
+class TestTTLCache(unittest.TestCase):
+    """Test persistent TTL cache behavior."""
+
+    def setUp(self):
+        from core.resolvers.ref_utils import invalidate_persistent_cache
+        invalidate_persistent_cache()
+
+    def test_set_and_get(self):
+        from core.resolvers.ref_utils import _set_persistent, _get_persistent
+        _set_persistent("sql:creature_template:123:entry", "creature_template [Rabbit]")
+        result = _get_persistent("sql:creature_template:123:entry")
+        self.assertEqual(result, "creature_template [Rabbit]")
+
+    def test_key_not_found(self):
+        from core.resolvers.ref_utils import _get_persistent
+        self.assertIsNone(_get_persistent("nonexistent:key"))
+
+    def test_expiry(self):
+        import time
+        from core.resolvers.ref_utils import _set_persistent, _get_persistent
+        # Manually set an expired entry
+        from core.resolvers.ref_utils import _PERSISTENT_CACHE
+        _PERSISTENT_CACHE["expired:key"] = ("old_value", time.time() - 1)
+        self.assertIsNone(_get_persistent("expired:key"))
+
+    def test_invalidate_clears_all(self):
+        from core.resolvers.ref_utils import _set_persistent, _get_persistent, invalidate_persistent_cache
+        _set_persistent("k1", "v1")
+        _set_persistent("k2", "v2")
+        invalidate_persistent_cache()
+        self.assertIsNone(_get_persistent("k1"))
+        self.assertIsNone(_get_persistent("k2"))
+
+    def test_max_size_eviction(self):
+        from core.resolvers.ref_utils import _set_persistent, _get_persistent, _CACHE_MAX, _PERSISTENT_CACHE
+        # Fill cache with expired entries to trigger eviction path
+        import time
+        for i in range(_CACHE_MAX + 100):
+            _PERSISTENT_CACHE[f"old-{i}"] = (f"v{i}", time.time() - 60)
+        # Set fresh key should evict expired entries first
+        _set_persistent("fresh", "value")
+        self.assertEqual(_get_persistent("fresh"), "value")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

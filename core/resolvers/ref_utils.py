@@ -3,13 +3,48 @@ Shared reference resolution utilities for resolver modules.
 
 Provides functions to resolve DBC references, SQL references, and loot templates
 by ID. Used by all table-specific resolver modules. Includes optional per-request
-memoization to avoid duplicate lookups within a single resolve operation.
+memoization and persistent TTL cache to avoid duplicate lookups across requests.
 """
-from typing import Any, Dict, Optional
+import time
+from typing import Any, Dict, Optional, Tuple
 
 # Module-level cache for per-request memoization. Set via set_ref_cache() before
 # a batch of resolve calls, then cleared via clear_ref_cache() afterward.
 _active_cache: Optional[Dict[str, str]] = None
+
+# Persistent TTL cache that survives across requests.
+_PERSISTENT_CACHE: Dict[str, Tuple[str, float]] = {}
+_CACHE_TTL = 300  # 5 minutes
+_CACHE_MAX = 2000
+
+
+def _get_persistent(key: str) -> Optional[str]:
+    """Get a value from the persistent TTL cache."""
+    if key in _PERSISTENT_CACHE:
+        value, expiry = _PERSISTENT_CACHE[key]
+        if time.time() < expiry:
+            return value
+        del _PERSISTENT_CACHE[key]
+    return None
+
+
+def _set_persistent(key: str, value: str) -> None:
+    """Store a value in the persistent TTL cache."""
+    if len(_PERSISTENT_CACHE) >= _CACHE_MAX:
+        now = time.time()
+        expired = [k for k, (_, exp) in _PERSISTENT_CACHE.items() if now >= exp]
+        for k in expired:
+            del _PERSISTENT_CACHE[k]
+        if len(_PERSISTENT_CACHE) >= _CACHE_MAX:
+            keys = list(_PERSISTENT_CACHE.keys())[:_CACHE_MAX // 4]
+            for k in keys:
+                del _PERSISTENT_CACHE[k]
+    _PERSISTENT_CACHE[key] = (value, time.time() + _CACHE_TTL)
+
+
+def invalidate_persistent_cache() -> None:
+    """Clear the persistent TTL cache. Useful for manual cache invalidation."""
+    _PERSISTENT_CACHE.clear()
 
 
 def set_ref_cache(cache: Dict[str, str]) -> None:
@@ -40,6 +75,13 @@ def resolve_dbc_ref(
 ) -> Optional[str]:
     """Resolve a DBC reference by ID to its name/title."""
     key = _cache_key_dbc(dbc_name, ref_id, id_col)
+
+    # Check persistent cache first
+    cached = _get_persistent(key)
+    if cached is not None:
+        return cached
+
+    # Check per-request cache
     if _active_cache is not None and key in _active_cache:
         return _active_cache[key]
 
@@ -59,6 +101,8 @@ def resolve_dbc_ref(
     except Exception:
         return None
 
+    # Store in both caches
+    _set_persistent(key, result)
     if _active_cache is not None:
         _active_cache[key] = result
 
@@ -73,6 +117,13 @@ def resolve_sql_ref(
 ) -> Optional[str]:
     """Resolve an SQL reference by ID to its key identifying field."""
     key = _cache_key_sql(table, ref_id, id_col)
+
+    # Check persistent cache first
+    cached = _get_persistent(key)
+    if cached is not None:
+        return cached
+
+    # Check per-request cache
     if _active_cache is not None and key in _active_cache:
         return _active_cache[key]
 
@@ -95,6 +146,8 @@ def resolve_sql_ref(
     except Exception:
         return None
 
+    # Store in both caches
+    _set_persistent(key, result)
     if _active_cache is not None:
         _active_cache[key] = result
 
