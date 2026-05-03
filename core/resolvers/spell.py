@@ -9,7 +9,7 @@ to maintain a single source of truth for all ~50 condition types.
 """
 from typing import Any, Dict, List
 
-from ..enums import _SOURCE_TYPE_NAMES
+from ..enums import _SOURCE_TYPE_NAMES, SPELL_EFFECT_NAMES
 
 # Spell-related SourceTypeOrReferenceId values from conditions table
 _SPELL_SOURCE_TYPES = (13, 17, 18, 21, 24)
@@ -135,6 +135,43 @@ def _format_condition_row(server, cond: Dict) -> Dict:
     return entry
 
 
+def _resolve_spell_effects(row: Dict[str, Any], allowed: set) -> Dict[str, Any]:
+    """Resolve Effect[0], Effect[1], Effect[2] fields to effect names.
+    
+    Args:
+        row: Spell row with effect fields
+        allowed: Set of allowed resolve types
+        
+    Returns:
+        Dict of resolved effect fields
+    """
+    if "enum" not in allowed:
+        return {}
+    
+    resolved_effects = {}
+    
+    # Check each effect slot
+    for slot in range(3):
+        field_name = f"Effect[{slot}]"
+        effect_value = row.get(field_name)
+        
+        if effect_value is None or effect_value == 0:
+            continue
+        
+        # Resolve effect index to name
+        effect_name = SPELL_EFFECT_NAMES.get(
+            effect_value, 
+            f"UNKNOWN({effect_value})"
+        )
+        
+        resolved_effects[field_name] = {
+            "value": effect_value,
+            "name": effect_name,
+        }
+    
+    return resolved_effects
+
+
 def resolve_spell_fields(
     server,
     reg_entry: Dict,
@@ -152,15 +189,21 @@ def resolve_spell_fields(
     if isinstance(resolve_filter, list):
         allowed = set(resolve_filter)
     elif resolve_filter is True:
-        allowed = {"dbc", "sql", "loot"}
+        allowed = {"dbc", "sql", "loot", "enum"}
     else:
         return base_resolved
 
-    if "sql" not in allowed:
-        return base_resolved
-
-    spell_ids = collect_spell_condition_ids(rows)
-    conditions_by_spell = _fetch_spell_conditions(server, spell_ids)
+    # Collect spell IDs and prepare base resolved dict
+    spell_ids = []
+    for row in rows:
+        sid = _get_spell_id(row)
+        if sid:
+            spell_ids.append(sid)
+    
+    # Fetch conditions if needed
+    conditions_by_spell = {}
+    if "sql" in allowed:
+        conditions_by_spell = _fetch_spell_conditions(server, spell_ids)
 
     # Pre-warm cache with batch lookups for all condition value references
     if conditions_by_spell:
@@ -170,31 +213,39 @@ def resolve_spell_fields(
         if collected:
             _prewarm_condition_cache(server, collected)
 
+    # Build final resolved dict with effects and conditions
     resolved = {}
     for row in rows:
         sid = _get_spell_id(row)
         if not sid:
             continue
 
-        entry_resolved = base_resolved.get(sid, {})
-        conds = conditions_by_spell.get(sid, [])
+        # Start with any base resolved data
+        entry_resolved = dict(base_resolved.get(sid, {}))
+        
+        # Resolve effect names if enum resolution is enabled
+        if "enum" in allowed:
+            effect_data = _resolve_spell_effects(row, allowed)
+            if effect_data:
+                entry_resolved["effects"] = effect_data
 
-        enriched = {}
-        if conds:
-            limit = resolve_max if resolve_max else len(conds)
-            formatted = [_format_condition_row(server, c) for c in conds[:limit]]
-            enriched["conditions"] = {
-                "count": len(conds),
-                "requirements": formatted,
-            }
-            if resolve_max and len(conds) > resolve_max:
-                enriched["conditions"]["warning"] = (
-                    f"Spell has {len(conds)} conditions, showing first {resolve_max}. "
-                    f"Use resolve_max=0 to show all."
-                )
+        # Add conditions if enabled
+        if "sql" in allowed:
+            conds = conditions_by_spell.get(sid, [])
+            if conds:
+                limit = resolve_max if resolve_max else len(conds)
+                formatted = [_format_condition_row(server, c) for c in conds[:limit]]
+                entry_resolved["conditions"] = {
+                    "count": len(conds),
+                    "requirements": formatted,
+                }
+                if resolve_max and len(conds) > resolve_max:
+                    entry_resolved["conditions"]["warning"] = (
+                        f"Spell has {len(conds)} conditions, showing first {resolve_max}. "
+                        f"Use resolve_max=0 to show all."
+                    )
 
-        merged = {**entry_resolved, **enriched}
-        if merged:
-            resolved[sid] = merged
+        if entry_resolved:
+            resolved[sid] = entry_resolved
 
     return resolved
