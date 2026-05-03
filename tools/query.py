@@ -82,30 +82,28 @@ def _resolve_sql_column(
 
 def _build_sql_filter_clause(
     col_name: str, val: Any
-) -> Tuple[Optional[str], bool]:
+) -> Tuple[Optional[str], Optional[str], bool]:
     """Build a single SQL WHERE clause from a column name and value.
 
     Handles $like / $ilike dict operators and exact match values.
 
     Returns:
-        (clause_string, is_error) -- clause_string is None on error.
+        (fragment_with_%s_or_literal, param_value_or_None, is_error)
     """
     if isinstance(val, dict):
         if "$like" in val:
             pattern = _escape_like_pattern(val["$like"])
-            return f"{col_name} LIKE {pattern}", False
+            return f"{col_name} LIKE %s", val["$like"], False
         elif "$ilike" in val:
-            pattern = _escape_like_pattern(val["$ilike"])
-            # MySQL case-insensitive: use LOWER() wrapper
-            return f"LOWER({col_name}) LIKE LOWER({pattern})", False
-        return None, True
+            # MySQL case-insensitive: use LOWER() wrapper + lower'd param
+            return f"LOWER({col_name}) LIKE LOWER(%s)", val["$ilike"].lower(), False
+        return None, None, True
 
     if isinstance(val, str):
-        escaped = val.replace("'", "''")
-        return f"{col_name} = '{escaped}'", False
+        return f"{col_name} = %s", val, False
 
     # Numeric / boolean values
-    return f"{col_name} = {val}", False
+    return f"{col_name} = %s", val, False
 
 
 def query_tools(server):
@@ -344,13 +342,15 @@ def _query_sql(
             f"Routing query to {target_db} for table '{sql_table}'", file=sys.stderr
         )
 
-    # Build SQL
+    # Build SQL with parameterized values
     sql = f"SELECT * FROM {sql_table}"
-    where_clauses = []
+    where_fragments = []
+    params: list = []
 
     if id_value is not None:
         pk_col = server.database._find_primary_key(reg_entry, sql_table)
-        where_clauses.append(f"{pk_col} = {id_value}")
+        where_fragments.append(f"{pk_col} = %s")
+        params.append(id_value)
 
     if filter_data:
         for col, val in filter_data.items():
@@ -360,20 +360,21 @@ def _query_sql(
                     "error": f"Unknown field '{col}' for table '{sql_table}'. {err_msg}",
                     "isError": True,
                 }
-            clause, is_err = _build_sql_filter_clause(resolved_col, val)
+            fragment, param_val, is_err = _build_sql_filter_clause(resolved_col, val)
             if is_err:
                 return {
                     "error": f"Unsupported filter operator for '{col}'",
                     "isError": True,
                 }
-            where_clauses.append(clause)
+            where_fragments.append(fragment)
+            params.append(param_val)
 
-    if where_clauses:
-        sql += " WHERE " + " AND ".join(where_clauses)
+    if where_fragments:
+        sql += " WHERE " + " AND ".join(where_fragments)
 
     sql += f" LIMIT {limit}"
 
-    rows, error = server.database._query_database(sql, db_name=target_db)
+    rows, error = server.database._query_database(sql, db_name=target_db, params=tuple(params))
 
     if error:
         error_msg = f"Database error: {error}"
@@ -427,23 +428,25 @@ def _query_sql_overlay(
 ) -> tuple:
     """Query SQL overlay for DBC-backed store."""
     sql = f"SELECT * FROM {sql_table}"
-    where_clauses = []
+    where_fragments = []
+    params: list = []
 
     if id_value is not None:
         pk_col = "ID"
         if len(dbc_filter) == 0:
-            where_clauses.append(f"{pk_col} = {id_value}")
+            where_fragments.append(f"{pk_col} = %s")
+            params.append(id_value)
 
     if dbc_filter:
-        where_clauses.extend(
-            _dbc_filter_to_sql_where(dbc_filter, reg_entry)
-        )
+        for frag, param_val in _dbc_filter_to_sql_where(dbc_filter, reg_entry):
+            where_fragments.append(frag)
+            params.append(param_val)
 
-    if where_clauses:
-        sql += " WHERE " + " AND ".join(where_clauses)
+    if where_fragments:
+        sql += " WHERE " + " AND ".join(where_fragments)
     sql += f" LIMIT {limit}"
 
-    return server.database._query_database(sql)
+    return server.database._query_database(sql, params=tuple(params))
 
 
 def _merge_dbc_sql(

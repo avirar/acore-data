@@ -41,35 +41,41 @@ class TestBuildSqlFilterClause(unittest.TestCase):
     """Test SQL WHERE clause building."""
 
     def test_like_operator(self):
-        """"$like should produce LIKE clause."""
-        clause, err = _build_sql_filter_clause("name", {"$like": "%term%"})
+        """"$like should produce LIKE clause with %s placeholder."""
+        fragment, param, err = _build_sql_filter_clause("name", {"$like": "%term%"})
         self.assertFalse(err)
-        self.assertIn("LIKE", clause)
-        self.assertIn("name", clause)
+        self.assertIn("LIKE", fragment)
+        self.assertIn("%s", fragment)
+        self.assertIn("name", fragment)
+        self.assertEqual(param, "%term%")
 
     def test_ilike_operator(self):
-        """"$ilike should produce LOWER() wrapped LIKE."""
-        clause, err = _build_sql_filter_clause("name", {"$ilike": "%term%"})
+        """"$ilike should produce LOWER() wrapped LIKE with %s placeholder."""
+        fragment, param, err = _build_sql_filter_clause("name", {"$ilike": "%TERM%"})
         self.assertFalse(err)
-        self.assertIn("LOWER(", clause)
-        self.assertIn("LIKE", clause)
+        self.assertIn("LOWER(", fragment)
+        self.assertIn("LIKE", fragment)
+        self.assertIn("%s", fragment)
+        self.assertEqual(param, "%term%")
 
     def test_string_exact_match(self):
-        """Plain string should produce equality with quote escaping."""
-        clause, err = _build_sql_filter_clause("name", "O'Brien")
+        """Plain string should produce equality with %s placeholder."""
+        fragment, param, err = _build_sql_filter_clause("name", "O'Brien")
         self.assertFalse(err)
-        self.assertIn("=", clause)
-        self.assertIn("''", clause)  # Escaped quote
+        self.assertIn("=", fragment)
+        self.assertIn("%s", fragment)
+        self.assertEqual(param, "O'Brien")
 
     def test_numeric_exact_match(self):
-        """Integer should produce equality without quotes."""
-        clause, err = _build_sql_filter_clause("entry", 42)
+        """Integer should produce equality with %s placeholder."""
+        fragment, param, err = _build_sql_filter_clause("entry", 42)
         self.assertFalse(err)
-        self.assertIn("= 42", clause)
+        self.assertIn("= %s", fragment)
+        self.assertEqual(param, 42)
 
     def test_unknown_dict_operator_fails(self):
         """Unknown dict operators should return error."""
-        clause, err = _build_sql_filter_clause("name", {"$unknown": "x"})
+        fragment, param, err = _build_sql_filter_clause("name", {"$unknown": "x"})
         self.assertTrue(err)
 
 

@@ -38,29 +38,28 @@ def _resolve_field_name_to_index(
     return resolved
 
 
-def _parse_filter_value(value: Any) -> Tuple[str, str]:
-    """Parse filter value into (operator, escaped_value).
-    
+def _parse_filter_value(value: Any) -> Tuple[str, Any]:
+    """Parse filter value into (operator, raw_param_value).
+
     Supports:
-      - Exact match: value -> (=, 'value')
+      - Exact match: value -> (=, value)
       - $like: {'$like': '%term%'} -> (LIKE, '%term%')
-      - $ilike: {'$ilike': '%term%'} -> (INSTR for case-insensitive)
-    
+      - $ilike: {'$ilike': '%term%'} -> (LIKE_CI, '%term%'.lower())
+
     Returns:
-        Tuple of (operator_sql, escaped_value)
+        Tuple of (operator_sql, raw_param_value_for_%)s)
     """
     if isinstance(value, dict):
         if "$like" in value:
-            return "LIKE", _escape_like_pattern(value["$like"])
+            return "LIKE", value["$like"]
         elif "$ilike" in value:
-            # MySQL doesn't have ILIKE; use LIKE BINARY for case-sensitive
-            # or LOWER() + LIKE for case-insensitive
-            return "LIKE_CI", _escape_like_pattern(value["$ilike"])
-    
+            # MySQL case-insensitive via LOWER() + LIKE
+            return "LIKE_CI", value["$ilike"].lower()
+
     if isinstance(value, str):
-        return "=", f"'{value}'"
-    
-    return "=", str(value)
+        return "=", value
+
+    return "=", value
 
 
 def _escape_like_pattern(pattern: str) -> str:
@@ -73,34 +72,34 @@ def _escape_like_pattern(pattern: str) -> str:
 
 def _dbc_filter_to_sql_where(
     filter_dict: Dict[int, Any], reg_entry: Optional[Dict]
-) -> List[str]:
-    """Convert DBC filter dict to SQL WHERE clauses with parameterized escaping.
-    
+) -> List[Tuple[str, Any]]:
+    """Convert DBC filter dict to SQL WHERE clause fragments + params.
+
     Args:
         filter_dict: Dictionary of field_index -> value
         reg_entry: Registry entry for SQL column mapping
-    
+
     Returns:
-        List of WHERE clause strings
+        List of (fragment_with_%s, param_value) tuples
     """
-    where_clauses = []
+    clauses = []
     fields_meta = reg_entry.get("fields", {}) if reg_entry else {}
 
     for idx, value in filter_dict.items():
         field_info = fields_meta.get(str(idx), {})
         sql_col = field_info.get("sql_column", f"field_{idx}")
 
-        operator, escaped_value = _parse_filter_value(value)
+        operator, param_val = _parse_filter_value(value)
 
         if operator == "LIKE":
-            where_clauses.append(f"{sql_col} LIKE {escaped_value}")
+            clauses.append((f"{sql_col} LIKE %s", param_val))
         elif operator == "LIKE_CI":
-            # Case-insensitive LIKE in MySQL
-            where_clauses.append(f"LOWER({sql_col}) LIKE LOWER({escaped_value})")
+            # Case-insensitive LIKE in MySQL via LOWER()
+            clauses.append((f"LOWER({sql_col}) LIKE LOWER(%s)", param_val))
         else:
-            where_clauses.append(f"{sql_col} {operator} {escaped_value}")
+            clauses.append((f"{sql_col} {operator} %s", param_val))
 
-    return where_clauses
+    return clauses
 
 
 def _annotate_single_record(

@@ -1519,8 +1519,10 @@ def _resolve_sql_ref(
 ) -> Optional[str]:
     """Resolve an SQL reference by ID to its key identifying field."""
     try:
-        sql = f"SELECT * FROM {table} WHERE {id_col} = {ref_id} LIMIT 1"
-        rows, _ = server.database._query_database(sql)
+        rows, _ = server.database._query_database(
+            f"SELECT * FROM {table} WHERE {id_col} = %s LIMIT 1",
+            params=(ref_id,),
+        )
 
         if rows:
             row = rows[0]
@@ -1544,8 +1546,10 @@ def _resolve_loot_ref(
 ) -> Optional[Dict[str, Any]]:
     """Resolve a loot template reference to item list."""
     try:
-        sql = f"SELECT Item, Chance, MinCount, MaxCount FROM {table} WHERE {id_col} = {loot_id}"
-        items, _ = server.database._query_database(sql)
+        items, _ = server.database._query_database(
+            f"SELECT Item, Chance, MinCount, MaxCount FROM {table} WHERE {id_col} = %s",
+            params=(loot_id,),
+        )
 
         if not items:
             return {"resolved_to": f"{table} [{loot_id}]", "warning": "Empty loot template"}
@@ -1559,8 +1563,10 @@ def _resolve_loot_ref(
                 continue
 
             # Resolve item name
-            sql_item = f"SELECT entry, name FROM item_template WHERE entry = {item_id} LIMIT 1"
-            item_rows, _ = server.database._query_database(sql_item)
+            item_rows, _ = server.database._query_database(
+                "SELECT entry, name FROM item_template WHERE entry = %s LIMIT 1",
+                params=(item_id,),
+            )
             item_name = ""
             if item_rows:
                 item_name = item_rows[0].get("name", "")
