@@ -25,7 +25,7 @@ def get_resolver(table_name: str):
 
 
 # Import and auto-register resolvers (after function defs to avoid circular import)
-from . import gameobject, smart_scripts, quest, condition, achievement_criteria, item
+from . import gameobject, smart_scripts, quest, condition, achievement_criteria, item, spell
 
 register_resolver("gameobject_template", gameobject.resolve_gameobject_fields)
 register_resolver("smart_scripts", smart_scripts.resolve_smart_scripts)
@@ -33,3 +33,5 @@ register_resolver("quest_template", quest.resolve_quest_fields)
 register_resolver("conditions", condition.resolve_condition_fields)
 register_resolver("achievement_criteria_data", achievement_criteria.resolve_achievement_criteria)
 register_resolver("item_template", item.resolve_item_fields)
+register_resolver("Spell", spell.resolve_spell_fields)
+register_resolver("spell_dbc", spell.resolve_spell_fields)
