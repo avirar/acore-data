@@ -276,6 +276,64 @@ def _annotate_dbc_result(
     return {"result": result}
 
 
+_ALWAYS_KEEP_COLUMNS = frozenset({
+    "entry", "ID", "Id", "id", "guid", "name", "LogTitle", "title",
+    "ScriptName", "ScriptName", "VerifiedBuild",
+})
+
+
+def _is_trivial_value(value: Any) -> bool:
+    """Check if a value is trivial (zero, None, empty string)."""
+    if value is None:
+        return True
+    if isinstance(value, (int, float)) and value == 0:
+        return True
+    if value == "":
+        return True
+    return False
+
+
+def compact_sql_rows(
+    rows: List[Dict[str, Any]],
+    pk_columns: Optional[set] = None,
+) -> List[Dict[str, Any]]:
+    """Strip trivial-value columns from SQL result rows for compact output.
+
+    Removes columns where every row has a trivial value (0, None, ""),
+    except for primary key and identity columns which are always preserved.
+
+    Args:
+        rows: SQL query result rows
+        pk_columns: Additional columns to always preserve (e.g. {"entry"})
+
+    Returns:
+        Compacted rows with trivial columns removed
+    """
+    if not rows or len(rows) == 0:
+        return rows
+
+    keep = _ALWAYS_KEEP_COLUMNS | (pk_columns or set())
+
+    all_columns = list(rows[0].keys())
+
+    has_nontrivial = set()
+    for row in rows:
+        for col in all_columns:
+            if col not in has_nontrivial and col not in keep:
+                if not _is_trivial_value(row.get(col)):
+                    has_nontrivial.add(col)
+
+    drop_cols = set()
+    for col in all_columns:
+        if col not in keep and col not in has_nontrivial:
+            drop_cols.add(col)
+
+    if not drop_cols:
+        return rows
+
+    return [{k: v for k, v in row.items() if k not in drop_cols} for row in rows]
+
+
 def _build_schema_error(
     store_name: str,
     error_msg: str,

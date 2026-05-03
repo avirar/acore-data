@@ -163,29 +163,31 @@ def sql_tools(server):
                 msg += f"\n\nUse lookup(query='{bad_table}') to verify table and get schema."
                 msg += f"\nNote: Searched databases: {', '.join(server.database._db_priority_order)}"
 
-            elif "Unknown column" in error:
-                msg = f"Database query failed: {error}"
-                col_match = re.search(
-                    r"Unknown column '([^']+)' in '([^']*)'", error
+            return {"error": msg, "isError": True}
+
+        if "Unknown column" in error:
+            msg = f"Database query failed: {error}"
+            col_match = re.search(
+                r"Unknown column '([^']+)' in '([^']*)'", error
+            )
+            if not col_match:
+                col_match = re.search(r"Unknown column '([^']+)'", error)
+
+            if col_match:
+                bad_col = col_match.group(1)
+                from_match = re.search(
+                    r'\bFROM\s+`?(\w+)`?', query, re.IGNORECASE
                 )
-                if not col_match:
-                    col_match = re.search(r"Unknown column '([^']+)'", error)
+                table_hint = (
+                    from_match.group(1)
+                    if from_match and from_match.group(1).upper() not in ("SELECT", "DUAL")
+                    else None
+                )
 
-                if col_match:
-                    bad_col = col_match.group(1)
-                    from_match = re.search(
-                        r'\bFROM\s+`?(\w+)`?', query, re.IGNORECASE
-                    )
-                    table_hint = (
-                        from_match.group(1)
-                        if from_match and from_match.group(1).upper() not in ("SELECT", "DUAL")
-                        else None
-                    )
-
-                    if table_hint:
-                        suggestion = server.database._suggest_column(table_hint, bad_col)
-                        if suggestion:
-                            msg += f"\n{suggestion}"
+                if table_hint:
+                    suggestion = server.database._suggest_column(table_hint, bad_col)
+                    if suggestion:
+                        msg += f"\n{suggestion}"
 
             return {"error": msg, "isError": True}
 
