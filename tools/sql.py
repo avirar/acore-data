@@ -218,7 +218,7 @@ def get_schema() -> Dict[str, Any]:
         "name": "sql",
         "description": (
             "Execute raw SQL query with smart database routing."
-            " Automatically routes to correct database (acore_world, acore_characters, acore_auth)."
+            " Automatically routes to correct database (acore_world, acore_characters, acore_auth, acore_playerbots)."
             " Provides typo suggestions for tables and columns."
             " Blocks destructive statements (DROP, TRUNCATE, ALTER, GRANT, REVOKE)."
         ),
