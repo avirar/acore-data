@@ -56,7 +56,7 @@ class Database:
         self._all_tables_cache: Set[str] = set()
         self._db_tables_cache: Dict[str, Set[str]] = {}
         self._table_to_db_cache: Dict[str, List[str]] = {}
-        self._schema_cache: Dict[str, Optional[List[Dict]]] = {}
+        self._schema_cache: Dict[Tuple[str, str], Optional[List[Dict]]] = {}
         self._pk_cache: Dict[str, str] = {}
 
         # Connection cache (pymysql)
@@ -388,20 +388,24 @@ class Database:
 
         return list(sorted(set(sorted_suggestions[:5])))
 
-    def _get_table_schema(self, table_name: str) -> Optional[List[Dict]]:
-        """Get column info from INFORMATION_SCHEMA, cached per table."""
+    def _get_table_schema(self, table_name: str, db_name: Optional[str] = None) -> Optional[List[Dict]]:
+        """Get column info from INFORMATION_SCHEMA, cached per (db, table)."""
         if not self.db_available:
             return None
-        if table_name in self._schema_cache:
-            return self._schema_cache[table_name]
 
-        self._schema_cache[table_name] = None
+        db = db_name or self._resolve_table_database(table_name, self.db_name) or self.db_name
+        cache_key = (db, table_name)
+
+        if cache_key in self._schema_cache:
+            return self._schema_cache[cache_key]
+
+        self._schema_cache[cache_key] = None
 
         pk_rows, _ = self._query_database(
             "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE "
             "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s "
             "AND CONSTRAINT_NAME = 'PRIMARY'",
-            params=(self.db_name, table_name),
+            params=(db, table_name),
         )
         pk_col = pk_rows[0]["COLUMN_NAME"] if pk_rows else None
 
@@ -410,7 +414,7 @@ class Database:
             "FROM INFORMATION_SCHEMA.COLUMNS "
             "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s "
             "ORDER BY ORDINAL_POSITION",
-            params=(self.db_name, table_name),
+            params=(db, table_name),
         )
 
         if rows:
@@ -420,13 +424,13 @@ class Database:
                     if pk_col
                     else (r.get("COLUMN_KEY") == "PRI")
                 )
-            self._schema_cache[table_name] = rows[:50]
+            self._schema_cache[cache_key] = rows[:50]
 
-        return self._schema_cache[table_name]
+        return self._schema_cache[cache_key]
 
-    def _suggest_column(self, table_name: str, bad_col: str) -> Optional[str]:
+    def _suggest_column(self, table_name: str, bad_col: str, db_name: Optional[str] = None) -> Optional[str]:
         """Find similar column names when a query fails on Unknown column."""
-        schema = self._get_table_schema(table_name)
+        schema = self._get_table_schema(table_name, db_name)
         if not schema:
             return None
 
@@ -445,7 +449,7 @@ class Database:
             return f"Column '{bad_col}' not found in '{table_name}'. " f"Similar columns: {', '.join(suggestions[:8])}."
         return f"Column '{bad_col}' not found in '{table_name}'. " f"Available columns: {', '.join(columns[:30])}"
 
-    def _find_primary_key(self, reg_entry: Dict, sql_table: str) -> str:
+    def _find_primary_key(self, reg_entry: Dict, sql_table: str, db_name: Optional[str] = None) -> str:
         """Try to determine the primary key column name from registry fields."""
         fields = reg_entry.get("fields", {})
         if "0" in fields:
@@ -455,7 +459,7 @@ class Database:
                 return col
 
         if sql_table not in self._pk_cache:
-            schema = self._get_table_schema(sql_table)
+            schema = self._get_table_schema(sql_table, db_name)
             if schema:
                 for c in schema:
                     if c.get("is_primary_key"):

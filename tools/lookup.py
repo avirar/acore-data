@@ -152,7 +152,8 @@ def _build_lookup_result(
 
     # Add live SQL columns from database if available
     if sql_table and server.database.db_available:
-        schema = server.database._get_table_schema(sql_table)
+        target_db = server.database._resolve_table_database(sql_table, server.database.db_name)
+        schema = server.database._get_table_schema(sql_table, target_db)
         if schema:
             result["sql_columns"] = [
                 {

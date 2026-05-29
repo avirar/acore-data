@@ -424,7 +424,7 @@ def _query_sql(
     if rows:
         metadata["columns"] = list(rows[0].keys())
     elif server.database.db_available:
-        schema = server.database._get_table_schema(sql_table)
+        schema = server.database._get_table_schema(sql_table, target_db)
         if schema:
             metadata["columns"] = [c["COLUMN_NAME"] for c in schema]
 
