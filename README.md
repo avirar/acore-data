@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Exposes four tools (`query`, `lookup`, `list`, `sql`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data. Exposes five tools (`query`, `lookup`, `list`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -120,6 +120,57 @@ sql(query="SELECT * FROM creature_templat LIMIT 1")
 → Error with suggestion: "Did you mean: creature_template?"
 ```
 
+### `terrain`
+
+Query map, VMap, and MMap terrain data — terrain height, liquid, area IDs, navmesh tiles, and cross-tile pathfinding on the Detour navmesh.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `subcommand` | string | **Required.** One of: `list_maps`, `list_tiles`, `height`, `liquid`, `area`, `coord`, `tile_info`, `vmap_info`, `tile_stats`, `map_info`, `pathfind`. |
+| `mapId` | string or number | Map ID (numeric) or name (e.g. `"Eastern Kingdoms"`, `"571"`). |
+| `x`, `y`, `z` | number | World coordinates (required by subcommand). |
+| `tileX`, `tileY` | number | Tile coordinates 0-63 (for tile-level queries). |
+| `data_type` | string | `"maps"`, `"vmaps"`, or `"mmaps"` (for `list_tiles`, `tile_info`). |
+| `x1`, `y1`, `z1`, `x2`, `y2`, `z2` | number | Start/end coordinates (for `pathfind`). |
+| `flying` | boolean | Ignore height constraints (for `pathfind`, default `false`). |
+
+**Subcommands:**
+
+| Subcommand | Purpose |
+|------------|---------|
+| `list_maps` | List all maps with file counts (ADT, VMap, MMap) |
+| `list_tiles` | List tiles for a map (maps, vmaps, or mmaps) |
+| `height` | Terrain height at (x, y) |
+| `liquid` | Liquid type/height at (x, y, z) |
+| `area` | Area table ID at (x, y) |
+| `coord` | Convert world coordinates to grid/tile |
+| `tile_info` | MMap/VMap tile header info |
+| `vmap_info` | VMap model info for a tile |
+| `tile_stats` | Navmesh statistics for a tile (poly count, vertex count) |
+| `map_info` | MMap navmesh parameters for a map |
+| `pathfind` | A* pathfinding between two points with cross-tile support |
+
+**Pathfinding:**
+
+The `pathfind` subcommand runs A* on the Detour navmesh with on-demand tile loading, cross-tile external edge resolution, and funnel-algorithm corridor steering. Coordinates are in world space. The AC world→Detour transform `(world_y, world_z, world_x)` is applied automatically.
+
+```
+terrain(subcommand="height", mapId=0, x=1620, y=1530)
+→ {"height": 52.34, "map_id": 0, "position": {"x": 1620, "y": 1530}}
+
+terrain(subcommand="list_tiles", mapId=571, data_type="mmaps")
+→ 433 MMap tiles for Wintergrasp
+
+terrain(subcommand="tile_stats", mapId=571, tileX=23, tileY=24)
+→ {"poly_count": 3639, "vert_count": 5832, "tile": [23, 24]}
+
+terrain(subcommand="pathfind", mapId=571, x1=4683, y1=3824, z1=355, x2=4538, y2=3230, z2=403)
+→ {"found": true, "distance": 649.0, "raw_path_length": 38, "smooth_path_length": 3,
+   "smooth_path": [{"x": 4683, "y": 3824, "z": 355}, {"x": 4528, "y": 3244, "z": 357}, {"x": 4538, "y": 3230, "z": 403}]}
+```
+
+**Cross-tile pathfinding** works automatically: tiles are loaded on-demand as the A* search expands, and external edges (`DT_EXT_LINK`) are resolved by finding matching polygons in neighbor tiles via BV-tree search. Long-distance paths (2000+ yards) across many tiles are supported.
+
 ## Type Resolver
 
 The `resolve` parameter on `query` enables type-aware field resolution for tables whose fields change meaning based on a type column. Resolution types:
@@ -170,6 +221,7 @@ query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 - `pymysql` — installed via `requirements.txt` into `.venv`
 - Access to an AzerothCore MySQL instance (for SQL tools)
 - DBC binary files and `DBCfmt.h` from the AzerothCore source/build
+- MMap data files (`.mmtile`, `.mm`) for terrain/pathfinding queries
 
 ### Environment Variables
 
@@ -177,6 +229,9 @@ query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 |----------|---------|
 | `ACORE_DBC_PATH` | `/root/azerothcore-wotlk/env/dist/bin/dbc` |
 | `ACORE_FORMAT_FILE` | `/root/azerothcore-wotlk/src/server/shared/DataStores/DBCfmt.h` |
+| `ACORE_MMAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/mmaps` |
+| `ACORE_VMAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/vmaps` |
+| `ACORE_MAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/maps` |
 | `DB_HOST` | Auto-detected |
 | `DB_PORT` | `3306` |
 | `DB_USER` | Auto-detected |
@@ -228,14 +283,23 @@ acore-data/
 ├── requirements.txt             # pymysql >= 1.1, pytest >= 7.0
 │
 ├── core/
-│   ├── annotation.py            # DBC field annotation, filter conversion, schema errors
-│   ├── database.py              # MySQL connection (pymysql), table discovery, smart routing
-│   ├── dbc.py                   # WDBC binary file reader
-│   ├── enums.py                 # Shared enum dicts: condition types, SOURCE_TYPE, TYPEID …
-│   ├── formats.py               # DBCfmt.h parser (format strings → field types)
-│   ├── registry.py              # Datastore registry: name resolution, fuzzy matching
-│   ├── type_resolver.py         # Dispatcher + generic registry-driven resolution engine
-│   └── resolvers/               # Specialized table-specific resolver modules
+    │   ├── annotation.py            # DBC field annotation, filter conversion, schema errors
+    │   ├── database.py              # MySQL connection (pymysql), table discovery, smart routing
+    │   ├── dbc.py                   # WDBC binary file reader
+    │   ├── enums.py                 # Shared enum dicts: condition types, SOURCE_TYPE, TYPEID …
+    │   ├── formats.py               # DBCfmt.h parser (format strings → field types)
+    │   ├── registry.py              # Datastore registry: name resolution, fuzzy matching
+    │   ├── type_resolver.py         # Dispatcher + generic registry-driven resolution engine
+    │   ├── resolvers/               # Specialized table-specific resolver modules
+    │   └── terrain/                 # Terrain data: map/vmap/mmap readers, navmesh pathfinding
+    │       ├── coords.py            # World ↔ tile coordinate conversions
+    │       ├── map_reader.py        # ADT map file reader (height, liquid, area)
+    │       ├── vmap_reader.py       # VMap model file reader
+    │       ├── mmap_reader.py       # MMap navmesh tile index reader
+    │       ├── detour_parser.py     # Detour tile parser (polygons, BV tree, vertices)
+    │       ├── tile_manager.py      # On-demand tile loading, cross-tile link resolution
+    │       └── pathfinder.py        # A* search, corridor steering, cross-tile pathfinding
+    │
 │       ├── __init__.py          # Resolver registry (table_name → func)
 │       ├── gameobject.py        # data[0-19] annotation for GAMEOBJECT_TYPE subtypes
 │       ├── smart_scripts.py     # EVENT_ID/ACTION_ID/TARGET_ID enum + value meaning
@@ -247,11 +311,12 @@ acore-data/
 │       └── ref_utils.py         # Shared helpers: resolve_dbc_ref, resolve_sql_ref, batch_resolve_sql, resolve_loot_ref
 │
 ├── tools/
-│   ├── query.py                 # Unified query tool (DBC + SQL + overlay merge)
-│   ├── lookup.py                # Schema/metadata lookup tool
-│   ├── list.py                  # Datastore listing tool
-│   └── sql.py                   # Raw SQL execution with routing and suggestions
-│
+    │   ├── query.py                 # Unified query tool (DBC + SQL + overlay merge)
+    │   ├── lookup.py                # Schema/metadata lookup tool
+    │   ├── list.py                  # Datastore listing tool
+    │   ├── sql.py                   # Raw SQL execution with routing and suggestions
+    │   └── terrain.py               # Terrain/pathfinding tool (map/vmap/mmap, A* navmesh)
+    │
 ├── tests/
 │   ├── test_integration.py      # Integration tests (live DB)
 │   └── test_helpers.py          # Unit tests
@@ -302,5 +367,8 @@ acore-data/
          │
          ├─► tools/list.py      Category filtering + search
          │
-         └─► tools/sql.py       Raw SQL with routing + typo suggestions
+          ├─► tools/sql.py       Raw SQL with routing + typo suggestions
+          │
+          └─► tools/terrain.py   Terrain queries + pathfinding
+                                   (map/vmap/mmap, A* navmesh)
 ```
