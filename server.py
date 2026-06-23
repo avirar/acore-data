@@ -63,6 +63,15 @@ class AcoreDataServer:
         if not self.database.db_host or not self.database.db_user:
             self.database._auto_detect_db_config()
 
+        # Terrain data paths
+        data_base = Path(os.environ.get(
+            "ACORE_DATA_PATH",
+            os.environ.get("DATA_PATH", "/root/azerothcore-wotlk/env/dist/bin"),
+        ))
+        self.maps_path = data_base / "maps"
+        self.vmaps_path = data_base / "vmaps"
+        self.mmaps_path = data_base / "mmaps"
+
         # Cache for DBC readers
         self.dbc_cache: Dict[str, WDBCReader] = {}
 
@@ -120,6 +129,10 @@ class AcoreDataServer:
             from tools import sql as sql_tool
             return sql_tool.sql_tools(self)
 
+        elif name == "terrain":
+            from tools import terrain as terrain_tool
+            return terrain_tool.terrain_tools(self)
+
         else:
             return {
                 "error": f"Unknown tool: {name}",
@@ -131,7 +144,10 @@ class AcoreDataServer:
         print("acore-data MCP server starting...", file=sys.stderr)
         print(f"  DBC path: {self.dbc_path}", file=sys.stderr)
         print(f"  Format file: {self.format_file}", file=sys.stderr)
-        print(f"  Tools: query, lookup, list, sql", file=sys.stderr)
+        print(f"  Maps path: {self.maps_path}", file=sys.stderr)
+        print(f"  VMaps path: {self.vmaps_path}", file=sys.stderr)
+        print(f"  MMaps path: {self.mmaps_path}", file=sys.stderr)
+        print(f"  Tools: query, lookup, list, terrain, sql", file=sys.stderr)
 
         while True:
             try:
