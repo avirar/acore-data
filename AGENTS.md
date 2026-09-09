@@ -25,6 +25,11 @@ DBC file, SQL table, store variable) and traverse to the others.
 - Never rewrite `datastore_registry.json` wholesale with re-sorted keys —
   editors must preserve structure; make surgical edits (see
   `scripts/update_*.py` conventions).
+- `.pi/extensions/acore-data.ts` is the pi bridge (pi loads it
+  automatically; it spawns `server.py` over stdio JSON-RPC). It must NOT
+  hardcode paths or credentials — it inherits the environment and the server
+  self-configures (DBC defaults + DB creds from `worldserver.conf`); override
+  the project root with `ACORE_DATA_ROOT`.
 
 ## Tool semantics (post rework, branch fix/mcp-ergonomics)
 
