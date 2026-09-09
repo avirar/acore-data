@@ -174,13 +174,15 @@ def _annotate_single_record(
         if filter_indices is not None and idx_int not in filter_indices:
             continue
 
-        # Skip null, zero, and empty string values in compact mode
+        # Skip null, zero, and empty string values in compact mode,
+        # except the identity field (index 0) which is kept even when 0
         if compact:
             if value is None:
                 continue
             # Skip zero values for numeric fields (but keep empty strings)
             if isinstance(value, (int, float)) and value == 0:
-                continue
+                if idx_int != 0:
+                    continue
             # Also skip empty strings in compact mode
             if value == "":
                 continue

@@ -24,19 +24,24 @@ Query any datastore by name. Accepts a DBC file name (`"Spell"`), SQL table name
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `name` | string | **Required.** Datastore name. Use `lookup` to find valid names. |
-| `id` | number | Primary key for O(1) lookup. Mutually exclusive with `filter`. |
+| `id` | number | Primary key for O(1) lookup. If a `filter` is also given, both must match (AND). |
 | `filter` | object | Named field filters. Supports `$like` / `$ilike` patterns. |
-| `fields` | array | Select specific fields by index `[38, 39]` or name `["BaseLevel", "SpellLevel"]`. |
+| `fields` | array | Select fields by index `[38, 39]` or name `["BaseLevel", "SpellLevel"]`. Strict: unknown names are errors with suggestions. |
 | `limit` | number | Max records to return (default 100). |
 | `compact` | boolean | Strip null/zero fields (default `true`). |
+| `annotate` | boolean | DBC rows as legacy per-field arrays with index/type/sql_column/source (default `false` = flat `{name: value}` rows). On SQL tables, attaches column types. |
+| `hints` | boolean | Include `field_references` / `referenced_by` cross-reference metadata (default `false`). |
+| `links` | boolean | Add `metadata.links`: one-hop relation map (related NPC/item/spell names) for the returned rows (default `false`; capped at 25 rows × 10 fields). |
 | `resolve` | boolean or array | Resolve type-specific data fields. `true` = all, or `["dbc", "sql", "loot"]`. |
 | `resolve_max` | number | Max items per loot table resolution (default 10). Use 0 for unlimited. |
+
+**Result shape:** rows are flat `{field: value}` objects. `id`/`row_index` lookups return a single object (or a specific error if the id is absent / does not match the filter); `filter` and unconstrained queries return a list. Locale arrays (e.g. `name[0..15]`) collapse to a scalar (or a list of non-empty values).
 
 **Examples:**
 
 ```
 query(name="Spell", id=118)
-→ O(1) DBC lookup for Polymorph
+→ O(1) lookup for Polymorph, ~1 KB flat object
 
 query(name="quest_template", filter={"Title": {"$ilike": "%murloc%"}})
 → SQL $ilike search across all quest titles
@@ -44,11 +49,14 @@ query(name="quest_template", filter={"Title": {"$ilike": "%murloc%"}})
 query(name="gameobject_template", id=180013, resolve=true)
 → Returns gameobject data with data[0-19] annotated (lockId, lootId, spellId, etc.)
 
-query(name="Spell", id=118, fields=[38, 39], compact=true)
-→ Select only BaseLevel and SpellLevel fields
+query(name="quest_template", id=46, links=true)
+→ metadata.links: quest NPC (Guard Thomas), required item (Torn Murloc Fin), reward items
+
+query(name="Spell", id=118, fields=[38, 39])
+→ Only BaseLevel and SpellLevel fields
 ```
 
-For DBC-backed stores that also have an SQL overlay table, `query` merges both sources — SQL overlay data replaces or supplements the binary DBC data.
+For DBC-backed stores that also have an SQL overlay table, `query` merges both sources — SQL overlay data replaces or supplements the binary DBC data, and errors report which source failed.
 
 ### `lookup`
 
@@ -59,7 +67,7 @@ Get schema and metadata for any datastore. Resolves by C++ struct name, SQL tabl
 | `query` | string | **Required.** Name to resolve. |
 | `detail` | string | `"schema"` (default) — full field list. `"summary"` — 10 sample fields. |
 
-Returns field definitions (name, type, SQL column, references), live SQL column metadata from the database, cross-references, and access hints (e.g. `sSpellStore.LookupEntry(id) -> SpellEntry const*`).
+Returns the per-field mapping (`index`, `name`, `type`, `sql_column`, plus `notes`/`references` where available), `referenced_by` cross-references, and access hints (e.g. `sSpellStore.LookupEntry(id) -> SpellEntry const*`). SQL-native tables additionally list live columns as `name:type [PK]`.
 
 **Examples:**
 
@@ -82,15 +90,16 @@ List available datastores with optional search and category filtering.
 |-----------|------|-------------|
 | `search` | string | Filter by struct name, table, DBC file, or store variable. |
 | `category` | string | `"all"` (default), `"dbc_backed"`, `"sql_objectmgr"`, `"sql_manager"`, `"sql_auxiliary"`. |
+| `limit` | number | Max entries to return (default 50). When truncated, `metadata.total` reports the full count. |
 
 **Examples:**
 
 ```
 list(category="dbc_backed")
-→ All ~112 DBC-backed stores with format info and field counts
+→ First 50 DBC-backed stores with field counts (total reported in metadata)
 
 list(search="Quest")
-→ All stores matching "Quest" in name, table, or DBC file
+→ Stores matching "Quest" in struct name, table, or DBC file
 ```
 
 ### `sql`
@@ -247,7 +256,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python3 server.py
 ```
 
-**IMPORTANT:** The server MUST be launched with the `.venv` Python (`.venv/bin/python3`), NOT the system `python3`. The system Python won't have `pymysql`, causing silent fallback to the `mysql` CLI subprocess — which doesn't support parameterized queries and breaks all SQL lookups.
+**Recommended:** launch with the `.venv` Python (`.venv/bin/python3`). Without `pymysql` the server falls back to a `mysql` CLI subprocess — it works (params are interpolated and `MYSQL_PWD` is honored) but is slower.
 
 If run via an MCP client, point the command at the venv's Python:
 ```json
@@ -263,15 +272,24 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/py
 ## Testing
 
 ```bash
-# Integration tests (30 tests — requires running MySQL)
-bash test_integration.sh
+# Regression suite — 21 tests, the output-shape/strictness/protocol contract
+.venv/bin/python3 tests/test_regression.py
 
-# Python unit/integration tests (39 tests)
-python3 -m pytest tests/ -v
+# Integration tests — 75 tests (requires running MySQL + DBC files)
+.venv/bin/python3 tests/test_integration.py
 
-# Or without pytest
-python3 tests/test_integration.py
-python3 tests/test_helpers.py
+# Fast unit tests — 20 tests (no DB)
+.venv/bin/python3 tests/test_helpers.py
+
+# Everything at once
+.venv/bin/python3 -m pytest tests/ -q
+```
+
+Output-size baselines (for LLM context budgeting):
+
+```bash
+.venv/bin/python3 scripts/capture_output_sizes.py /tmp/after
+.venv/bin/python3 scripts/capture_output_sizes.py --compare /tmp/before /tmp/after
 ```
 
 ## Project Structure
