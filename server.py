@@ -157,6 +157,10 @@ class AcoreDataServer:
             from tools import sql as sql_tool
             return sql_tool.sql_tools(self)
 
+        elif name == "spawns":
+            from tools import spawns as spawns_tool
+            return spawns_tool.spawns_tools(self)
+
         elif name == "terrain":
             from tools import terrain as terrain_tool
             return terrain_tool.terrain_tools(self)
@@ -175,7 +179,7 @@ class AcoreDataServer:
         print(f"  Maps path: {self.maps_path}", file=sys.stderr)
         print(f"  VMaps path: {self.vmaps_path}", file=sys.stderr)
         print(f"  MMaps path: {self.mmaps_path}", file=sys.stderr)
-        print(f"  Tools: query, lookup, list, terrain, sql", file=sys.stderr)
+        print(f"  Tools: query, lookup, list, spawns, terrain, sql", file=sys.stderr)
 
         while True:
             try:
