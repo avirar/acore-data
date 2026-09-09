@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, and travel-graph verification. Exposes eight tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `travel`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, and travel-graph verification. Exposes nine tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -132,6 +132,23 @@ Database state audit for this install — no arguments. Reports the core/DB vers
 dbversion()
 → core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
   mod_playerbots_installed=true|false
+```
+
+### `encounter`
+
+Map/instance encounter rollup — what is in this place. Top creatures by spawn count with level ranges, rank (0=normal 1=rare 2=elite 3=worldboss) and loot item names for the top 5; top game objects (ores, doors, chests); instance metadata (`script`, `allow_mount`) when the map is an instance; and the mod-playerbots travel graph size when installed. Read-only, `acore_world` based — works on any azerothcore-wotlk install.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `map` | number | **Required.** Map id. |
+| `limit` | number | Max creatures to list (default 20, max 100). |
+
+**Examples:**
+
+```
+encounter(map=43)
+→ Wailing Caverns (instance_wailing_caverns): Druid of the Fang (19, rare),
+  Deviate Lasher (19), ... with loot; travel graph: 10 nodes / 1968 points
 ```
 
 ### `travel`
