@@ -347,8 +347,9 @@ def _query_dbc(
     db_result = None
     db_error = None
 
+    overlay_notes: list = []
     if sql_table and server.database.db_available:
-        db_result, db_error = _query_sql_overlay(
+        db_result, db_error, overlay_notes = _query_sql_overlay(
             server, sql_table, id_value, dbc_filter, limit, reg_entry
         )
 
@@ -358,7 +359,30 @@ def _query_dbc(
     )
 
     if merged.get("error"):
-        return merged
+        parts = []
+        if dbc_error:
+            parts.append(f"DBC {dbc_load_name}.dbc: {dbc_error}")
+        elif dbc_result is None:
+            parts.append(f"DBC {dbc_load_name}.dbc: not available")
+        elif not dbc_result:
+            parts.append(f"DBC {dbc_load_name}.dbc: 0 matching records")
+        if db_error:
+            parts.append(f"SQL overlay {sql_table}: {db_error}")
+        elif sql_table and db_result is None:
+            parts.append(f"SQL overlay {sql_table}: query not run (db unavailable)")
+        elif sql_table and db_result == []:
+            parts.append(f"SQL overlay {sql_table}: 0 matching rows")
+        if overlay_notes:
+            parts.append("overlay: " + "; ".join(dict.fromkeys(overlay_notes)))
+        detail = " | ".join(parts) if parts else ""
+        suffix = f": {detail}" if detail else ""
+        return {
+            "error": f"No data found for '{name}'{suffix}",
+            "isError": True,
+        }
+
+    if overlay_notes:
+        filter_notes.extend(overlay_notes)
 
     metadata = {
         "source": merged.pop("source", "unknown"),
@@ -565,10 +589,16 @@ def _query_sql(
 def _query_sql_overlay(
     server, sql_table: str, id_value: Optional[int], dbc_filter: Dict, limit: int, reg_entry: Optional[Dict] = None
 ) -> tuple:
-    """Query SQL overlay for DBC-backed store."""
+    """Query SQL overlay for DBC-backed store.
+
+    Returns (rows, error, notes). Conditions on columns missing from the
+    live overlay table are skipped (with a note) instead of raising a SQL
+    error that would hide the DBC-side result.
+    """
     sql = f"SELECT * FROM {sql_table}"
     where_fragments = []
     params: list = []
+    notes: list = []
 
     if id_value is not None:
         pk_col = "ID"
@@ -577,7 +607,14 @@ def _query_sql_overlay(
             params.append(id_value)
 
     if dbc_filter:
-        for frag, param_val in _dbc_filter_to_sql_where(dbc_filter, reg_entry):
+        available_columns = None
+        if server.database.db_available:
+            target_db = server.database._resolve_table_database(sql_table, server.database.db_name)
+            schema = server.database._get_table_schema(sql_table, target_db)
+            if schema:
+                available_columns = {c["COLUMN_NAME"].lower() for c in schema}
+        clauses, notes = _dbc_filter_to_sql_where(dbc_filter, reg_entry, available_columns)
+        for frag, param_val in clauses:
             where_fragments.append(frag)
             params.append(param_val)
 
@@ -585,7 +622,8 @@ def _query_sql_overlay(
         sql += " WHERE " + " AND ".join(where_fragments)
     sql += f" LIMIT {limit}"
 
-    return server.database._query_database(sql, params=tuple(params))
+    rows, error = server.database._query_database(sql, params=tuple(params))
+    return rows, error, notes
 
 
 def _merge_dbc_sql(
