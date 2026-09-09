@@ -269,6 +269,10 @@ To test manually:
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/python3 server.py
 ```
 
+### pi (coding agent)
+
+This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers the server's tools (`query`, `lookup`, `list`, `sql`, `terrain`) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
+
 ## Testing
 
 ```bash
