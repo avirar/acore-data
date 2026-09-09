@@ -157,6 +157,10 @@ class AcoreDataServer:
             from tools import sql as sql_tool
             return sql_tool.sql_tools(self)
 
+        elif name == "enums":
+            from tools import enums as enums_tool
+            return enums_tool.enums_tools(self)
+
         elif name == "config":
             from tools import config as config_tool
             return config_tool.config_tools(self)
@@ -199,7 +203,7 @@ class AcoreDataServer:
         print(f"  Maps path: {self.maps_path}", file=sys.stderr)
         print(f"  VMaps path: {self.vmaps_path}", file=sys.stderr)
         print(f"  MMaps path: {self.mmaps_path}", file=sys.stderr)
-        print(f"  Tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, config, terrain, sql", file=sys.stderr)
+        print(f"  Tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, config, enums, terrain, sql", file=sys.stderr)
 
         while True:
             try:

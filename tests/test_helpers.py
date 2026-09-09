@@ -199,6 +199,53 @@ class TestTTLCache(unittest.TestCase):
         self.assertEqual(_get_persistent("fresh"), "value")
 
 
+class TestEnumIndex(unittest.TestCase):
+    """core.enum_index: C++ enum definition parsing."""
+
+    def test_parse_value(self):
+        from core.enum_index import _parse_value
+        self.assertEqual(_parse_value("17"), 17)
+        self.assertEqual(_parse_value("0x00200000"), 2097152)
+        self.assertEqual(_parse_value("0b101"), 5)
+        self.assertIsNone(_parse_value("(1 << 0)"))
+        self.assertIsNone(_parse_value("A | B"))
+
+    def test_extract_named_and_auto_enums(self):
+        from core.enum_index import _extract_enums_from_text
+        text = """
+        // comment
+        enum Foo {
+            FOO_A,
+            FOO_B = 5,        // explicit
+            FOO_C,            // auto: 6
+            FOO_D = (1 << 3), // expression: skipped
+            FOO_E = 0x10      // hex
+        };
+        enum class Bar : uint32 {
+            BAR_X = 0,
+        };
+        enum {
+            ANON = 1
+        };
+        """
+        idx = {}
+        _extract_enums_from_text(text, "test.h", idx)
+        self.assertIn("Foo", idx)
+        self.assertEqual(idx["Foo"]["members"][0], "FOO_A")
+        self.assertEqual(idx["Foo"]["members"][5], "FOO_B")
+        self.assertEqual(idx["Foo"]["members"][6], "FOO_C")
+        self.assertNotIn(8, idx["Foo"]["members"])   # expression skipped
+        self.assertEqual(idx["Foo"]["members"][16], "FOO_E")
+        self.assertIn("Bar", idx)
+        self.assertEqual(idx["Bar"]["members"][0], "BAR_X")
+
+    def test_find_enums_by_value(self):
+        from core.enum_index import find_enums_by_value
+        idx = {"A": {"file": "x", "members": {17: "A_X"}},
+               "B": {"file": "y", "members": {5: "B_Y"}}}
+        self.assertEqual(find_enums_by_value(idx, 17), {"A": "A_X"})
+
+
 class TestExplainHelpers(unittest.TestCase):
     """explain tool: pure helpers (no DB)."""
 
