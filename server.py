@@ -185,25 +185,25 @@ class AcoreDataServer:
 
                 request = json.loads(line.strip())
 
+                # Notifications carry no id and expect no response
+                if request.get("method", "").startswith("notifications/"):
+                    continue
+
                 if request.get("method") == "initialize":
+                    client_params = request.get("params", {}) or {}
                     response = {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
                         "result": {
-                            "protocolVersion": "2024-11-05",
+                            "protocolVersion": client_params.get(
+                                "protocolVersion", "2024-11-05"
+                            ),
                             "serverInfo": {
                                 "name": "acore-data",
                                 "version": "1.0.0",
                             },
                             "capabilities": {"tools": {}},
                         },
-                    }
-
-                elif request.get("method") == "notifications/initialized":
-                    response = {
-                        "jsonrpc": "2.0",
-                        "id": request.get("id"),
-                        "result": {},
                     }
 
                 elif request.get("method") == "tools/list":
@@ -264,7 +264,7 @@ class AcoreDataServer:
 
                 response = {
                     "jsonrpc": "2.0",
-                    "id": request.get("id") if "request" in dir() else None,
+                    "id": request.get("id") if "request" in locals() else None,
                     "error": {"code": -32000, "message": str(e)},
                 }
                 sys.stdout.write(json.dumps(response) + "\n")
