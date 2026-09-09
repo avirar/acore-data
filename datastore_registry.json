@@ -20343,8 +20343,8 @@
     "BannedAddons": {
       "category": "sql_manager",
       "sql_table": "banned_addons",
-      "sql_database": "db_world",
-      "manager_singleton": "namespace",
+      "sql_database": "acore_world",
+      "manager_singleton": "",
       "manager_class": "AddonMgr",
       "store_variable": "std::list<BannedAddon>",
       "container_type": "std::list<BannedAddon>",
@@ -20353,26 +20353,26 @@
       "fields": {
         "Id": {
           "name": "Id",
-          "type": "Id",
-          "notes": "uint32",
+          "type": "uint32",
+          "notes": "",
           "sql_column": "Id"
         },
         "Name": {
           "name": "Name",
-          "type": "NameMD5",
-          "notes": "std::array&lt;uint8, 16&gt;",
+          "type": "std::array&lt;uint8, 16&gt;",
+          "notes": "",
           "sql_column": "NameMD5"
         },
         "Version": {
           "name": "Version",
-          "type": "VersionMD5",
-          "notes": "std::array&lt;uint8, 16&gt;",
+          "type": "std::array&lt;uint8, 16&gt;",
+          "notes": "",
           "sql_column": "VersionMD5"
         },
         "Timestamp": {
           "name": "Timestamp",
-          "type": "Timestamp",
-          "notes": "time_t",
+          "type": "time_t",
+          "notes": "",
           "sql_column": "Timestamp"
         }
       },
