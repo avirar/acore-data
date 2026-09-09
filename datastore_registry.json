@@ -38,13 +38,19 @@
           "name": "requiredFaction",
           "type": "int32",
           "sql_column": "requiredFaction",
-          "notes": "-1=all, 0=horde, 1=alliance"
+          "notes": "-1=all, 0=horde, 1=alliance",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "mapID",
           "type": "int32",
           "sql_column": "mapID",
-          "notes": "-1=none"
+          "notes": "-1=none",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "name[0]",
@@ -756,7 +762,10 @@
           "name": "zoneId",
           "type": "uint32",
           "sql_column": "zoneId",
-          "notes": "-"
+          "notes": "-",
+          "references": "AreaTableEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "52": {
           "name": "worldState",
@@ -2116,7 +2125,10 @@
           "name": "ExtendedDisplayInfoID",
           "type": "uint32",
           "sql_column": "ExtendedDisplayInfoID",
-          "notes": "-"
+          "notes": "-",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "scale",
@@ -2268,7 +2280,10 @@
           "name": "BloodID",
           "type": "uint32",
           "sql_column": "BloodID",
-          "notes": "Skipped in struct"
+          "notes": "Skipped in struct",
+          "references": "CreatureModelDataEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "FootprintTextureID",
@@ -2570,7 +2585,10 @@
           "name": "DamagedDisplayId",
           "type": "uint32",
           "sql_column": "State0ImpactEffectDoodadSet",
-          "notes": "Loaded - damaged display ID"
+          "notes": "Loaded - damaged display ID",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "4": {
           "name": "DamagedUnk3",
@@ -2594,7 +2612,10 @@
           "name": "DestroyedDisplayId",
           "type": "uint32",
           "sql_column": "State1ImpactEffectDoodadSet",
-          "notes": "Loaded - destroyed display ID"
+          "notes": "Loaded - destroyed display ID",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "DestroyedUnk3",
@@ -2618,7 +2639,10 @@
           "name": "RebuildingDisplayId",
           "type": "uint32",
           "sql_column": "State2ImpactEffectDoodadSet",
-          "notes": "Loaded - rebuilding display ID"
+          "notes": "Loaded - rebuilding display ID",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "12": {
           "name": "RebuildingUnk3",
@@ -2642,7 +2666,10 @@
           "name": "SmokeDisplayId",
           "type": "uint32",
           "sql_column": "State3ImpactEffectDoodadSet",
-          "notes": "Loaded - smoke display ID"
+          "notes": "Loaded - smoke display ID",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "16": {
           "name": "SmokeUnk3",
@@ -3121,7 +3148,10 @@
           "name": "textid",
           "type": "uint32",
           "sql_column": "EmoteID",
-          "notes": "Loaded - emote text ID / emote reference"
+          "notes": "Loaded - emote text ID / emote reference",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "EmoteText_1",
@@ -3218,12 +3248,6 @@
           "type": "uint32",
           "sql_column": "EmoteText_16",
           "notes": "Additional emote text (skipped)"
-        },
-        "19": {
-          "name": "_padding",
-          "type": "uint32",
-          "sql_column": null,
-          "notes": "Extra field in DBC, not in SQL table (skipped)"
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
@@ -3251,7 +3275,10 @@
           "name": "EmotesTextId",
           "type": "uint32",
           "sql_column": "EmotesTextId",
-          "notes": "-"
+          "notes": "-",
+          "references": "EmotesTextEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "2": {
           "name": "RaceId",
@@ -3272,7 +3299,10 @@
           "name": "SoundId",
           "type": "uint32",
           "sql_column": "SoundId",
-          "notes": "-"
+          "notes": "-",
+          "references": "SoundEntriesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       }
     },
@@ -3554,49 +3584,73 @@
           "name": "enemyFaction[0]",
           "type": "uint32",
           "sql_column": "enemyFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "enemyFaction[1]",
           "type": "uint32",
           "sql_column": "enemyFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "enemyFaction[2]",
           "type": "uint32",
           "sql_column": "enemyFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "9": {
           "name": "enemyFaction[3]",
           "type": "uint32",
           "sql_column": "enemyFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "10": {
           "name": "friendFaction[0]",
           "type": "uint32",
           "sql_column": "friendFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "11": {
           "name": "friendFaction[1]",
           "type": "uint32",
           "sql_column": "friendFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "12": {
           "name": "friendFaction[2]",
           "type": "uint32",
           "sql_column": "friendFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "13": {
           "name": "friendFaction[3]",
           "type": "uint32",
           "sql_column": "friendFaction",
-          "notes": "-"
+          "notes": "-",
+          "references": "FactionEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "referenced_by": [
@@ -4490,7 +4544,10 @@
           "name": "DisplayInfoID",
           "type": "uint32",
           "sql_column": "DisplayInfoID",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "InventoryType",
@@ -4728,31 +4785,46 @@
           "name": "reqitem[0]",
           "type": "uint32",
           "sql_column": "reqitem",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "reqitem[1]",
           "type": "uint32",
           "sql_column": "reqitem",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "reqitem[2]",
           "type": "uint32",
           "sql_column": "reqitem",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "reqitem[3]",
           "type": "uint32",
           "sql_column": "reqitem",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "reqitem[4]",
           "type": "uint32",
           "sql_column": "reqitem",
-          "notes": "-"
+          "notes": "-",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "9": {
           "name": "reqitemcount[0]",
@@ -5422,55 +5494,82 @@
           "name": "items_to_triggerspell[0]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "44": {
           "name": "items_to_triggerspell[1]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "45": {
           "name": "items_to_triggerspell[2]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "46": {
           "name": "items_to_triggerspell[3]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "47": {
           "name": "items_to_triggerspell[4]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "48": {
           "name": "items_to_triggerspell[5]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "49": {
           "name": "items_to_triggerspell[6]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "50": {
           "name": "items_to_triggerspell[7]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "51": {
           "name": "required_skill_id",
           "type": "uint32",
           "sql_column": "required_skill_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "52": {
           "name": "required_skill_value",
@@ -6497,13 +6596,19 @@
           "name": "linked_zone",
           "type": "uint32",
           "sql_column": "linked_zone",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "57": {
           "name": "multimap_id",
           "type": "uint32",
           "sql_column": "multimap_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "59": {
           "name": "entrance_map",
@@ -7371,12 +7476,6 @@
           "type": "uint32",
           "sql_column": "UncommonPropertiesPoints",
           "notes": "-"
-        },
-        "16": {
-          "name": "UncommonPropertiesPoints[4]",
-          "type": "uint32",
-          "sql_column": "UncommonPropertiesPoints",
-          "notes": "-"
         }
       },
       "is_leaf": true,
@@ -7879,7 +7978,10 @@
           "name": "SupercededBySpell",
           "type": "uint32",
           "sql_column": "SupercededBySpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "9": {
           "name": "AcquireMethod",
@@ -9044,6 +9146,12 @@
           "notes": "EffectMiscValueB for slot 1."
         },
         "115": {
+          "name": "EffectMiscValueB[2]",
+          "type": "int32",
+          "sql_column": "EffectMiscValueB",
+          "notes": "EffectMiscValueB for slot 2."
+        },
+        "116": {
           "name": "EffectTriggerSpell[0]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
@@ -9052,23 +9160,23 @@
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
-        "116": {
-          "name": "EffectMiscValueB[2]",
-          "type": "int32",
-          "sql_column": "EffectMiscValueB",
-          "notes": "EffectMiscValueB for slot 2."
-        },
         "117": {
           "name": "EffectTriggerSpell[1]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "EffectTriggerSpell for slot 1."
+          "notes": "EffectTriggerSpell for slot 1.",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "118": {
           "name": "EffectTriggerSpell[2]",
           "type": "uint32",
           "sql_column": "EffectTriggerSpell",
-          "notes": "EffectTriggerSpell for slot 2."
+          "notes": "EffectTriggerSpell for slot 2.",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "119": {
           "name": "EffectPointsPerComboPoint[0]",
@@ -9862,7 +9970,10 @@
           "name": "aura_id",
           "type": "uint32",
           "sql_column": "aura_id",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "32": {
           "name": "slot",
@@ -9874,7 +9985,10 @@
           "name": "GemID",
           "type": "uint32",
           "sql_column": "GemID",
-          "notes": "-"
+          "notes": "-",
+          "references": "GemPropertiesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "34": {
           "name": "EnchantmentCondition",
@@ -9886,7 +10000,10 @@
           "name": "requiredSkill",
           "type": "uint32",
           "sql_column": "requiredSkill",
-          "notes": "-"
+          "notes": "-",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "36": {
           "name": "requiredSkillValue",
@@ -10225,49 +10342,73 @@
           "name": "stanceSpell[0]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "28": {
           "name": "stanceSpell[1]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "29": {
           "name": "stanceSpell[2]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "30": {
           "name": "stanceSpell[3]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "31": {
           "name": "stanceSpell[4]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "32": {
           "name": "stanceSpell[5]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "33": {
           "name": "stanceSpell[6]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "34": {
           "name": "stanceSpell[7]",
           "type": "uint32",
           "sql_column": "stanceSpell",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
@@ -10611,31 +10752,46 @@
           "name": "RankID[0]",
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "5": {
           "name": "RankID[1]",
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "6": {
           "name": "RankID[2]",
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "7": {
           "name": "RankID[3]",
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "8": {
           "name": "RankID[4]",
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
-          "notes": "-"
+          "notes": "-",
+          "references": "TalentEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "13": {
           "name": "DependsOn",
@@ -10879,13 +11035,10 @@
           "name": "MountCreatureID[0]",
           "type": "uint32",
           "sql_column": "MountCreatureID",
-          "notes": "-"
-        },
-        "24": {
-          "name": "MountCreatureID[1]",
-          "type": "uint32",
-          "sql_column": "MountCreatureID",
-          "notes": "-"
+          "notes": "-",
+          "references": "CreatureTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         }
       }
     },
@@ -11723,7 +11876,7 @@
         "DifficultyEntry1": {
           "name": "DifficultyEntry[0]",
           "type": "uint32",
-          "sql_column": "DifficultyEntry1",
+          "sql_column": "difficulty_entry_1",
           "notes": " (Normal difficulty creature template entry ID)",
           "references": "CreatureTemplate",
           "reference_type": "sql_objectmgr",
@@ -11732,7 +11885,7 @@
         "DifficultyEntry2": {
           "name": "DifficultyEntry[1]",
           "type": "uint32",
-          "sql_column": "DifficultyEntry2",
+          "sql_column": "difficulty_entry_2",
           "notes": " (Heroic difficulty creature template entry ID)",
           "references": "CreatureTemplate",
           "reference_type": "sql_objectmgr",
@@ -11741,7 +11894,7 @@
         "DifficultyEntry3": {
           "name": "DifficultyEntry[2]",
           "type": "uint32",
-          "sql_column": "DifficultyEntry3",
+          "sql_column": "difficulty_entry_3",
           "notes": " (LFR difficulty creature template entry ID)",
           "references": "CreatureTemplate",
           "reference_type": "sql_objectmgr",
@@ -11969,13 +12122,13 @@
         "resistance1..7": {
           "name": "resistance",
           "type": "int32[7]",
-          "sql_column": "resistance1..7",
+          "sql_column": null,
           "notes": "Loaded separately via LoadCreatureTemplateResistances()"
         },
         "spell1..8": {
           "name": "spells",
           "type": "uint32[8]",
-          "sql_column": "spell1..8",
+          "sql_column": null,
           "notes": "Loaded separately via LoadCreatureTemplateSpells() (Creature's equipped spells (stored in creature_template_spell table))",
           "references": "SpellEntry",
           "reference_type": "dbc_backed",
@@ -12095,61 +12248,61 @@
         "Ground": {
           "name": "Ground",
           "type": "CreatureGroundMovementType",
-          "sql_column": "Ground",
+          "sql_column": null,
           "notes": "enum"
         },
         "Swim": {
           "name": "Swim",
           "type": "bool",
-          "sql_column": "Swim",
+          "sql_column": null,
           "notes": ""
         },
         "Flight": {
           "name": "Flight",
           "type": "CreatureFlightMovementType",
-          "sql_column": "Flight",
+          "sql_column": null,
           "notes": "enum"
         },
         "Rooted": {
           "name": "Rooted",
           "type": "bool",
-          "sql_column": "Rooted",
+          "sql_column": null,
           "notes": ""
         },
         "Chase": {
           "name": "Chase",
           "type": "CreatureChaseMovementType",
-          "sql_column": "Chase",
+          "sql_column": null,
           "notes": "enum"
         },
         "Random": {
           "name": "Random",
           "type": "CreatureRandomMovementType",
-          "sql_column": "Random",
+          "sql_column": null,
           "notes": "enum"
         },
         "InteractionPauseTimer": {
           "name": "InteractionPauseTimer",
           "type": "uint32",
-          "sql_column": "InteractionPauseTimer",
+          "sql_column": null,
           "notes": ""
         },
         "CreatureDisplayID": {
           "name": "CreatureDisplayID",
           "type": "uint32",
-          "sql_column": "CreatureDisplayID",
+          "sql_column": null,
           "notes": ""
         },
         "DisplayScale": {
           "name": "DisplayScale",
           "type": "float",
-          "sql_column": "DisplayScale",
+          "sql_column": null,
           "notes": ""
         },
         "Probability": {
           "name": "Probability",
           "type": "float",
-          "sql_column": "Probability",
+          "sql_column": null,
           "notes": ""
         }
       }
@@ -12210,19 +12363,19 @@
         "basedamage0": {
           "name": "BaseDamage[0]",
           "type": "float",
-          "sql_column": "basedamage0",
+          "sql_column": "damage_base",
           "notes": "Vanilla"
         },
         "basedamage1": {
           "name": "BaseDamage[1]",
           "type": "float",
-          "sql_column": "basedamage1",
+          "sql_column": "damage_exp1",
           "notes": "TBC"
         },
         "basedamage2": {
           "name": "BaseDamage[2]",
           "type": "float",
-          "sql_column": "basedamage2",
+          "sql_column": "damage_exp2",
           "notes": "WotLK"
         },
         "strength": {
@@ -12324,8 +12477,11 @@
         "spawnGroup": {
           "name": "spawnGroupId",
           "type": "uint32",
-          "sql_column": "spawnGroup",
-          "notes": ""
+          "sql_column": null,
+          "notes": "",
+          "references": "SpawnGroupTemplateData",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "groupId"
         },
         "guid": {
           "name": "spawnId",
@@ -12336,26 +12492,29 @@
         "id1": {
           "name": "id1",
           "type": "uint32",
-          "sql_column": "id1",
+          "sql_column": null,
           "notes": "Primary creature entry"
         },
         "id2": {
           "name": "id2",
           "type": "uint32",
-          "sql_column": "id2",
+          "sql_column": null,
           "notes": "Alternate entry (difficulty)"
         },
         "id3": {
           "name": "id3",
           "type": "uint32",
-          "sql_column": "id3",
+          "sql_column": null,
           "notes": "Alternate entry (difficulty)"
         },
         "displayid": {
           "name": "displayid",
           "type": "uint32",
-          "sql_column": "displayid",
-          "notes": "Override model"
+          "sql_column": null,
+          "notes": "Override model",
+          "references": "CreatureDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "equipment_id": {
           "name": "equipmentId",
@@ -12491,13 +12650,13 @@
         "bounding_radius": {
           "name": "bounding_radius",
           "type": "float",
-          "sql_column": "bounding_radius",
+          "sql_column": "BoundingRadius",
           "notes": ""
         },
         "combat_reach": {
           "name": "combat_reach",
           "type": "float",
-          "sql_column": "combat_reach",
+          "sql_column": "CombatReach",
           "notes": ""
         },
         "gender": {
@@ -12509,7 +12668,7 @@
         "modelid_other_gender": {
           "name": "modelid_other_gender",
           "type": "uint32",
-          "sql_column": "modelid_other_gender",
+          "sql_column": "DisplayID_Other_Gender",
           "notes": "",
           "references": "CreatureModelDataEntry",
           "reference_type": "dbc_entry",
@@ -12518,7 +12677,7 @@
         "is_trigger": {
           "name": "is_trigger",
           "type": "float",
-          "sql_column": "is_trigger",
+          "sql_column": null,
           "notes": ""
         }
       },
@@ -12538,7 +12697,7 @@
         "ItemEntry1": {
           "name": "ItemEntry[0]",
           "type": "uint32",
-          "sql_column": "ItemEntry1",
+          "sql_column": "ItemID1",
           "notes": "",
           "references": "ItemEntry",
           "reference_type": "dbc_entry",
@@ -12547,14 +12706,20 @@
         "ItemEntry2": {
           "name": "ItemEntry[1]",
           "type": "uint32",
-          "sql_column": "ItemEntry2",
-          "notes": ""
+          "sql_column": "ItemID2",
+          "notes": "",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "ItemEntry3": {
           "name": "ItemEntry[2]",
           "type": "uint32",
-          "sql_column": "ItemEntry3",
-          "notes": ""
+          "sql_column": "ItemID3",
+          "notes": "",
+          "references": "ItemEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
@@ -13161,7 +13326,7 @@
         "ParentRotation": {
           "name": "ParentRotation",
           "type": "QuaternionData",
-          "sql_column": "ParentRotation",
+          "sql_column": "parent_rotation0..3",
           "notes": "x,y,z,w"
         },
         "invisibilityType": {
@@ -13281,7 +13446,10 @@
           "name": "DisplayInfoID",
           "type": "uint32",
           "sql_column": "displayid",
-          "notes": "ItemDisplayInfo.dbc"
+          "notes": "ItemDisplayInfo.dbc",
+          "references": "ItemDisplayInfoEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "Quality": {
           "name": "Quality",
@@ -13454,37 +13622,37 @@
         "HolyRes": {
           "name": "HolyRes",
           "type": "int32",
-          "sql_column": "HolyRes",
+          "sql_column": "holy_res",
           "notes": ""
         },
         "FireRes": {
           "name": "FireRes",
           "type": "int32",
-          "sql_column": "FireRes",
+          "sql_column": "fire_res",
           "notes": ""
         },
         "NatureRes": {
           "name": "NatureRes",
           "type": "int32",
-          "sql_column": "NatureRes",
+          "sql_column": "nature_res",
           "notes": ""
         },
         "FrostRes": {
           "name": "FrostRes",
           "type": "int32",
-          "sql_column": "FrostRes",
+          "sql_column": "frost_res",
           "notes": ""
         },
         "ShadowRes": {
           "name": "ShadowRes",
           "type": "int32",
-          "sql_column": "ShadowRes",
+          "sql_column": "shadow_res",
           "notes": ""
         },
         "ArcaneRes": {
           "name": "ArcaneRes",
           "type": "int32",
-          "sql_column": "ArcaneRes",
+          "sql_column": "arcane_res",
           "notes": ""
         },
         "delay": {
@@ -13677,7 +13845,10 @@
           "name": "RequiredDisenchantSkill",
           "type": "uint32",
           "sql_column": "RequiredDisenchantSkill",
-          "notes": ""
+          "notes": "",
+          "references": "SkillLineEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "ArmorDamageModifier": {
           "name": "ArmorDamageModifier",
@@ -13745,7 +13916,7 @@
         "flags_custom": {
           "name": "FlagsCu",
           "type": "ItemFlagsCustom",
-          "sql_column": "flags_custom",
+          "sql_column": "flagsCustom",
           "notes": "enum ItemFlagsCustom"
         }
       }
@@ -13878,7 +14049,7 @@
         "ZoneOrSort": {
           "name": "ZoneOrSort",
           "type": "int32",
-          "sql_column": "ZoneOrSort",
+          "sql_column": null,
           "notes": "",
           "references": [
             {
@@ -13904,13 +14075,13 @@
         "Level": {
           "name": "Level",
           "type": "int32",
-          "sql_column": "Level",
+          "sql_column": "QuestLevel",
           "notes": "QuestLevel"
         },
         "Type": {
           "name": "Type",
           "type": "uint32",
-          "sql_column": "Type",
+          "sql_column": null,
           "notes": "enum QuestType"
         },
         "AllowableRaces": {
@@ -13952,7 +14123,7 @@
         "SuggestedPlayers": {
           "name": "SuggestedPlayers",
           "type": "uint32",
-          "sql_column": "SuggestedPlayers",
+          "sql_column": "SuggestedGroupNum",
           "notes": ""
         },
         "TimeAllowed": {
@@ -13979,7 +14150,7 @@
         "RequiredPlayerKillCount": {
           "name": "RequiredPlayerKills",
           "type": "uint32",
-          "sql_column": "RequiredPlayerKillCount",
+          "sql_column": "RequiredPlayerKills",
           "notes": ""
         },
         "RewardTalents": {
@@ -13997,7 +14168,7 @@
         "NextQuestInChain": {
           "name": "RewardNextQuest",
           "type": "uint32",
-          "sql_column": "NextQuestInChain",
+          "sql_column": "RewardNextQuest",
           "notes": " (Next quest ID in chain (follow-up quest))",
           "references": "Quest",
           "reference_type": "sql_objectmgr",
@@ -14012,7 +14183,7 @@
         "SrcItemId": {
           "name": "StartItem",
           "type": "uint32",
-          "sql_column": "SrcItemId",
+          "sql_column": "StartItem",
           "notes": " (Item required to start quest (quest item))",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
@@ -14027,25 +14198,25 @@
         "Details": {
           "name": "Details",
           "type": "std::string",
-          "sql_column": "Details",
+          "sql_column": "QuestDescription",
           "notes": ""
         },
         "Objectives": {
           "name": "Objectives",
           "type": "std::string",
-          "sql_column": "Objectives",
+          "sql_column": null,
           "notes": ""
         },
         "OfferRewardText": {
           "name": "OfferRewardText",
           "type": "std::string",
-          "sql_column": "OfferRewardText",
+          "sql_column": null,
           "notes": ""
         },
         "RequestItemsText": {
           "name": "RequestItemsText",
           "type": "std::string",
-          "sql_column": "RequestItemsText",
+          "sql_column": null,
           "notes": ""
         },
         "AreaDescription": {
@@ -14057,7 +14228,7 @@
         "CompletedText": {
           "name": "CompletedText",
           "type": "std::string",
-          "sql_column": "CompletedText",
+          "sql_column": "QuestCompletionLog",
           "notes": ""
         },
         "RewardHonor": {
@@ -14075,7 +14246,7 @@
         "RewardOrRequiredMoney": {
           "name": "RewardMoney",
           "type": "int32",
-          "sql_column": "RewardOrRequiredMoney",
+          "sql_column": "RewardMoney",
           "notes": ""
         },
         "RewardMoneyDifficulty": {
@@ -14131,13 +14302,13 @@
         "EmoteOnIncomplete": {
           "name": "EmoteOnIncomplete",
           "type": "uint32",
-          "sql_column": "EmoteOnIncomplete",
+          "sql_column": null,
           "notes": ""
         },
         "EmoteOnComplete": {
           "name": "EmoteOnComplete",
           "type": "uint32",
-          "sql_column": "EmoteOnComplete",
+          "sql_column": null,
           "notes": ""
         },
         "ObjectiveText1..4": {
@@ -14212,13 +14383,13 @@
         "RewardChoiceItemCount1..6": {
           "name": "RewardChoiceItemCount",
           "type": "uint32[6]",
-          "sql_column": "RewardChoiceItemCount1..6",
+          "sql_column": null,
           "notes": ""
         },
         "RewardItemId1..4": {
           "name": "RewardItemId",
           "type": "uint32[4]",
-          "sql_column": "RewardItemId1..4",
+          "sql_column": "RewardItem1..4",
           "notes": " (Items rewarded automatically (guaranteed, non-choosable))",
           "references": "ItemTemplate",
           "reference_type": "sql_objectmgr",
@@ -14227,7 +14398,7 @@
         "RewardItemIdCount1..4": {
           "name": "RewardItemIdCount",
           "type": "uint32[4]",
-          "sql_column": "RewardItemIdCount1..4",
+          "sql_column": null,
           "notes": ""
         },
         "RewardFactionId1..5": {
@@ -14242,31 +14413,31 @@
         "RewardFactionValueId1..5": {
           "name": "RewardFactionValueId",
           "type": "int32[5]",
-          "sql_column": "RewardFactionValueId1..5",
+          "sql_column": "RewardFactionValue1..5",
           "notes": ""
         },
         "RewardFactionValueIdOverride1..5": {
           "name": "RewardFactionValueIdOverride",
           "type": "int32[5]",
-          "sql_column": "RewardFactionValueIdOverride1..5",
+          "sql_column": "RewardFactionOverride1..5",
           "notes": ""
         },
         "MaxLevel": {
           "name": "MaxLevel",
           "type": "uint32",
-          "sql_column": "MaxLevel",
+          "sql_column": null,
           "notes": ""
         },
         "RequiredClasses": {
           "name": "RequiredClasses",
           "type": "uint32",
-          "sql_column": "RequiredClasses",
+          "sql_column": null,
           "notes": "Class mask"
         },
         "SourceSpellid": {
           "name": "SourceSpellid",
           "type": "uint32",
-          "sql_column": "SourceSpellid",
+          "sql_column": null,
           "notes": " (Spell that generates this quest)",
           "references": "SpellEntry",
           "reference_type": "dbc_backed",
@@ -14275,7 +14446,7 @@
         "PrevQuestId": {
           "name": "PrevQuestId",
           "type": "int32",
-          "sql_column": "PrevQuestId",
+          "sql_column": null,
           "notes": " (Previous quest ID in chain (prerequisite quest))",
           "references": "Quest",
           "reference_type": "sql_objectmgr",
@@ -14284,7 +14455,7 @@
         "NextQuestId": {
           "name": "NextQuestId",
           "type": "uint32",
-          "sql_column": "NextQuestId",
+          "sql_column": null,
           "notes": " (Next quest ID in chain (follow-up recommendation))",
           "references": "Quest",
           "reference_type": "sql_objectmgr",
@@ -14293,13 +14464,13 @@
         "ExclusiveGroup": {
           "name": "ExclusiveGroup",
           "type": "int32",
-          "sql_column": "ExclusiveGroup",
+          "sql_column": null,
           "notes": ""
         },
         "BreadcrumbForQuestId": {
           "name": "BreadcrumbForQuestId",
           "type": "uint32",
-          "sql_column": "BreadcrumbForQuestId",
+          "sql_column": null,
           "notes": " (Quest ID this object is a breadcrumb for (quest tracker arrow))",
           "references": "Quest",
           "reference_type": "sql_objectmgr",
@@ -14308,19 +14479,19 @@
         "RewardMailTemplateId": {
           "name": "RewardMailTemplateId",
           "type": "uint32",
-          "sql_column": "RewardMailTemplateId",
+          "sql_column": null,
           "notes": ""
         },
         "RewardMailDelay": {
           "name": "RewardMailDelay",
           "type": "uint32",
-          "sql_column": "RewardMailDelay",
+          "sql_column": null,
           "notes": ""
         },
         "RequiredSkillId": {
           "name": "RequiredSkillId",
           "type": "uint32",
-          "sql_column": "RequiredSkillId",
+          "sql_column": null,
           "notes": " (Skill required to accept quest (use with RequiredSkillPoints))",
           "references": "SkillLineEntry",
           "reference_type": "dbc_backed",
@@ -14329,13 +14500,13 @@
         "RequiredSkillPoints": {
           "name": "RequiredSkillPoints",
           "type": "uint32",
-          "sql_column": "RequiredSkillPoints",
+          "sql_column": null,
           "notes": ""
         },
         "RequiredMinRepFaction": {
           "name": "RequiredMinRepFaction",
           "type": "uint32",
-          "sql_column": "RequiredMinRepFaction",
+          "sql_column": null,
           "notes": " (Minimum reputation faction required (use with RequiredMinRepValue))",
           "references": "FactionEntry",
           "reference_type": "dbc_backed",
@@ -14344,13 +14515,13 @@
         "RequiredMinRepValue": {
           "name": "RequiredMinRepValue",
           "type": "int32",
-          "sql_column": "RequiredMinRepValue",
+          "sql_column": null,
           "notes": ""
         },
         "RequiredMaxRepFaction": {
           "name": "RequiredMaxRepFaction",
           "type": "uint32",
-          "sql_column": "RequiredMaxRepFaction",
+          "sql_column": null,
           "notes": " (Maximum reputation faction required (use with RequiredMaxRepValue))",
           "references": "FactionEntry",
           "reference_type": "dbc_backed",
@@ -14359,19 +14530,19 @@
         "RequiredMaxRepValue": {
           "name": "RequiredMaxRepValue",
           "type": "int32",
-          "sql_column": "RequiredMaxRepValue",
+          "sql_column": null,
           "notes": ""
         },
         "StartItemCount": {
           "name": "StartItemCount",
           "type": "uint32",
-          "sql_column": "StartItemCount",
+          "sql_column": null,
           "notes": ""
         },
         "RewardMailSenderEntry": {
           "name": "RewardMailSenderEntry",
           "type": "uint32",
-          "sql_column": "RewardMailSenderEntry",
+          "sql_column": null,
           "notes": " (NPC text entry for mail sender name and subject)",
           "references": "GossipText",
           "reference_type": "sql_table",
@@ -14380,7 +14551,7 @@
         "SpecialFlags": {
           "name": "SpecialFlags",
           "type": "uint32",
-          "sql_column": "SpecialFlags",
+          "sql_column": null,
           "notes": "enum QuestSpecialFlags"
         }
       }
@@ -14397,67 +14568,67 @@
       "c_struct": "QuestMoneyRewardArray",
       "fields": {
         "Level": {
-          "name": "uint32",
+          "name": "Level",
           "type": "map key",
           "sql_column": "Level",
           "notes": "Quest level"
         },
         "Money0": {
-          "name": "uint32",
+          "name": "Money0",
           "type": "questMoneyReward[0]",
           "sql_column": "Money0",
           "notes": "Reward at level offset 0"
         },
         "Money1": {
-          "name": "uint32",
+          "name": "Money1",
           "type": "questMoneyReward[1]",
           "sql_column": "Money1",
           "notes": ""
         },
         "Money2": {
-          "name": "uint32",
+          "name": "Money2",
           "type": "questMoneyReward[2]",
           "sql_column": "Money2",
           "notes": ""
         },
         "Money3": {
-          "name": "uint32",
+          "name": "Money3",
           "type": "questMoneyReward[3]",
           "sql_column": "Money3",
           "notes": ""
         },
         "Money4": {
-          "name": "uint32",
+          "name": "Money4",
           "type": "questMoneyReward[4]",
           "sql_column": "Money4",
           "notes": ""
         },
         "Money5": {
-          "name": "uint32",
+          "name": "Money5",
           "type": "questMoneyReward[5]",
           "sql_column": "Money5",
           "notes": ""
         },
         "Money6": {
-          "name": "uint32",
+          "name": "Money6",
           "type": "questMoneyReward[6]",
           "sql_column": "Money6",
           "notes": ""
         },
         "Money7": {
-          "name": "uint32",
+          "name": "Money7",
           "type": "questMoneyReward[7]",
           "sql_column": "Money7",
           "notes": ""
         },
         "Money8": {
-          "name": "uint32",
+          "name": "Money8",
           "type": "questMoneyReward[8]",
           "sql_column": "Money8",
           "notes": ""
         },
         "Money9": {
-          "name": "uint32",
+          "name": "Money9",
           "type": "questMoneyReward[9]",
           "sql_column": "Money9",
           "notes": ""
@@ -14488,14 +14659,14 @@
           "_source_table": "quest_poi"
         },
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "Id",
           "sql_column": "id",
           "notes": "POI identifier",
           "_source_table": "quest_poi"
         },
         "ObjectiveIndex": {
-          "name": "int32",
+          "name": "ObjectiveIndex",
           "type": "ObjectiveIndex",
           "sql_column": "ObjectiveIndex",
           "notes": "-1=quest turn-in point, 0-3=objective index",
@@ -14512,44 +14683,44 @@
           "_source_table": "quest_poi"
         },
         "WorldMapAreaId": {
-          "name": "uint32",
+          "name": "WorldMapAreaId",
           "type": "AreaId",
           "sql_column": "WorldMapAreaId",
           "notes": "Maps to AreaTable entry for minimap overlay",
           "_source_table": "quest_poi"
         },
         "Floor": {
-          "name": "uint32",
+          "name": "Floor",
           "type": "FloorId",
           "sql_column": "Floor",
           "notes": "",
           "_source_table": "quest_poi"
         },
         "Priority": {
-          "name": "uint32",
+          "name": "Priority",
           "type": "Unk3",
           "sql_column": "Priority",
           "notes": "",
           "_source_table": "quest_poi"
         },
         "Flags": {
-          "name": "uint32",
+          "name": "Flags",
           "type": "Unk4",
           "sql_column": "Flags",
           "notes": "",
           "_source_table": "quest_poi"
         },
         "VerifiedBuild": {
-          "name": "",
+          "name": "VerifiedBuild",
           "type": "*(not loaded)*",
           "sql_column": "VerifiedBuild",
           "notes": "",
           "_source_table": "quest_poi"
         },
         "Idx1": {
-          "name": "",
+          "name": "Idx1",
           "type": "POI id match",
-          "sql_column": "Idx1",
+          "sql_column": null,
           "notes": "Matches points to POI by id",
           "_source_table": "quest_poi_points",
           "references": "QuestPOI",
@@ -14557,23 +14728,23 @@
           "reference_column": "ID"
         },
         "Idx2": {
-          "name": "",
+          "name": "Idx2",
           "type": "*(ordering)*",
-          "sql_column": "Idx2",
+          "sql_column": null,
           "notes": "ORDER BY Idx2",
           "_source_table": "quest_poi_points"
         },
         "X": {
-          "name": "int32",
+          "name": "X",
           "type": "x",
-          "sql_column": "X",
+          "sql_column": null,
           "notes": "",
           "_source_table": "quest_poi_points"
         },
         "Y": {
-          "name": "int32",
+          "name": "Y",
           "type": "y",
-          "sql_column": "Y",
+          "sql_column": null,
           "notes": "",
           "_source_table": "quest_poi_points"
         }
@@ -14598,13 +14769,13 @@
       "c_struct": "QuestAreaTrigger",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "map key",
           "sql_column": "id",
           "notes": "AreaTrigger entry ID"
         },
         "quest": {
-          "name": "uint32",
+          "name": "quest",
           "type": "map value",
           "sql_column": "quest",
           "notes": "Quest ID"
@@ -14627,13 +14798,13 @@
         "EmoteType": {
           "name": "EmoteType",
           "type": "uint16",
-          "sql_column": "EmoteType",
+          "sql_column": "GreetEmoteType",
           "notes": ""
         },
         "EmoteDelay": {
           "name": "EmoteDelay",
           "type": "uint32",
-          "sql_column": "EmoteDelay",
+          "sql_column": "GreetEmoteDelay",
           "notes": ""
         },
         "Greeting": {
@@ -14699,8 +14870,11 @@
         "NextPage": {
           "name": "NextPage",
           "type": "uint32",
-          "sql_column": "NextPage",
-          "notes": ""
+          "sql_column": "NextPageID",
+          "notes": "",
+          "references": "PageText",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "is_leaf": true,
@@ -15286,7 +15460,10 @@
           "name": "MenuID",
           "type": "uint32",
           "sql_column": "MenuID",
-          "notes": ""
+          "notes": "",
+          "references": "GossipMenus",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "MenuID"
         },
         "TextID": {
           "name": "TextID",
@@ -15315,13 +15492,19 @@
           "name": "MenuID",
           "type": "uint32",
           "sql_column": "MenuID",
-          "notes": ""
+          "notes": "",
+          "references": "GossipMenus",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "MenuID"
         },
         "OptionID": {
           "name": "OptionID",
           "type": "uint32",
           "sql_column": "OptionID",
-          "notes": ""
+          "notes": "",
+          "references": "GossipMenuItems",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "OptionID"
         },
         "OptionIcon": {
           "name": "OptionIcon",
@@ -15360,13 +15543,19 @@
           "name": "ActionMenuID",
           "type": "uint32",
           "sql_column": "ActionMenuID",
-          "notes": ""
+          "notes": "",
+          "references": "GossipMenus",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "MenuID"
         },
         "ActionPoiID": {
           "name": "ActionPoiID",
           "type": "uint32",
           "sql_column": "ActionPoiID",
-          "notes": ""
+          "notes": "",
+          "references": "AreaPOIEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "BoxCoded": {
           "name": "BoxCoded",
@@ -15461,7 +15650,10 @@
           "name": "EmotesID",
           "type": "uint32",
           "sql_column": "EmotesID",
-          "notes": ""
+          "notes": "",
+          "references": "EmotesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "Flags": {
           "name": "Flags",
@@ -15548,7 +15740,7 @@
         "id": {
           "name": "entry",
           "type": "uint32",
-          "sql_column": "id",
+          "sql_column": "entry",
           "notes": ""
         },
         "map": {
@@ -15679,7 +15871,7 @@
         "ScriptName": {
           "name": "ScriptId",
           "type": "uint32",
-          "sql_column": "ScriptName",
+          "sql_column": "script",
           "notes": "",
           "references": "self_ref",
           "reference_type": "sql_table",
@@ -15721,13 +15913,13 @@
           "reference_column": "ID"
         },
         "creditEntry": {
-          "name": "uint32",
+          "name": "creditEntry",
           "type": "creditEntry",
           "sql_column": "creditEntry",
           "notes": ""
         },
         "lastEncounterDungeon": {
-          "name": "uint32",
+          "name": "lastEncounterDungeon",
           "type": "lastEncounterDungeon",
           "sql_column": "lastEncounterDungeon",
           "notes": "Read as uint16, stored as uint32"
@@ -15763,39 +15955,39 @@
       "c_struct": "DungeonProgressionRequirements",
       "fields": {
         "levelMin": {
-          "name": "",
+          "name": "levelMin",
           "type": "uint8",
-          "sql_column": "levelMin",
+          "sql_column": "min_level",
           "notes": ""
         },
         "levelMax": {
-          "name": "",
+          "name": "levelMax",
           "type": "uint8",
-          "sql_column": "levelMax",
+          "sql_column": "max_level",
           "notes": ""
         },
         "reqItemLevel": {
-          "name": "",
+          "name": "reqItemLevel",
           "type": "uint16",
-          "sql_column": "reqItemLevel",
+          "sql_column": "min_avg_item_level",
           "notes": ""
         },
         "quests": {
-          "name": "",
+          "name": "quests",
           "type": "vector&lt;ProgressionRequirement*&gt;",
-          "sql_column": "quests",
+          "sql_column": null,
           "notes": ""
         },
         "items": {
-          "name": "",
+          "name": "items",
           "type": "vector&lt;ProgressionRequirement*&gt;",
-          "sql_column": "items",
+          "sql_column": null,
           "notes": ""
         },
         "achievements": {
-          "name": "",
+          "name": "achievements",
           "type": "vector&lt;ProgressionRequirement*&gt;",
-          "sql_column": "achievements",
+          "sql_column": null,
           "notes": ""
         }
       },
@@ -15814,13 +16006,13 @@
       "c_struct": "ScriptInfo",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "id / outer map key",
           "sql_column": "id",
           "notes": "ScriptInfo::id, also key in ScriptMapMap"
         },
         "delay": {
-          "name": "uint32",
+          "name": "delay",
           "type": "delay / inner map key",
           "sql_column": "delay",
           "notes": "ScriptInfo::delay, also key in ScriptMap"
@@ -15832,43 +16024,43 @@
           "notes": "Union discriminator"
         },
         "datalong": {
-          "name": "uint32",
+          "name": "datalong",
           "type": "Raw.nData[0]",
           "sql_column": "datalong",
           "notes": "Aliased as union members (e.g. Talk.ChatType)"
         },
         "datalong2": {
-          "name": "uint32",
+          "name": "datalong2",
           "type": "Raw.nData[1]",
           "sql_column": "datalong2",
           "notes": "Aliased as union members (e.g. Talk.Flags)"
         },
         "dataint": {
-          "name": "uint32",
+          "name": "dataint",
           "type": "Raw.nData[2]",
           "sql_column": "dataint",
           "notes": "Aliased as union members (e.g. Talk.TextID)"
         },
         "x": {
-          "name": "float",
+          "name": "x",
           "type": "Raw.fData[0]",
           "sql_column": "x",
           "notes": "Aliased as e.g. MoveTo.DestX"
         },
         "y": {
-          "name": "float",
+          "name": "y",
           "type": "Raw.fData[1]",
           "sql_column": "y",
           "notes": "Aliased as e.g. MoveTo.DestY"
         },
         "z": {
-          "name": "float",
+          "name": "z",
           "type": "Raw.fData[2]",
           "sql_column": "z",
           "notes": "Aliased as e.g. MoveTo.DestZ"
         },
         "o": {
-          "name": "float",
+          "name": "o",
           "type": "Raw.fData[3]",
           "sql_column": "o",
           "notes": "Aliased as e.g. TeleportTo.Orientation"
@@ -15876,7 +16068,7 @@
         "guid": {
           "name": "",
           "type": "*(not loaded)*",
-          "sql_column": "guid",
+          "sql_column": null,
           "notes": "SQL PRIMARY KEY only"
         }
       },
@@ -15961,37 +16153,37 @@
         "RepFaction1": {
           "name": "RepFaction1",
           "type": "uint32",
-          "sql_column": "RepFaction1",
+          "sql_column": "RewOnKillRepFaction1",
           "notes": ""
         },
         "RepFaction2": {
           "name": "RepFaction2",
           "type": "uint32",
-          "sql_column": "RepFaction2",
+          "sql_column": "RewOnKillRepFaction2",
           "notes": ""
         },
         "ReputationMaxCap1": {
           "name": "ReputationMaxCap1",
           "type": "uint32",
-          "sql_column": "ReputationMaxCap1",
+          "sql_column": "MaxStanding1",
           "notes": ""
         },
         "RepValue1": {
           "name": "RepValue1",
           "type": "float",
-          "sql_column": "RepValue1",
+          "sql_column": "RewOnKillRepValue1",
           "notes": ""
         },
         "ReputationMaxCap2": {
           "name": "ReputationMaxCap2",
           "type": "uint32",
-          "sql_column": "ReputationMaxCap2",
+          "sql_column": "MaxStanding2",
           "notes": ""
         },
         "RepValue2": {
           "name": "RepValue2",
           "type": "float",
-          "sql_column": "RepValue2",
+          "sql_column": "RewOnKillRepValue2",
           "notes": ""
         },
         "IsTeamAward1": {
@@ -16028,115 +16220,115 @@
       "c_struct": "RepSpilloverTemplate",
       "fields": {
         "faction": {
-          "name": "uint32",
+          "name": "faction",
           "type": "map key",
           "sql_column": "faction",
           "notes": "Read as uint16"
         },
         "faction1": {
-          "name": "uint32",
+          "name": "faction1",
           "type": "faction[0]",
           "sql_column": "faction1",
           "notes": ""
         },
         "rate_1": {
-          "name": "float",
+          "name": "rate_1",
           "type": "faction_rate[0]",
           "sql_column": "rate_1",
           "notes": ""
         },
         "rank_1": {
-          "name": "uint32",
+          "name": "rank_1",
           "type": "faction_rank[0]",
           "sql_column": "rank_1",
           "notes": ""
         },
         "faction2": {
-          "name": "uint32",
+          "name": "faction2",
           "type": "faction[1]",
           "sql_column": "faction2",
           "notes": ""
         },
         "rate_2": {
-          "name": "float",
+          "name": "rate_2",
           "type": "faction_rate[1]",
           "sql_column": "rate_2",
           "notes": ""
         },
         "rank_2": {
-          "name": "uint32",
+          "name": "rank_2",
           "type": "faction_rank[1]",
           "sql_column": "rank_2",
           "notes": ""
         },
         "faction3": {
-          "name": "uint32",
+          "name": "faction3",
           "type": "faction[2]",
           "sql_column": "faction3",
           "notes": ""
         },
         "rate_3": {
-          "name": "float",
+          "name": "rate_3",
           "type": "faction_rate[2]",
           "sql_column": "rate_3",
           "notes": ""
         },
         "rank_3": {
-          "name": "uint32",
+          "name": "rank_3",
           "type": "faction_rank[2]",
           "sql_column": "rank_3",
           "notes": ""
         },
         "faction4": {
-          "name": "uint32",
+          "name": "faction4",
           "type": "faction[3]",
           "sql_column": "faction4",
           "notes": ""
         },
         "rate_4": {
-          "name": "float",
+          "name": "rate_4",
           "type": "faction_rate[3]",
           "sql_column": "rate_4",
           "notes": ""
         },
         "rank_4": {
-          "name": "uint32",
+          "name": "rank_4",
           "type": "faction_rank[3]",
           "sql_column": "rank_4",
           "notes": ""
         },
         "faction5": {
-          "name": "uint32",
+          "name": "faction5",
           "type": "faction[4]",
           "sql_column": "faction5",
           "notes": ""
         },
         "rate_5": {
-          "name": "float",
+          "name": "rate_5",
           "type": "faction_rate[4]",
           "sql_column": "rate_5",
           "notes": ""
         },
         "rank_5": {
-          "name": "uint32",
+          "name": "rank_5",
           "type": "faction_rank[4]",
           "sql_column": "rank_5",
           "notes": ""
         },
         "faction6": {
-          "name": "uint32",
+          "name": "faction6",
           "type": "faction[5]",
           "sql_column": "faction6",
           "notes": ""
         },
         "rate_6": {
-          "name": "float",
+          "name": "rate_6",
           "type": "faction_rate[5]",
           "sql_column": "rate_6",
           "notes": ""
         },
         "rank_6": {
-          "name": "uint32",
+          "name": "rank_6",
           "type": "faction_rank[5]",
           "sql_column": "rank_6",
           "notes": ""
@@ -16157,18 +16349,18 @@
       "c_struct": "PlayerInfo",
       "fields": {
         "mapId": {
-          "name": "",
+          "name": "mapId",
           "type": "uint32",
-          "sql_column": "mapId",
+          "sql_column": "map",
           "notes": "",
           "references": "MapEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
         "areaId": {
-          "name": "",
+          "name": "areaId",
           "type": "uint32",
-          "sql_column": "areaId",
+          "sql_column": "zone",
           "notes": "",
           "references": "AreaTableEntry",
           "reference_type": "dbc_backed",
@@ -16177,31 +16369,31 @@
         "positionX/Y/Z": {
           "name": "",
           "type": "float",
-          "sql_column": "positionX/Y/Z",
+          "sql_column": null,
           "notes": ""
         },
         "orientation": {
-          "name": "",
+          "name": "orientation",
           "type": "float",
           "sql_column": "orientation",
           "notes": ""
         },
         "displayId_m": {
-          "name": "",
+          "name": "displayId_m",
           "type": "uint16",
-          "sql_column": "displayId_m",
+          "sql_column": null,
           "notes": ""
         },
         "displayId_f": {
-          "name": "",
+          "name": "displayId_f",
           "type": "uint16",
-          "sql_column": "displayId_f",
+          "sql_column": null,
           "notes": ""
         },
         "item": {
           "name": "From playercreateinfo_item",
           "type": "PlayerCreateInfoItems",
-          "sql_column": "item",
+          "sql_column": null,
           "notes": "",
           "references": "ItemEntry",
           "reference_type": "dbc_backed",
@@ -16210,31 +16402,31 @@
         "customSpells": {
           "name": "From playercreateinfo_spell_custom",
           "type": "PlayerCreateInfoSpells",
-          "sql_column": "customSpells",
+          "sql_column": null,
           "notes": ""
         },
         "castSpells": {
           "name": "From playercreateinfo_cast_spell",
           "type": "PlayerCreateInfoSpells",
-          "sql_column": "castSpells",
+          "sql_column": null,
           "notes": ""
         },
         "action": {
           "name": "From playercreateinfo_action",
           "type": "PlayerCreateInfoActions",
-          "sql_column": "action",
+          "sql_column": null,
           "notes": ""
         },
         "skills": {
           "name": "From playercreateinfo_skills",
           "type": "PlayerCreateInfoSkills",
-          "sql_column": "skills",
+          "sql_column": null,
           "notes": ""
         },
         "levelInfo": {
           "name": "From player_race_stats + player_class_stats",
           "type": "PlayerLevelInfo*",
-          "sql_column": "levelInfo",
+          "sql_column": null,
           "notes": ""
         }
       }
@@ -16251,73 +16443,73 @@
       "c_struct": "PetLevelInfo",
       "fields": {
         "creature_entry": {
-          "name": "uint32",
+          "name": "creature_entry",
           "type": "map key",
           "sql_column": "creature_entry",
           "notes": "Creature template entry"
         },
         "level": {
-          "name": "uint8",
+          "name": "level",
           "type": "array index",
           "sql_column": "level",
           "notes": "`level - 1` into array"
         },
         "hp": {
-          "name": "uint32",
+          "name": "hp",
           "type": "health",
           "sql_column": "hp",
           "notes": ""
         },
         "mana": {
-          "name": "uint32",
+          "name": "mana",
           "type": "mana",
           "sql_column": "mana",
           "notes": ""
         },
         "str": {
-          "name": "uint32",
+          "name": "str",
           "type": "stats[0]",
           "sql_column": "str",
           "notes": ""
         },
         "agi": {
-          "name": "uint32",
+          "name": "agi",
           "type": "stats[1]",
           "sql_column": "agi",
           "notes": ""
         },
         "sta": {
-          "name": "uint32",
+          "name": "sta",
           "type": "stats[2]",
           "sql_column": "sta",
           "notes": ""
         },
         "inte": {
-          "name": "uint32",
+          "name": "inte",
           "type": "stats[3]",
           "sql_column": "inte",
           "notes": ""
         },
         "spi": {
-          "name": "uint32",
+          "name": "spi",
           "type": "stats[4]",
           "sql_column": "spi",
           "notes": ""
         },
         "armor": {
-          "name": "uint32",
+          "name": "armor",
           "type": "armor",
           "sql_column": "armor",
           "notes": ""
         },
         "min_dmg": {
-          "name": "uint32",
+          "name": "min_dmg",
           "type": "min_dmg",
           "sql_column": "min_dmg",
           "notes": ""
         },
         "max_dmg": {
-          "name": "uint32",
+          "name": "max_dmg",
           "type": "max_dmg",
           "sql_column": "max_dmg",
           "notes": ""
@@ -16385,7 +16577,10 @@
         "2": {
           "name": "seat_id",
           "type": "int8",
-          "sql_column": "seat_id"
+          "sql_column": "seat_id",
+          "references": "VehicleSeatEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "3": {
           "name": "minion",
@@ -16425,37 +16620,40 @@
       "c_struct": "VehicleSeatAddon",
       "fields": {
         "SeatEntry": {
-          "name": "uint32",
+          "name": "SeatEntry",
           "type": "map key",
           "sql_column": "SeatEntry",
-          "notes": "Validated against VehicleSeat.dbc"
+          "notes": "Validated against VehicleSeat.dbc",
+          "references": "VehicleSeatEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "SeatOrientation": {
-          "name": "float",
+          "name": "SeatOrientation",
           "type": "SeatOrientationOffset",
           "sql_column": "SeatOrientation",
           "notes": ""
         },
         "ExitParamX": {
-          "name": "float",
+          "name": "ExitParamX",
           "type": "ExitParameterX",
           "sql_column": "ExitParamX",
           "notes": ""
         },
         "ExitParamY": {
-          "name": "float",
+          "name": "ExitParamY",
           "type": "ExitParameterY",
           "sql_column": "ExitParamY",
           "notes": ""
         },
         "ExitParamZ": {
-          "name": "float",
+          "name": "ExitParamZ",
           "type": "ExitParameterZ",
           "sql_column": "ExitParamZ",
           "notes": ""
         },
         "ExitParamO": {
-          "name": "float",
+          "name": "ExitParamO",
           "type": "ExitParameterO",
           "sql_column": "ExitParamO",
           "notes": ""
@@ -16534,25 +16732,25 @@
       "c_struct": "MailLevelReward",
       "fields": {
         "level": {
-          "name": "uint8",
+          "name": "level",
           "type": "map key",
           "sql_column": "level",
           "notes": ""
         },
         "raceMask": {
-          "name": "uint32",
+          "name": "raceMask",
           "type": "raceMask",
           "sql_column": "raceMask",
           "notes": ""
         },
         "mailTemplateId": {
-          "name": "uint32",
+          "name": "mailTemplateId",
           "type": "mailTemplateId",
           "sql_column": "mailTemplateId",
           "notes": ""
         },
         "senderEntry": {
-          "name": "uint32",
+          "name": "senderEntry",
           "type": "senderEntry",
           "sql_column": "senderEntry",
           "notes": ""
@@ -16573,7 +16771,7 @@
       "c_struct": "TempSummonData",
       "fields": {
         "summonerId": {
-          "name": "uint32",
+          "name": "summonerId",
           "type": "TempSummonGroupKey._summonerEntry",
           "sql_column": "summonerId",
           "notes": "Part of composite key"
@@ -16585,37 +16783,37 @@
           "notes": "0=Creature, 1=GO, 2=Map"
         },
         "groupId": {
-          "name": "uint8",
+          "name": "groupId",
           "type": "TempSummonGroupKey._summonGroup",
           "sql_column": "groupId",
           "notes": "Part of composite key"
         },
         "entry": {
-          "name": "uint32",
+          "name": "entry",
           "type": "entry",
           "sql_column": "entry",
           "notes": ""
         },
         "position_x": {
-          "name": "float",
+          "name": "position_x",
           "type": "pos.m_positionX",
           "sql_column": "position_x",
           "notes": "Via pos.Relocate()"
         },
         "position_y": {
-          "name": "float",
+          "name": "position_y",
           "type": "pos.m_positionY",
           "sql_column": "position_y",
           "notes": ""
         },
         "position_z": {
-          "name": "float",
+          "name": "position_z",
           "type": "pos.m_positionZ",
           "sql_column": "position_z",
           "notes": ""
         },
         "orientation": {
-          "name": "float",
+          "name": "orientation",
           "type": "pos.m_orientation",
           "sql_column": "orientation",
           "notes": ""
@@ -16627,7 +16825,7 @@
           "notes": ""
         },
         "summonTime": {
-          "name": "uint32",
+          "name": "summonTime",
           "type": "time",
           "sql_column": "summonTime",
           "notes": ""
@@ -16654,7 +16852,7 @@
       "c_struct": "LinkedRespawn",
       "fields": {
         "guid": {
-          "name": "ObjectGuid",
+          "name": "guid",
           "type": "map key",
           "sql_column": "guid",
           "notes": "HighGuid determined by linkType",
@@ -16663,13 +16861,13 @@
           "reference_column": "ID"
         },
         "linkedGuid": {
-          "name": "ObjectGuid",
+          "name": "linkedGuid",
           "type": "map value",
           "sql_column": "linkedGuid",
           "notes": "HighGuid determined by linkType"
         },
         "linkType": {
-          "name": "uint8",
+          "name": "linkType",
           "type": "*(determines HighGuid)*",
           "sql_column": "linkType",
           "notes": "0=CREATURE_TO_CREATURE, 1=CREATURE_TO_GO, 2=GO_TO_GO, 3=GO_TO_CREATURE"
@@ -16689,61 +16887,61 @@
       "c_struct": "AcoreString",
       "fields": {
         "entry": {
-          "name": "int32",
+          "name": "entry",
           "type": "map key",
           "sql_column": "entry",
           "notes": ""
         },
         "content_default": {
-          "name": "string",
+          "name": "content_default",
           "type": "Content[LOCALE_enUS]",
           "sql_column": "content_default",
           "notes": ""
         },
         "locale_koKR": {
-          "name": "string",
+          "name": "locale_koKR",
           "type": "Content[LOCALE_koKR]",
           "sql_column": "locale_koKR",
           "notes": ""
         },
         "locale_frFR": {
-          "name": "string",
+          "name": "locale_frFR",
           "type": "Content[LOCALE_frFR]",
           "sql_column": "locale_frFR",
           "notes": ""
         },
         "locale_deDE": {
-          "name": "string",
+          "name": "locale_deDE",
           "type": "Content[LOCALE_deDE]",
           "sql_column": "locale_deDE",
           "notes": ""
         },
         "locale_zhCN": {
-          "name": "string",
+          "name": "locale_zhCN",
           "type": "Content[LOCALE_zhCN]",
           "sql_column": "locale_zhCN",
           "notes": ""
         },
         "locale_zhTW": {
-          "name": "string",
+          "name": "locale_zhTW",
           "type": "Content[LOCALE_zhTW]",
           "sql_column": "locale_zhTW",
           "notes": ""
         },
         "locale_esES": {
-          "name": "string",
+          "name": "locale_esES",
           "type": "Content[LOCALE_esES]",
           "sql_column": "locale_esES",
           "notes": ""
         },
         "locale_esMX": {
-          "name": "string",
+          "name": "locale_esMX",
           "type": "Content[LOCALE_esMX]",
           "sql_column": "locale_esMX",
           "notes": ""
         },
         "locale_ruRU": {
-          "name": "string",
+          "name": "locale_ruRU",
           "type": "Content[LOCALE_ruRU]",
           "sql_column": "locale_ruRU",
           "notes": ""
@@ -16764,13 +16962,13 @@
       "c_struct": "ModuleString",
       "fields": {
         "module": {
-          "name": "std::string",
+          "name": "module",
           "type": "key.first",
           "sql_column": "module",
           "notes": "Module name"
         },
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "key.second",
           "sql_column": "id",
           "notes": "String ID"
@@ -16797,7 +16995,7 @@
       "c_struct": "TavernAreaTrigger",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "map key",
           "sql_column": "id",
           "notes": "AreaTrigger entry ID"
@@ -16831,13 +17029,13 @@
       "c_struct": "AreaTriggerScript",
       "fields": {
         "entry": {
-          "name": "uint32",
+          "name": "entry",
           "type": "map key",
           "sql_column": "entry",
           "notes": "AreaTrigger ID"
         },
         "ScriptName": {
-          "name": "uint32",
+          "name": "ScriptName",
           "type": "map value",
           "sql_column": "ScriptName",
           "notes": "Resolved to script ID via GetScriptId()"
@@ -16864,7 +17062,7 @@
           "notes": "Creature spawn GUID"
         },
         "SparringPCT": {
-          "name": "float",
+          "name": "SparringPCT",
           "type": "vector element",
           "sql_column": "SparringPCT",
           "notes": "Health percentage (0-100)"
@@ -16885,13 +17083,13 @@
       "c_struct": "ExplorationBaseXP",
       "fields": {
         "level": {
-          "name": "uint32",
+          "name": "level",
           "type": "map key",
           "sql_column": "level",
           "notes": "Read as uint8"
         },
         "basexp": {
-          "name": "uint32",
+          "name": "basexp",
           "type": "map value",
           "sql_column": "basexp",
           "notes": "Base XP for level"
@@ -16912,13 +17110,13 @@
       "c_struct": "PlayerXPperLevel",
       "fields": {
         "Level": {
-          "name": "uint8",
+          "name": "Level",
           "type": "array index",
           "sql_column": "Level",
           "notes": "Vector index"
         },
         "Experience": {
-          "name": "uint32",
+          "name": "Experience",
           "type": "vector element",
           "sql_column": "Experience",
           "notes": "XP required for next level"
@@ -16939,19 +17137,19 @@
       "c_struct": "PetNameGeneration",
       "fields": {
         "entry": {
-          "name": "uint32",
+          "name": "entry",
           "type": "map key",
           "sql_column": "entry",
           "notes": "Creature family entry"
         },
         "word": {
-          "name": "std::string",
+          "name": "word",
           "type": "vector element",
           "sql_column": "word",
           "notes": "Name word part"
         },
         "half": {
-          "name": "uint8",
+          "name": "half",
           "type": "*(selects store)*",
           "sql_column": "half",
           "notes": "0 = _petHalfName0 (prefix), 1 = _petHalfName1 (suffix)"
@@ -16987,7 +17185,7 @@
           "reference_column": "ID"
         },
         "COALESCE(cmo.Swim, ctm.Swim)": {
-          "name": "bool",
+          "name": "COALESCE(cmo.Swim, ctm.Swim)",
           "type": "Swim",
           "sql_column": "COALESCE(cmo.Swim, ctm.Swim)",
           "notes": ""
@@ -17002,7 +17200,7 @@
           "reference_column": "ID"
         },
         "COALESCE(cmo.Rooted, ctm.Rooted)": {
-          "name": "bool",
+          "name": "COALESCE(cmo.Rooted, ctm.Rooted)",
           "type": "Rooted",
           "sql_column": "COALESCE(cmo.Rooted, ctm.Rooted)",
           "notes": ""
@@ -17023,7 +17221,7 @@
           "notes": "Walk=0, CanRun=1, AlwaysRun=2"
         },
         "COALESCE(cmo.InteractionPauseTimer, ctm.InteractionPauseTimer)": {
-          "name": "uint32",
+          "name": "COALESCE(cmo.InteractionPauseTimer, ctm.InteractionPauseTimer)",
           "type": "InteractionPauseTimer",
           "sql_column": "COALESCE(cmo.InteractionPauseTimer, ctm.InteractionPauseTimer)",
           "notes": "Milliseconds"
@@ -17043,7 +17241,7 @@
       "c_struct": "GameObjectQuestItem",
       "fields": {
         "GameObjectEntry": {
-          "name": "uint32",
+          "name": "GameObjectEntry",
           "type": "map key",
           "sql_column": "GameObjectEntry",
           "notes": "GO template entry",
@@ -17052,7 +17250,7 @@
           "reference_column": "entry"
         },
         "ItemId": {
-          "name": "uint32",
+          "name": "ItemId",
           "type": "vector element",
           "sql_column": "ItemId",
           "notes": "Item entry",
@@ -17061,7 +17259,7 @@
           "reference_column": "ID"
         },
         "Idx": {
-          "name": "uint32",
+          "name": "Idx",
           "type": "*(ordering)*",
           "sql_column": "Idx",
           "notes": "ORDER BY only"
@@ -17086,7 +17284,7 @@
       "c_struct": "CreatureQuestItem",
       "fields": {
         "CreatureEntry": {
-          "name": "uint32",
+          "name": "CreatureEntry",
           "type": "map key",
           "sql_column": "CreatureEntry",
           "notes": "Creature template entry",
@@ -17095,7 +17293,7 @@
           "reference_column": "entry"
         },
         "ItemId": {
-          "name": "uint32",
+          "name": "ItemId",
           "type": "vector element",
           "sql_column": "ItemId",
           "notes": "Item entry",
@@ -17104,7 +17302,7 @@
           "reference_column": "ID"
         },
         "Idx": {
-          "name": "uint32",
+          "name": "Idx",
           "type": "*(ordering)*",
           "sql_column": "Idx",
           "notes": "ORDER BY only"
@@ -17129,7 +17327,7 @@
       "c_struct": "GameObjectSummonData",
       "fields": {
         "summonerId": {
-          "name": "uint32",
+          "name": "summonerId",
           "type": "TempSummonGroupKey._summonerEntry",
           "sql_column": "summonerId",
           "notes": "Key part"
@@ -17141,67 +17339,67 @@
           "notes": "0=Creature, 1=GO, 2=Map"
         },
         "groupId": {
-          "name": "uint8",
+          "name": "groupId",
           "type": "TempSummonGroupKey._summonGroup",
           "sql_column": "groupId",
           "notes": "Key part"
         },
         "entry": {
-          "name": "uint32",
+          "name": "entry",
           "type": "entry",
           "sql_column": "entry",
           "notes": "GO template to summon"
         },
         "position_x": {
-          "name": "float",
+          "name": "position_x",
           "type": "pos.x",
           "sql_column": "position_x",
           "notes": ""
         },
         "position_y": {
-          "name": "float",
+          "name": "position_y",
           "type": "pos.y",
           "sql_column": "position_y",
           "notes": ""
         },
         "position_z": {
-          "name": "float",
+          "name": "position_z",
           "type": "pos.z",
           "sql_column": "position_z",
           "notes": ""
         },
         "orientation": {
-          "name": "float",
+          "name": "orientation",
           "type": "pos.orientation",
           "sql_column": "orientation",
           "notes": ""
         },
         "rotation0": {
-          "name": "G3D::Quat",
+          "name": "rotation0",
           "type": "rot",
           "sql_column": "rotation0",
           "notes": "Quaternion w"
         },
         "rotation1": {
-          "name": "G3D::Quat",
+          "name": "rotation1",
           "type": "rot",
           "sql_column": "rotation1",
           "notes": "Quaternion x"
         },
         "rotation2": {
-          "name": "G3D::Quat",
+          "name": "rotation2",
           "type": "rot",
           "sql_column": "rotation2",
           "notes": "Quaternion y"
         },
         "rotation3": {
-          "name": "G3D::Quat",
+          "name": "rotation3",
           "type": "rot",
           "sql_column": "rotation3",
           "notes": "Quaternion z"
         },
         "respawnTime": {
-          "name": "uint32",
+          "name": "respawnTime",
           "type": "respawnTime",
           "sql_column": "respawnTime",
           "notes": "Seconds"
@@ -17218,7 +17416,7 @@
     },
     "SpawnGroupTemplateData": {
       "category": "sql_objectmgr",
-      "sql_table": "",
+      "sql_table": "spawn_group_template",
       "sql_database": "db_world",
       "store_variable": "ObjectMgr::_spawnGroupDataStore",
       "store_type": "",
@@ -17228,27 +17426,30 @@
       "c_struct": "SpawnGroupTemplateData",
       "fields": {
         "groupId": {
-          "name": "",
+          "name": "groupId",
           "type": "uint32",
           "sql_column": "groupId",
           "notes": ""
         },
         "name": {
-          "name": "",
+          "name": "name",
           "type": "std::string",
-          "sql_column": "name",
+          "sql_column": "groupName",
           "notes": ""
         },
         "mapid": {
-          "name": "",
+          "name": "mapid",
           "type": "uint16",
-          "sql_column": "mapid",
-          "notes": ""
+          "sql_column": null,
+          "notes": "Not loaded from spawn_group_template (runtime-derived)",
+          "references": "MapEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "flags": {
           "name": "SPAWNGROUP_FLAG_SYSTEM, etc.",
           "type": "SpawnGroupFlags",
-          "sql_column": "flags",
+          "sql_column": "groupFlags",
           "notes": ""
         }
       },
@@ -17279,7 +17480,7 @@
           "notes": "ChrRacesEntry validated"
         },
         "ModelID": {
-          "name": "uint32",
+          "name": "ModelID",
           "type": "map value",
           "sql_column": "ModelID",
           "notes": "Creature display ID"
@@ -17306,25 +17507,25 @@
           "notes": ""
         },
         "RaceID": {
-          "name": "uint8",
+          "name": "RaceID",
           "type": "get<1>",
           "sql_column": "RaceID",
           "notes": "ChrRacesEntry validated"
         },
         "CustomizationID": {
-          "name": "uint8",
+          "name": "CustomizationID",
           "type": "get<2>",
           "sql_column": "CustomizationID",
           "notes": "Skin/hair color index"
         },
         "GenderID": {
-          "name": "uint8",
+          "name": "GenderID",
           "type": "get<3>",
           "sql_column": "GenderID",
           "notes": "GENDER_MALE=0, GENDER_FEMALE=1"
         },
         "ModelID": {
-          "name": "uint32",
+          "name": "ModelID",
           "type": "map value",
           "sql_column": "ModelID",
           "notes": "Creature display ID"
@@ -17360,7 +17561,8 @@
           "notes": ""
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "in_memory_only": true
     },
     "SpellProcEntry": {
       "category": "sql_manager",
@@ -17401,43 +17603,43 @@
           "name": "SpellTypeMask",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "SpellTypeMask"
+          "sql_column": "procFlags"
         },
         "SpellPhaseMask": {
           "name": "SpellPhaseMask",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "SpellPhaseMask"
+          "sql_column": "procPhase"
         },
         "HitMask": {
           "name": "HitMask",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "HitMask"
+          "sql_column": null
         },
         "AttributesMask": {
           "name": "AttributesMask",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "AttributesMask"
+          "sql_column": null
         },
         "DisableEffectsMask": {
           "name": "DisableEffectsMask",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "DisableEffectsMask"
+          "sql_column": null
         },
         "ProcsPerMinute": {
           "name": "ProcsPerMinute",
           "type": "`float`",
           "notes": "",
-          "sql_column": "ProcsPerMinute"
+          "sql_column": "ppmRate"
         },
         "Chance": {
           "name": "Chance",
           "type": "`float`",
           "notes": "",
-          "sql_column": "Chance"
+          "sql_column": "CustomChance"
         },
         "Cooldown": {
           "name": "Cooldown",
@@ -17449,7 +17651,7 @@
           "name": "Charges",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "Charges"
+          "sql_column": null
         }
       },
       "is_leaf": true,
@@ -17581,7 +17783,7 @@
           "name": "target_mapId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "TargetMapID",
+          "sql_column": "MapID",
           "references": "MapEntry",
           "reference_type": "dbc_entry",
           "reference_column": "ID"
@@ -17590,25 +17792,25 @@
           "name": "target_X",
           "type": "`float`",
           "notes": "",
-          "sql_column": "TargetX"
+          "sql_column": "PositionX"
         },
         "target_Y": {
           "name": "target_Y",
           "type": "`float`",
           "notes": "",
-          "sql_column": "TargetY"
+          "sql_column": "PositionY"
         },
         "target_Z": {
           "name": "target_Z",
           "type": "`float`",
           "notes": "",
-          "sql_column": "TargetZ"
+          "sql_column": "PositionZ"
         },
         "target_Orientation": {
           "name": "target_Orientation",
           "type": "`float`",
           "notes": "",
-          "sql_column": "TargetOrientation"
+          "sql_column": "Orientation"
         }
       }
     },
@@ -17621,12 +17823,12 @@
         "0": {
           "name": "guid",
           "type": "int32",
-          "sql_column": "guid"
+          "sql_column": null
         },
         "1": {
           "name": "casterGuid",
           "type": "int64",
-          "sql_column": "casterGuid"
+          "sql_column": null
         },
         "2": {
           "name": "spell",
@@ -17639,62 +17841,62 @@
         "3": {
           "name": "effectMask",
           "type": "int8",
-          "sql_column": "effectMask"
+          "sql_column": null
         },
         "4": {
           "name": "recalculateMask",
           "type": "int8",
-          "sql_column": "recalculateMask"
+          "sql_column": null
         },
         "5": {
           "name": "stackCount",
           "type": "int8",
-          "sql_column": "stackCount"
+          "sql_column": null
         },
         "6": {
           "name": "amount0",
           "type": "int32",
-          "sql_column": "amount0"
+          "sql_column": null
         },
         "7": {
           "name": "amount1",
           "type": "int32",
-          "sql_column": "amount1"
+          "sql_column": null
         },
         "8": {
           "name": "amount2",
           "type": "int32",
-          "sql_column": "amount2"
+          "sql_column": null
         },
         "9": {
           "name": "base_amount0",
           "type": "int32",
-          "sql_column": "base_amount0"
+          "sql_column": null
         },
         "10": {
           "name": "base_amount1",
           "type": "int32",
-          "sql_column": "base_amount1"
+          "sql_column": null
         },
         "11": {
           "name": "base_amount2",
           "type": "int32",
-          "sql_column": "base_amount2"
+          "sql_column": null
         },
         "12": {
           "name": "maxDuration",
           "type": "int32",
-          "sql_column": "maxDuration"
+          "sql_column": null
         },
         "13": {
           "name": "remainTime",
           "type": "int32",
-          "sql_column": "remainTime"
+          "sql_column": null
         },
         "14": {
           "name": "remainCharges",
           "type": "int8",
-          "sql_column": "remainCharges"
+          "sql_column": null
         }
       },
       "loader_function": "",
@@ -17747,7 +17949,10 @@
           "name": "auraSpell",
           "type": "`int32`",
           "notes": "",
-          "sql_column": "aura_spell"
+          "sql_column": "aura_spell",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "raceMask": {
           "name": "raceMask",
@@ -17967,7 +18172,8 @@
           "type": "`ConditionList`",
           "notes": ""
         }
-      }
+      },
+      "in_memory_only": true
     },
     "SmartScriptHolder": {
       "category": "sql_manager",
@@ -18329,10 +18535,7 @@
           "name": "EventId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "eventEntry",
-          "references": "GameEventEntry",
-          "reference_type": "sql_table",
-          "reference_column": "ID"
+          "sql_column": "eventEntry"
         },
         "Start": {
           "name": "Start",
@@ -18609,7 +18812,7 @@
     },
     "WaypointPath": {
       "category": "sql_manager",
-      "sql_table": "",
+      "sql_table": "waypoint_data",
       "sql_database": "db_world",
       "manager_singleton": "sWaypointMgr",
       "manager_class": "WaypointMgr",
@@ -18627,7 +18830,7 @@
         "Nodes": {
           "name": "Nodes",
           "type": "`std::vector<WaypointNode>`",
-          "notes": ""
+          "notes": "One waypoint_data row per node, grouped by id"
         }
       },
       "is_leaf": true,
@@ -18711,7 +18914,10 @@
           "name": "titleId",
           "type": "`uint32[2]`",
           "notes": "",
-          "sql_column": "TitleA"
+          "sql_column": "TitleA",
+          "references": "CharTitlesEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "itemId": {
           "name": "itemId",
@@ -18796,13 +19002,19 @@
           "name": "firstQuest",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "firstQuestId"
+          "sql_column": "firstQuestId",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         },
         "otherQuest": {
           "name": "otherQuest",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "otherQuestId"
+          "sql_column": "otherQuestId",
+          "references": "Quest",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "ID"
         }
       },
       "is_leaf": true,
@@ -18895,7 +19107,7 @@
           "name": "flags",
           "type": "`uint8`",
           "notes": "",
-          "sql_column": "flag1"
+          "sql_column": "flags"
         },
         "params[0]": {
           "name": "params[0]",
@@ -19067,7 +19279,7 @@
           "name": "Text",
           "type": "`std::vector<std::string>`",
           "notes": "",
-          "sql_column": "Text_loc"
+          "sql_column": "Text"
         }
       },
       "is_leaf": true,
@@ -19124,19 +19336,19 @@
           "name": "CheckId",
           "type": "`uint16`",
           "notes": "",
-          "sql_column": "check_id"
+          "sql_column": "id"
         },
         "IdStr": {
           "name": "IdStr",
           "type": "`std::array<char, 4>`",
           "notes": "",
-          "sql_column": "id_str"
+          "sql_column": "str"
         },
         "Action": {
           "name": "Action",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "action"
+          "sql_column": null
         }
       },
       "reference_status": "leaf",
@@ -19157,7 +19369,7 @@
           "name": "Result",
           "type": "`BigNumber`",
           "notes": "",
-          "sql_column": "result"
+          "sql_column": null
         }
       },
       "is_leaf": true,
@@ -19183,7 +19395,7 @@
           "name": "ScriptId",
           "type": "`uint32`",
           "notes": "",
-          "sql_column": "script_name",
+          "sql_column": "ScriptName",
           "references": "self_ref",
           "reference_type": "sql_table",
           "reference_column": "ID"
@@ -19232,19 +19444,19 @@
       "c_struct": "RandomEnchantmentData",
       "fields": {
         "entry": {
-          "name": "uint32",
+          "name": "entry",
           "type": "map key",
           "sql_column": "entry",
           "notes": "Enchantment group ID"
         },
         "ench": {
-          "name": "uint32",
+          "name": "ench",
           "type": "ench",
           "sql_column": "ench",
           "notes": "SpellItemEnchantment ID"
         },
         "chance": {
-          "name": "float",
+          "name": "chance",
           "type": "chance",
           "sql_column": "chance",
           "notes": "Weight 0-100"
@@ -19265,7 +19477,7 @@
       "c_struct": "GmTicket",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "_id",
           "sql_column": "id",
           "notes": "Ticket ID"
@@ -19277,25 +19489,25 @@
           "notes": ""
         },
         "playerGuid": {
-          "name": "ObjectGuid",
+          "name": "playerGuid",
           "type": "_playerGuid",
           "sql_column": "playerGuid",
           "notes": "Player"
         },
         "name": {
-          "name": "std::string",
+          "name": "name",
           "type": "_playerName",
           "sql_column": "name",
           "notes": ""
         },
         "description": {
-          "name": "std::string",
+          "name": "description",
           "type": "_message",
           "sql_column": "description",
           "notes": ""
         },
         "createTime": {
-          "name": "uint64",
+          "name": "createTime",
           "type": "_createTime",
           "sql_column": "createTime",
           "notes": ""
@@ -19310,55 +19522,55 @@
           "reference_column": "ID"
         },
         "posX": {
-          "name": "float",
+          "name": "posX",
           "type": "_posX",
           "sql_column": "posX",
           "notes": ""
         },
         "posY": {
-          "name": "float",
+          "name": "posY",
           "type": "_posY",
           "sql_column": "posY",
           "notes": ""
         },
         "posZ": {
-          "name": "float",
+          "name": "posZ",
           "type": "_posZ",
           "sql_column": "posZ",
           "notes": ""
         },
         "lastModifiedTime": {
-          "name": "uint64",
+          "name": "lastModifiedTime",
           "type": "_lastModifiedTime",
           "sql_column": "lastModifiedTime",
           "notes": ""
         },
         "closedBy": {
-          "name": "ObjectGuid",
+          "name": "closedBy",
           "type": "_closedBy",
           "sql_column": "closedBy",
           "notes": "Player"
         },
         "assignedTo": {
-          "name": "ObjectGuid",
+          "name": "assignedTo",
           "type": "_assignedTo",
           "sql_column": "assignedTo",
           "notes": "Player"
         },
         "comment": {
-          "name": "std::string",
+          "name": "comment",
           "type": "_comment",
           "sql_column": "comment",
           "notes": ""
         },
         "response": {
-          "name": "std::string",
+          "name": "response",
           "type": "_response",
           "sql_column": "response",
           "notes": ""
         },
         "completed": {
-          "name": "bool",
+          "name": "completed",
           "type": "_completed",
           "sql_column": "completed",
           "notes": ""
@@ -19370,19 +19582,19 @@
           "notes": ""
         },
         "viewed": {
-          "name": "bool",
+          "name": "viewed",
           "type": "_viewed",
           "sql_column": "viewed",
           "notes": ""
         },
         "needMoreHelp": {
-          "name": "bool",
+          "name": "needMoreHelp",
           "type": "_needMoreHelp",
           "sql_column": "needMoreHelp",
           "notes": ""
         },
         "resolvedBy": {
-          "name": "ObjectGuid",
+          "name": "resolvedBy",
           "type": "_resolvedBy",
           "sql_column": "resolvedBy",
           "notes": "Player"
@@ -19453,31 +19665,31 @@
       "c_struct": "Petition",
       "fields": {
         "ownerguid": {
-          "name": "ObjectGuid",
+          "name": "ownerguid",
           "type": "ownerGuid",
           "sql_column": "ownerguid",
           "notes": "Player"
         },
         "petitionguid": {
-          "name": "ObjectGuid",
+          "name": "petitionguid",
           "type": "petitionGuid",
           "sql_column": "petitionguid",
           "notes": "Item"
         },
         "name": {
-          "name": "std::string",
+          "name": "name",
           "type": "petitionName",
           "sql_column": "name",
           "notes": ""
         },
         "type": {
-          "name": "uint8",
+          "name": "type",
           "type": "petitionType",
           "sql_column": "type",
           "notes": ""
         },
         "petition_id": {
-          "name": "uint32",
+          "name": "petition_id",
           "type": "petitionId",
           "sql_column": "petition_id",
           "notes": ""
@@ -19502,7 +19714,7 @@
       "c_struct": "Signatures",
       "fields": {
         "petition_id": {
-          "name": "uint32",
+          "name": "petition_id",
           "type": "*(lookup key)*",
           "sql_column": "petition_id",
           "notes": "Maps to itemGuid via PetitionIdToItemGuid"
@@ -19514,7 +19726,7 @@
           "notes": "Player"
         },
         "player_account": {
-          "name": "uint32",
+          "name": "player_account",
           "type": "signatureMap value",
           "sql_column": "player_account",
           "notes": "Account ID"
@@ -19539,7 +19751,7 @@
       "c_struct": "InstanceSave",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "m_instanceid",
           "sql_column": "id",
           "notes": "Instance ID"
@@ -19566,13 +19778,13 @@
           "notes": ""
         },
         "completedEncounters": {
-          "name": "uint32",
+          "name": "completedEncounters",
           "type": "m_completedEncounterMask",
           "sql_column": "completedEncounters",
           "notes": "Bitmask"
         },
         "data": {
-          "name": "std::string",
+          "name": "data",
           "type": "m_instanceData",
           "sql_column": "data",
           "notes": ""
@@ -19591,7 +19803,7 @@
       "c_struct": "ResetTimes",
       "fields": {
         "mapid": {
-          "name": "uint16",
+          "name": "mapid",
           "type": "key part",
           "sql_column": "mapid",
           "notes": "Packed with difficulty"
@@ -19630,19 +19842,19 @@
           "notes": "Player"
         },
         "instance": {
-          "name": "uint32",
+          "name": "instance",
           "type": "*(links to InstanceSave)*",
           "sql_column": "instance",
           "notes": ""
         },
         "permanent": {
-          "name": "bool",
+          "name": "permanent",
           "type": "InstancePlayerBind::perm",
           "sql_column": "permanent",
           "notes": ""
         },
         "extended": {
-          "name": "bool",
+          "name": "extended",
           "type": "InstancePlayerBind::extended",
           "sql_column": "extended",
           "notes": ""
@@ -19663,13 +19875,13 @@
       "c_struct": "GroupData",
       "fields": {
         "guid": {
-          "name": "uint32",
+          "name": "guid",
           "type": "GUID",
           "sql_column": "guid",
           "notes": "Group ID"
         },
         "leaderGuid": {
-          "name": "ObjectGuid",
+          "name": "leaderGuid",
           "type": "LeaderGuid",
           "sql_column": "leaderGuid",
           "notes": "Player"
@@ -19681,21 +19893,21 @@
           "notes": ""
         },
         "looterGuid": {
-          "name": "ObjectGuid",
+          "name": "looterGuid",
           "type": "LooterGuid",
           "sql_column": "looterGuid",
           "notes": "Player"
         },
         "lootThreshold": {
-          "name": "uint32",
+          "name": "lootThreshold",
           "type": "m_lootThreshold",
           "sql_column": "lootThreshold",
           "notes": ""
         },
         "icon1-8": {
-          "name": "uint64",
+          "name": "icon1-8",
           "type": "m_targetIcons[0-7]",
-          "sql_column": "icon1-8",
+          "sql_column": "icon1..8",
           "notes": "Target markers"
         },
         "groupType": {
@@ -19705,19 +19917,19 @@
           "notes": ""
         },
         "difficulty": {
-          "name": "Difficulty",
+          "name": "difficulty",
           "type": "m_dungeonDifficulty",
           "sql_column": "difficulty",
           "notes": ""
         },
         "raidDifficulty": {
-          "name": "Difficulty",
+          "name": "raidDifficulty",
           "type": "m_raidDifficulty",
           "sql_column": "raidDifficulty",
           "notes": ""
         },
         "masterLooterGuid": {
-          "name": "ObjectGuid",
+          "name": "masterLooterGuid",
           "type": "MasterLooterGuid",
           "sql_column": "masterLooterGuid",
           "notes": "Player"
@@ -19738,7 +19950,7 @@
       "c_struct": "GroupMembers",
       "fields": {
         "guid": {
-          "name": "uint32",
+          "name": "guid",
           "type": "*(find Group)*",
           "sql_column": "guid",
           "notes": "Group ID"
@@ -19750,19 +19962,19 @@
           "notes": "Player"
         },
         "memberFlags": {
-          "name": "uint8",
+          "name": "memberFlags",
           "type": "flags",
           "sql_column": "memberFlags",
           "notes": ""
         },
         "subgroup": {
-          "name": "uint8",
+          "name": "subgroup",
           "type": "group",
           "sql_column": "subgroup",
           "notes": "Subgroup number"
         },
         "roles": {
-          "name": "uint8",
+          "name": "roles",
           "type": "roles",
           "sql_column": "roles",
           "notes": "Roles bitmask"
@@ -19783,13 +19995,13 @@
       "c_struct": "LFGData",
       "fields": {
         "guid": {
-          "name": "uint32",
+          "name": "guid",
           "type": "*(FK to groups)*",
           "sql_column": "guid",
           "notes": ""
         },
         "dungeon": {
-          "name": "uint32",
+          "name": "dungeon",
           "type": "m_LfgDungeonEntry",
           "sql_column": "dungeon",
           "notes": ""
@@ -19816,13 +20028,13 @@
       "c_struct": "Guild",
       "fields": {
         "guildid": {
-          "name": "uint32",
+          "name": "guildid",
           "type": "m_id",
           "sql_column": "guildid",
           "notes": ""
         },
         "name": {
-          "name": "std::string",
+          "name": "name",
           "type": "m_name",
           "sql_column": "name",
           "notes": ""
@@ -19864,13 +20076,13 @@
           "sql_column": "BackgroundColor"
         },
         "info": {
-          "name": "std::string",
+          "name": "info",
           "type": "m_info",
           "sql_column": "info",
           "notes": ""
         },
         "motd": {
-          "name": "std::string",
+          "name": "motd",
           "type": "m_motd",
           "sql_column": "motd",
           "notes": ""
@@ -19937,13 +20149,13 @@
       "c_struct": "ArenaTeam",
       "fields": {
         "arenaTeamId": {
-          "name": "uint32",
+          "name": "arenaTeamId",
           "type": "GetId()",
           "sql_column": "arenaTeamId",
           "notes": ""
         },
         "name": {
-          "name": "std::string",
+          "name": "name",
           "type": "GetName()",
           "sql_column": "name",
           "notes": ""
@@ -19955,73 +20167,73 @@
           "notes": "Player"
         },
         "type": {
-          "name": "uint8",
+          "name": "type",
           "type": "GetType()",
           "sql_column": "type",
           "notes": "2v2, 3v3, 5v5"
         },
         "backgroundColor": {
-          "name": "uint32",
+          "name": "backgroundColor",
           "type": "BackgroundColor",
           "sql_column": "backgroundColor",
           "notes": ""
         },
         "emblemStyle": {
-          "name": "uint32",
+          "name": "emblemStyle",
           "type": "EmblemStyle",
           "sql_column": "emblemStyle",
           "notes": ""
         },
         "emblemColor": {
-          "name": "uint32",
+          "name": "emblemColor",
           "type": "EmblemColor",
           "sql_column": "emblemColor",
           "notes": ""
         },
         "borderStyle": {
-          "name": "uint32",
+          "name": "borderStyle",
           "type": "BorderStyle",
           "sql_column": "borderStyle",
           "notes": ""
         },
         "borderColor": {
-          "name": "uint32",
+          "name": "borderColor",
           "type": "BorderColor",
           "sql_column": "borderColor",
           "notes": ""
         },
         "rating": {
-          "name": "uint32",
+          "name": "rating",
           "type": "Rating",
           "sql_column": "rating",
           "notes": ""
         },
         "weekGames": {
-          "name": "uint32",
+          "name": "weekGames",
           "type": "WeekGames",
           "sql_column": "weekGames",
           "notes": ""
         },
         "weekWins": {
-          "name": "uint32",
+          "name": "weekWins",
           "type": "WeekWins",
           "sql_column": "weekWins",
           "notes": ""
         },
         "seasonGames": {
-          "name": "uint32",
+          "name": "seasonGames",
           "type": "SeasonGames",
           "sql_column": "seasonGames",
           "notes": ""
         },
         "seasonWins": {
-          "name": "uint32",
+          "name": "seasonWins",
           "type": "SeasonWins",
           "sql_column": "seasonWins",
           "notes": ""
         },
         "rank": {
-          "name": "uint32",
+          "name": "rank",
           "type": "Rank",
           "sql_column": "rank",
           "notes": ""
@@ -20048,39 +20260,39 @@
           "notes": "Player"
         },
         "weekGames": {
-          "name": "uint16",
+          "name": "weekGames",
           "type": "WeekGames",
           "sql_column": "weekGames",
           "notes": ""
         },
         "weekWins": {
-          "name": "uint16",
+          "name": "weekWins",
           "type": "WeekWins",
           "sql_column": "weekWins",
           "notes": ""
         },
         "seasonGames": {
-          "name": "uint16",
+          "name": "seasonGames",
           "type": "SeasonGames",
           "sql_column": "seasonGames",
           "notes": ""
         },
         "seasonWins": {
-          "name": "uint16",
+          "name": "seasonWins",
           "type": "SeasonWins",
           "sql_column": "seasonWins",
           "notes": ""
         },
         "personalRating": {
-          "name": "uint16",
+          "name": "personalRating",
           "type": "PersonalRating",
           "sql_column": "personalRating",
           "notes": "From `character_arena_stats`"
         },
         "matchMakerRating": {
-          "name": "uint16",
+          "name": "matchMakerRating",
           "type": "MatchMakerRating",
-          "sql_column": "matchMakerRating",
+          "sql_column": "personalRating",
           "notes": "From `character_arena_stats`"
         }
       },
@@ -20103,7 +20315,7 @@
       "c_struct": "CalendarEvent",
       "fields": {
         "id": {
-          "name": "uint64",
+          "name": "id",
           "type": "_eventId",
           "sql_column": "id",
           "notes": ""
@@ -20115,13 +20327,13 @@
           "notes": "Player"
         },
         "title": {
-          "name": "std::string",
+          "name": "title",
           "type": "_title",
           "sql_column": "title",
           "notes": ""
         },
         "description": {
-          "name": "std::string",
+          "name": "description",
           "type": "_description",
           "sql_column": "description",
           "notes": ""
@@ -20142,19 +20354,19 @@
           "reference_column": "ID"
         },
         "eventtime": {
-          "name": "time_t",
+          "name": "eventtime",
           "type": "_eventTime",
           "sql_column": "eventtime",
           "notes": ""
         },
         "flags": {
-          "name": "uint32",
+          "name": "flags",
           "type": "_flags",
           "sql_column": "flags",
           "notes": ""
         },
         "time2": {
-          "name": "time_t",
+          "name": "time2",
           "type": "_timezoneTime",
           "sql_column": "time2",
           "notes": ""
@@ -20173,25 +20385,25 @@
       "c_struct": "CalendarInvite",
       "fields": {
         "id": {
-          "name": "uint64",
+          "name": "id",
           "type": "_inviteId",
           "sql_column": "id",
           "notes": ""
         },
         "event": {
-          "name": "uint64",
+          "name": "event",
           "type": "_eventId",
           "sql_column": "event",
           "notes": ""
         },
         "invitee": {
-          "name": "ObjectGuid",
+          "name": "invitee",
           "type": "_invitee",
           "sql_column": "invitee",
           "notes": "Player"
         },
         "sender": {
-          "name": "ObjectGuid",
+          "name": "sender",
           "type": "_senderGUID",
           "sql_column": "sender",
           "notes": "Player"
@@ -20215,7 +20427,7 @@
           "notes": ""
         },
         "text": {
-          "name": "std::string",
+          "name": "text",
           "type": "_text",
           "sql_column": "text",
           "notes": ""
@@ -20236,7 +20448,7 @@
       "c_struct": "AuctionEntry",
       "fields": {
         "id": {
-          "name": "uint32",
+          "name": "id",
           "type": "Id",
           "sql_column": "id",
           "notes": "Auction ID"
@@ -20251,31 +20463,31 @@
           "reference_column": "ID"
         },
         "itemguid": {
-          "name": "ObjectGuid",
+          "name": "itemguid",
           "type": "item_guid",
           "sql_column": "itemguid",
           "notes": "Item"
         },
         "item_template": {
-          "name": "uint32",
+          "name": "item_template",
           "type": "*(from item_instance join)*",
-          "sql_column": "item_template",
+          "sql_column": null,
           "notes": ""
         },
         "itemCount": {
-          "name": "uint32",
+          "name": "itemCount",
           "type": "*(from item_instance join)*",
-          "sql_column": "itemCount",
+          "sql_column": null,
           "notes": ""
         },
         "itemowner": {
-          "name": "ObjectGuid",
+          "name": "itemowner",
           "type": "owner",
           "sql_column": "itemowner",
           "notes": "Player"
         },
         "buyoutprice": {
-          "name": "uint32",
+          "name": "buyoutprice",
           "type": "buyout",
           "sql_column": "buyoutprice",
           "notes": ""
@@ -20287,25 +20499,25 @@
           "notes": ""
         },
         "buyguid": {
-          "name": "ObjectGuid",
+          "name": "buyguid",
           "type": "bidder",
           "sql_column": "buyguid",
           "notes": "Player"
         },
         "lastbid": {
-          "name": "uint32",
+          "name": "lastbid",
           "type": "bid",
           "sql_column": "lastbid",
           "notes": ""
         },
         "startbid": {
-          "name": "uint32",
+          "name": "startbid",
           "type": "startbid",
           "sql_column": "startbid",
           "notes": ""
         },
         "deposit": {
-          "name": "uint32",
+          "name": "deposit",
           "type": "deposit",
           "sql_column": "deposit",
           "notes": ""
@@ -20325,13 +20537,13 @@
       "c_struct": "SavedAddons",
       "fields": {
         "name": {
-          "name": "std::string",
+          "name": "name",
           "type": "Name",
           "sql_column": "name",
           "notes": "Addon name (PK)"
         },
         "crc": {
-          "name": "uint32",
+          "name": "crc",
           "type": "CRC",
           "sql_column": "crc",
           "notes": ""
@@ -20361,13 +20573,13 @@
           "name": "Name",
           "type": "std::array&lt;uint8, 16&gt;",
           "notes": "",
-          "sql_column": "NameMD5"
+          "sql_column": "Name"
         },
         "Version": {
           "name": "Version",
           "type": "std::array&lt;uint8, 16&gt;",
           "notes": "",
-          "sql_column": "VersionMD5"
+          "sql_column": "Version"
         },
         "Timestamp": {
           "name": "Timestamp",
@@ -21298,9 +21510,9 @@
           "name": "eventEntry",
           "type": "int32",
           "sql_column": "eventEntry",
-          "references": "GameEventEntry",
-          "reference_type": "sql_table",
-          "reference_column": "ID"
+          "references": "GameEventData",
+          "reference_type": "sql_manager",
+          "reference_column": "eventEntry"
         },
         "1": {
           "name": "guid",
@@ -26263,9 +26475,9 @@
           "name": "owner",
           "type": "int32",
           "sql_column": "owner",
-          "references": "Character",
-          "reference_type": "external",
-          "reference_column": "id"
+          "references": "Characters",
+          "reference_type": "sql_auxiliary",
+          "reference_column": "guid"
         },
         "3": {
           "name": "modelid",
@@ -31551,7 +31763,7 @@
         "0": {
           "name": "seat_entry",
           "type": "uint32",
-          "sql_column": "seat_entry",
+          "sql_column": "seat_id",
           "notes": "GO template entry",
           "references": "VehicleEntry",
           "reference_type": "dbc_entry",
