@@ -1,0 +1,276 @@
+[
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T1",
+    "run": 1,
+    "session_id": "ses_f77a42a83ffe1NYCFblOK5D1Vm",
+    "correct": true,
+    "answer_tail": "**Spell 118 (Polymorph)**\n\n| Field | Value |\n|-------|-------|\n| **BaseLevel** | 8 |\n| **Mechanic** | 17 (Polymorph) |\n\nBase level 8 means a mage needs to be at least level 8 to learn this spell. Mechanic 17 corresponds to the **Polymorph** mechanic type \u2014 it transforms the target into a harmless critter (sheep by default), incapacitating them until cancelled or damaged.",
+    "tool_calls": 3,
+    "tools_used": [
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 118,
+          "fields": [
+            "BaseLevel",
+            "Mechanic",
+            "SpellIconID"
+          ],
+          "compact": false
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 118,
+          "fields": [
+            "Mechanic"
+          ],
+          "resolve": "[\"enum\"]"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "SpellMechanic",
+          "compact": false
+        },
+        "error": true
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Store 'SpellMechanic' not found.\", \"suggestion\": \"Did you mean: spellitemenchantment_dbc (dbc_overlay), spellenchantprocentry (struct), spell_enchant_proc_data (table), spellranks (table), spellentry (struct)?\", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 16378,
+      "output": 345,
+      "reasoning": 0,
+      "total": 71379
+    },
+    "duration_s": 16.7,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T2",
+    "run": 1,
+    "session_id": "ses_f77a3e951ffeRLbtyCujQ2INJp",
+    "correct": true,
+    "answer_tail": "The `spellid_1` for Minor Healing Potion is **439**. Now let me look up that spell's name.\n\nSpell ID **439** is named **\"Healing Potion\"** (DBC source: `Spell.dbc`).",
+    "tool_calls": 6,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118,
+          "fields": [
+            "spellid_1"
+          ]
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "item_template",
+          "detail": "summary"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118,
+          "fields": [
+            "entry",
+            "name",
+            "spellid_1",
+            "spellid_2",
+            "spellid_3",
+            "spellid_4",
+            "spellid_5"
+          ]
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 439,
+          "fields": [
+            "ID",
+            "Name"
+          ]
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "ID",
+            "spellname"
+          ],
+          "id": 439,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Unknown field 'spellid_1' for table 'item_template'. Did you mean: spellid_1..5, Spells, SellPrice, displayid, ScriptId? \", \"isError\": true}",
+      "{\"error\": \"Unknown field 'spellid_1' for table 'item_template'. Did you mean: spellid_1..5, Spells, SellPrice, displayid, ScriptId? \", \"isError\": true}",
+      "{\"error\": \"Unknown field 'Name' for Spell. Did you mean: spellname, spellname[6], spellname[7], spellname[8], spellname[9]?\", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 19760,
+      "output": 597,
+      "reasoning": 0,
+      "total": 131973
+    },
+    "duration_s": 32.8,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T3",
+    "run": 1,
+    "session_id": "ses_f77a3692dffeiLZJ3anR7W4P6s",
+    "correct": true,
+    "answer_tail": "There are **3,125** creature spawns with entry ID 32820 in map 0 (Eastern Kingdoms). The creature template name is **\"Wild Turkey\"**.",
+    "tool_calls": 5,
+    "tools_used": [
+      "acore_data_list",
+      "acore_data_lookup",
+      "acore_data_query",
+      "acore_data_sql"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_list",
+        "input": {
+          "search": "creature"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "creature",
+          "detail": "schema"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT COUNT(*) AS count FROM creature WHERE id = 32820 AND map = 0"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT name FROM creature_template WHERE entry = 32820"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature",
+          "limit": 5,
+          "compact": true
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 19991,
+      "output": 1093,
+      "reasoning": 0,
+      "total": 120924
+    },
+    "duration_s": 34.4,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T4",
+    "run": 1,
+    "session_id": "ses_f77a2e2d7ffePH7SM3q7G2221N",
+    "correct": true,
+    "answer_tail": "Spell 118 is **Polymorph**. The name field is `SpellName` (locale array at indices 136\u2013151).",
+    "tool_calls": 3,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "SpellEntry",
+          "detail": "summary"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "SpellEntry",
+          "detail": "schema"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "SpellEntry",
+          "id": 118,
+          "fields": [
+            "SpellName"
+          ]
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 26404,
+      "output": 312,
+      "reasoning": 0,
+      "total": 92764
+    },
+    "duration_s": 20.2,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]
