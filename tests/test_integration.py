@@ -322,13 +322,14 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 9, "Should have exactly 9 tools")
+        self.assertEqual(len(tools), 10, "Should have exactly 10 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
         self.assertIn("dbversion", names)
         self.assertIn("travel", names)
         self.assertIn("encounter", names)
+        self.assertIn("explain", names)
         self.assertIn("query", names)
 
 
@@ -1157,6 +1158,41 @@ class TestEncounterTool(unittest.TestCase):
     def test_limit_validation(self):
         r = call_tool("encounter", {"map": 0, "limit": 500})
         self.assertTrue(r.get("isError"))
+
+
+class TestExplainTool(unittest.TestCase):
+    """explain tool: record digest (live DB + DBC)."""
+
+    def test_dbc_record_digest(self):
+        r = call_tool("explain", {"name": "Spell", "id": 118})
+        self.assertEqual(r["name"], "Polymorph")
+        self.assertIn("Polymorph", r["summary"])
+        # name is pinned first in key_fields
+        self.assertEqual(list(r["key_fields"].keys())[0], "SpellName[0]")
+        self.assertTrue(r["relations"])
+
+    def test_sql_record_digest(self):
+        r = call_tool("explain", {"name": "quest_template", "id": 46})
+        self.assertEqual(r["name"], "Bounty on Murlocs")
+        self.assertEqual(r["source"]["sql_table"], "quest_template")
+        names = {x["target_name"] for x in r["relations"]}
+        self.assertTrue(any("Guard Thomas" in n for n in names))
+
+    def test_overlay_only_record_notes_missing_dbc(self):
+        # spell 19 exists only in the live spell_dbc overlay in this build
+        r = call_tool("explain", {"name": "Spell", "id": 19})
+        self.assertNotIn("isError", r)
+        self.assertIn("sql_table", r["source"])
+        self.assertIn("note", r["source"])
+        self.assertIn("overlay", r["source"]["note"].lower())
+
+    def test_missing_id_is_error(self):
+        r = call_tool("explain", {"name": "Spell"})
+        self.assertTrue(r.get("isError"))
+
+    def test_unknown_store_gets_suggestion(self):
+        r = call_tool("explain", {"name": "BogusStoreXYZ", "id": 1})
+        self.assertTrue(r.get("isError") or r.get("suggestion"))
 
 
 class TestSpawnsTool(unittest.TestCase):
