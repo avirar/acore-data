@@ -257,6 +257,66 @@ class TestRegistryAudit(unittest.TestCase):
         self.assertFalse(problems, "; ".join(problems[:5]))
 
 
+class TestRegistryHygiene(unittest.TestCase):
+    """Live-but-unregistered tables found by the coverage audit (feat/registry-hygiene).
+
+    - playerbots_bis_gear is OPTIONAL (mod-playerbots only): it must be
+      registered, flagged in reference_notes, and must NOT be a structural
+      audit failure when absent from the install.
+    - SQL update-management tables + RBAC tables are registered so agents can
+      query DB state / GM permissions.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(_WORKDIR, "datastore_registry.json"), "r") as f:
+            reg = json.load(f)
+            cls.registry = reg["entries"]
+            cls.indices = reg["indices"]
+
+    def test_bis_gear_registered_as_optional(self):
+        e = self.registry["PlayerbotsBisGear"]
+        self.assertEqual(e["sql_table"], "playerbots_bis_gear")
+        self.assertEqual(e["sql_database"], "acore_playerbots")
+        self.assertEqual(e["category"], "sql_auxiliary")
+        notes = (e.get("reference_notes") or "").lower()
+        self.assertIn("optional", notes)
+        # item_id FK is annotated (cross-DB join to item_template is the point)
+        item_field = next(f for f in e["fields"].values() if f["sql_column"] == "item_id")
+        self.assertTrue(item_field.get("references"), "item_id should reference item_template")
+
+    def test_update_management_tables_registered(self):
+        for name, tbl, db in [
+            ("Updates", "updates", "acore_world"),
+            ("UpdatesInclude", "updates_include", "acore_world"),
+            ("Version", "version", "acore_world"),
+        ]:
+            self.assertIn(name, self.registry, name)
+            self.assertEqual(self.registry[name]["sql_table"], tbl)
+            self.assertEqual(self.registry[name]["sql_database"], db)
+
+    def test_rbac_tables_registered(self):
+        for name in [
+            "RbacPermissions",
+            "RbacAccountPermissions",
+            "RbacDefaultPermissions",
+            "RbacLinkedPermissions",
+        ]:
+            self.assertIn(name, self.registry, name)
+            self.assertEqual(self.registry[name]["sql_database"], "acore_auth")
+
+    def test_indices_contain_new_entries(self):
+        for name in ["PlayerbotsBisGear", "Updates", "Version", "RbacPermissions"]:
+            tbl = self.registry[name]["sql_table"]
+            self.assertEqual(self.indices["by_struct_name"].get(name), name)
+            self.assertEqual(self.indices["by_sql_table"].get(tbl), name)
+
+    def test_total_entries_consistent(self):
+        with open(os.path.join(_WORKDIR, "datastore_registry.json"), "r") as f:
+            reg = json.load(f)
+        self.assertEqual(reg["_meta"]["total_entries"], len(reg["entries"]))
+
+
 class TestFormatParser(unittest.TestCase):
     """DBCfmt parser robustness."""
 
