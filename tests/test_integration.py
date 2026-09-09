@@ -322,10 +322,11 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 6, "Should have exactly 6 tools")
+        self.assertEqual(len(tools), 7, "Should have exactly 7 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
+        self.assertIn("dbversion", names)
         self.assertIn("query", names)
 
 
@@ -1039,6 +1040,36 @@ class TestSpellResolution(unittest.TestCase):
         self.assertIn("warning", conds, "Should include warning when conditions exceed resolve_max")
         self.assertIn("191", conds["warning"], "Warning should mention total condition count")
         self.assertEqual(len(conds["requirements"]), 3, "Should show exactly resolve_max requirements")
+
+
+class TestDbversionTool(unittest.TestCase):
+    """dbversion tool: DB state / version audit (live DB)."""
+
+    def test_version_row_present(self):
+        r = call_tool("dbversion", {})
+        self.assertNotIn("isError", r)
+        v = r["version"]
+        self.assertTrue(v.get("core_version"))
+        self.assertTrue(v.get("db_version"))
+        self.assertIn("acore_world", r["databases"])
+
+    def test_per_db_update_counts_consistent(self):
+        r = call_tool("dbversion", {})
+        w = r["databases"]["acore_world"]
+        self.assertTrue(w["installed"])
+        self.assertGreater(w["tables"], 0)
+        # applied + pending must equal the sum of all state counts
+        total = sum(w["updates"].values())
+        self.assertEqual(w["applied"] + w["pending"], total)
+
+    def test_optional_playerbots_flag(self):
+        r = call_tool("dbversion", {})
+        self.assertIn("mod_playerbots_installed", r)
+        pb = r["databases"]["acore_playerbots"]
+        # flag must agree with the per-DB installed state
+        self.assertEqual(r["mod_playerbots_installed"], pb["installed"])
+        # on this install the mod DB is present
+        self.assertTrue(pb["installed"])
 
 
 class TestSpawnsTool(unittest.TestCase):
