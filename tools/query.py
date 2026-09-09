@@ -472,7 +472,7 @@ def _merge_dbc_sql(
 
     if dbc_result and not db_result:
         annotated = _annotate_dbc_result(
-            dbc_result, reg_entry, fields_param, compact, single_record
+            dbc_result, reg_entry, None, fields_param, compact, single_record
         )
         return {"result": annotated, "source": "dbc"}
 
