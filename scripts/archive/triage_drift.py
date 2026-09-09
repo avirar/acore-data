@@ -16,7 +16,7 @@ import json, re, sys
 from pathlib import Path
 from collections import defaultdict, Counter
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 reg = json.loads((ROOT / "datastore_registry.json").read_text())
 E = reg["entries"]
