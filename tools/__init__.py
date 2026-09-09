@@ -1,7 +1,7 @@
 """
 Tool modules for acore-data MCP server.
 
-Six tools: query, lookup, list, spawns, sql, terrain
+Seven tools: query, lookup, list, spawns, dbversion, sql, terrain
 """
 import os
 
@@ -9,6 +9,7 @@ from tools import query as query_tool
 from tools import lookup as lookup_tool
 from tools import list as list_tool
 from tools import spawns as spawns_tool
+from tools import dbversion as dbversion_tool
 from tools import sql as sql_tool
 from tools import terrain as terrain_tool
 
@@ -29,6 +30,7 @@ def get_tool_schemas() -> list:
         lookup_tool.get_schema(),
         list_tool.get_schema(),
         spawns_tool.get_schema(),
+        dbversion_tool.get_schema(),
         terrain_tool.get_schema(),
     ]
 
