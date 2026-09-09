@@ -8,6 +8,7 @@ Parameters renamed: dbc_name -> name
 """
 
 import difflib
+import json
 import re
 import sys
 from typing import Dict, Any, List, Optional, Tuple
@@ -18,6 +19,7 @@ from core.annotation import (
     _convert_filter_for_dbc as _convert_filter_for_dbc_impl,
     _dbc_filter_to_sql_where,
     _escape_like_pattern,
+    _resolve_field_name_to_index,
     compact_sql_rows,
 )
 from core.type_resolver import resolve_type_fields
@@ -107,6 +109,59 @@ def _build_sql_filter_clause(
     return f"{col_name} = %s", val, False
 
 
+def _validate_fields_param(
+    reg_entry: Dict, fields_param: List, display_name: str
+) -> Optional[Dict[str, Any]]:
+    """Validate field selectors against the registry. Returns an error dict or None."""
+    fields_meta = reg_entry.get("fields", {})
+    valid_numeric = {int(k) for k in fields_meta.keys() if k.isdigit()}
+    all_names = []
+    seen = set()
+    for info in fields_meta.values():
+        for n in [info.get("name", ""), info.get("sql_column", "")]:
+            if n and n.lower() not in seen:
+                seen.add(n.lower())
+                all_names.append(n)
+
+    for f in fields_param:
+        ok = False
+        if isinstance(f, bool):
+            pass  # invalid, handled below
+        elif isinstance(f, int) or (isinstance(f, str) and f.strip().isdigit()):
+            ok = int(f) in valid_numeric
+        elif isinstance(f, str):
+            low = f.lower()
+            ok = low in seen or bool(_resolve_field_name_to_index(f, fields_meta))
+
+        if not ok:
+            candidates = [n.lower() for n in all_names]
+            num_candidates = [str(i) for i in sorted(valid_numeric)[:200]]
+            sugg = difflib.get_close_matches(
+                str(f).lower(), candidates + num_candidates, n=5, cutoff=0.4
+            )
+            msg = f"Unknown field '{f}' for {display_name}."
+            if sugg:
+                msg += f" Did you mean: {', '.join(sorted(set(sugg)))}?"
+            return {"error": msg, "isError": True}
+
+    return None
+
+
+def _dbc_record_matches(record: Dict[int, Any], value: Any) -> bool:
+    """Check a DBC field value against a filter value (supports $like/$ilike dicts)."""
+    if isinstance(value, dict):
+        if "$like" in value:
+            pat, ci = value["$like"], False
+        elif "$ilike" in value:
+            pat, ci = value["$ilike"], True
+        else:
+            return False
+        rx = re.escape(str(pat)).replace("\\%", ".*").replace("_", ".")
+        hay = "" if record is None else str(record)
+        return re.match("^" + rx + "$", hay, re.IGNORECASE if ci else 0) is not None
+    return record == value
+
+
 def query_tools(server):
     """
     Query any datastore.
@@ -193,6 +248,12 @@ def _query_dbc(
         except Exception as e:
             return {"error": f"DBC error: {e}", "isError": True}
 
+    # Strict validation of requested fields (unknown names -> error + suggestions)
+    if fields_param and reg_entry:
+        err = _validate_fields_param(reg_entry, fields_param, name)
+        if err:
+            return err
+
     # Convert named filter to numeric indices (with OR group detection)
     dbc_filter = {}
     filter_notes = []
@@ -215,7 +276,35 @@ def _query_dbc(
 
         if id_value is not None:
             record = reader.get_record_by_id(id_value)
-            dbc_result = [record] if record else []
+            if record and dbc_filter:
+                # AND semantics: the record must also satisfy all filter conditions
+                or_group_indices = {p for p in (or_groups or {}).keys()}
+                ok = all(
+                    any(
+                        _dbc_record_matches(record.get(i), dbc_filter[p])
+                        for i in [p] + or_groups[p]
+                    )
+                    for p in or_group_indices
+                )
+                if ok:
+                    ok = all(
+                        _dbc_record_matches(record.get(k), v)
+                        for k, v in dbc_filter.items()
+                        if k not in or_group_indices
+                    )
+                if not ok:
+                    dbc_result = None
+                    return {
+                        "error": (
+                            f"Record id {id_value} exists but does not satisfy the filter "
+                            f"{json.dumps(filter_data)}. If this was a typo, adjust the "
+                            f"filter; otherwise query without the id constraint."
+                        ),
+                        "isError": True,
+                    }
+                dbc_result = [record]
+            else:
+                dbc_result = [record] if record else []
         elif row_index is not None:
             record = reader.get_record(int(row_index))
             dbc_result = [record] if record else []
@@ -344,8 +433,47 @@ def _query_sql(
             f"Routing query to {target_db} for table '{sql_table}'", file=sys.stderr
         )
 
+    # Field selection (strict: unknown names are errors)
+    fields_param = args.get("fields")
+    selected_cols: List[str] = []
+    if fields_param:
+        fields_meta = reg_entry.get("fields", {})
+        seen_cols = set()
+        for f in fields_param:
+            col = None
+            if isinstance(f, bool):
+                return {
+                    "error": f"Invalid field selector: {f!r} (use a field name or index)",
+                    "isError": True,
+                }
+            if isinstance(f, int) or (isinstance(f, str) and f.strip().isdigit()):
+                info = fields_meta.get(str(int(f)))
+                if info:
+                    col = info.get("sql_column") or info.get("name") or str(f)
+            elif isinstance(f, str):
+                col, err = _resolve_sql_column(reg_entry, f, sql_table)
+                if col is None:
+                    return {
+                        "error": f"Unknown field '{f}' for table '{sql_table}'. {err}",
+                        "isError": True,
+                    }
+            else:
+                return {
+                    "error": f"Invalid field selector: {f!r} (use a field name or index)",
+                    "isError": True,
+                }
+            if col and col.lower() not in seen_cols:
+                seen_cols.add(col.lower())
+                selected_cols.append(col)
+        if not selected_cols:
+            return {
+                "error": f"No valid fields in {fields_param!r} for '{sql_table}'",
+                "isError": True,
+            }
+
     # Build SQL with parameterized values
-    sql = f"SELECT * FROM {sql_table}"
+    select_clause = ", ".join(selected_cols) if selected_cols else "*"
+    sql = f"SELECT {select_clause} FROM {sql_table}"
     where_fragments = []
     params: list = []
 
@@ -418,7 +546,10 @@ def _query_sql(
     # Apply compact filtering to SQL results (before setting columns)
     if compact and rows:
         pk_col = metadata.get("primary_key", "")
-        rows = compact_sql_rows(rows, {pk_col} if pk_col else None)
+        keep = set(selected_cols)
+        if pk_col:
+            keep.add(pk_col)
+        rows = compact_sql_rows(rows, keep or None)
 
     # Set columns after compaction to reflect actual returned fields
     if rows:
