@@ -53,6 +53,45 @@ DBC file, SQL table, store variable) and traverse to the others.
   `EffectTriggerSpell_1`), compaction and single-record shaping. Errors
   report per source (`DBC Spell.dbc: ... | SQL overlay spell_dbc: ...`).
 
+## Composed tools (7 of the 12) — opt-in inputs, clean degradation
+
+Beyond `query`/`lookup`/`list`/`sql`/`terrain`, seven read-only composed
+tools answer recurring multi-step questions in one call (each has an
+integration test class; the exact tool set is asserted by `test_list_tools`):
+
+- `spawns(entry, map_id, area_id, limit)` — creature_spawn + location info;
+  multi-map entries return all maps (names resolved DBC-first, SQL `map`
+  table fallback).
+- `dbversion()` — no-arg server state: core version (fork marker), ACDB
+  version, per-DB `updates` state, pending `updates_include` rows, playerbots
+  flag. The "what server am I talking to?" gate.
+- `travel(map_id, mode, node, from, to)` — playerbots travel-graph tool:
+  `stats` (nodes/edges/points), `node` (details + neighbours), `path`
+  (decoded from `playerbots_travelnode_path`, navmesh height verification
+  via `MapReader` — degrades gracefully when .map data is absent).
+- `encounter(entry|instance|map_id)` — instance/map rollup: top creatures
+  (level, rank, loot), gameobjects, instance metadata. Real AzerothCore loot
+  table is `creature_loot_template`; backtick `rank` (MySQL 8 reserved word);
+  `gameobject` FK is `id` (not `entry`); `instance_template` PK is `map`.
+- `explain(name, id)` — agent-friendly digest of one record: summary,
+  key_fields (capped 20), relations, overlay-overridden fields, source
+  provenance. Reuses the query pipeline (`server.args` swap + `query_tools`).
+- `config(key|search)` — mod-playerbots conf index: `playerbots.conf.dist`
+  (888 settings → default + line) + the C++ `GetOption` call sites that read
+  each key (384 refs), one cached pass. `PLAYERBOTS_ROOT` override.
+- `enums(enum, value, member, search)` — C++ enum decoder: `core/enum_index.py`
+  scans the source tree once (~1,044 enums / 17.7k members) and resolves
+  magic numbers (`Mechanics 17 → MECHANIC_POLYMORPH`). `ACORE_SRC_ROOT`
+  override.
+
+The mod-playerbots and C++ source trees are OPTIONAL: absence of either is a
+clean per-tool error (naming the env var to set), never a server failure —
+the registry/DB/DBC path is independent.
+
+**Module naming gotcha**: `core/enums.py` is the pre-existing lookup
+dictionary module (GO_TYPE_NAMES etc., imported by `core.type_resolver`);
+the source-scanning index is `core/enum_index.py`. Do not merge/rename.
+
 ## Gotchas
 
 - Live `*_dbc` overlay tables (`spell_dbc`, `map_dbc`, `item_dbc`…) use the
@@ -100,18 +139,25 @@ DBC file, SQL table, store variable) and traverse to the others.
 
 ## Tests
 
-- `tests/test_regression.py` — 21 tests, the rework's contract (shape,
+- `tests/test_regression.py` — 26 tests, the rework's contract (shape,
   strictness, links, protocol, registry audit, format parser).
-- `tests/test_integration.py` — 75 tests (live DB + DBC; each test spawns
-  the server via subprocess and needs ~10 s).
-- `tests/test_helpers.py` — 20 fast unit tests (no DB).
+- `tests/test_integration.py` — 130+ tests (live DB + DBC; each test spawns
+  the server via subprocess and needs ~10 s). One test class per tool, incl.
+  TestConfigTool and TestEnumsTool (skip gracefully when the mod-playerbots /
+  azerothcore source trees are absent) and `test_list_tools` (asserts the
+  exact tool set — update it when adding a tool).
+- `tests/test_helpers.py` — 26 fast unit tests (no DB), incl. enum-index
+  parser coverage.
 - No `npm`/build step; no lint config. Run all suites with:
   `.venv/bin/python3 -m pytest tests/ -q` (or the standalone runners).
 
 ## Change process
 
 - Committed per logical area on feature branches with short imperative
-  messages (`fix(query): …`, `feat(list+lookup): …`).
+  messages (`fix(query): …`, `feat(spawns): …`, `feat(enums): …`).
+  **Branch discipline: `git checkout -b feat/x master` BEFORE editing** — a
+  commit accidentally made on master once had to be reconstructed
+  (`git branch feat/x <sha> && git reset --hard <pre-branch-tip>`).
 - After changing tool output: re-run `tests/test_regression.py` and capture
   a new `capture_output_sizes.py` run; compare against the baseline dir.
 - After changing `datastore_registry.json`: run the audit gate
