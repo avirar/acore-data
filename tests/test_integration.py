@@ -322,7 +322,7 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 11, "Should have exactly 11 tools")
+        self.assertEqual(len(tools), 12, "Should have exactly 12 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
@@ -331,6 +331,7 @@ class TestRegression(unittest.TestCase):
         self.assertIn("encounter", names)
         self.assertIn("explain", names)
         self.assertIn("config", names)
+        self.assertIn("enums", names)
         self.assertIn("query", names)
 
 
@@ -1247,6 +1248,52 @@ class TestConfigTool(unittest.TestCase):
         body = json.loads(r["result"]["content"][0]["text"])
         self.assertTrue(body.get("isError"))
         self.assertIn("PLAYERBOTS_ROOT", body["error"])
+
+
+class TestEnumsTool(unittest.TestCase):
+    """enums tool: C++ enum value decoding (needs the source tree)."""
+
+    def _skip_if_no_src(self):
+        import os
+        if not os.path.isdir("/root/azerothcore-wotlk/src"):
+            self.skipTest("azerothcore source tree not present")
+
+    def test_decode_mechanics_17(self):
+        self._skip_if_no_src()
+        r = call_tool("enums", {"enum": "Mechanics", "value": 17})
+        self.assertEqual(r["member"], "MECHANIC_POLYMORPH")
+        self.assertIn("SharedDefines.h", r["file"])
+
+    def test_summary(self):
+        self._skip_if_no_src()
+        r = call_tool("enums", {})
+        self.assertGreater(r["enum_count"], 500)
+        self.assertGreater(r["total_members"], 5000)
+
+    def test_reverse_lookup(self):
+        self._skip_if_no_src()
+        r = call_tool("enums", {"enum": "Mechanics", "member": "POLYMORPH"})
+        self.assertIn("MECHANIC_POLYMORPH", r["matches"].values())
+
+    def test_unknown_enum_suggests(self):
+        self._skip_if_no_src()
+        r = call_tool("enums", {"enum": "Mecanics", "value": 17})
+        self.assertTrue(r.get("isError"))
+        self.assertIn("Mechanics", r.get("did_you_mean", []))
+
+    def test_missing_src_is_clean_error(self):
+        import subprocess, json, sys
+        payload = {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                  "params": {"name": "enums", "arguments": {}}}
+        env = dict(_ENV)
+        env["ACORE_SRC_ROOT"] = "/nonexistent/acore-src-xyz"
+        p = subprocess.run([sys.executable, SERVER_SCRIPT], input=json.dumps(payload),
+                           capture_output=True, timeout=TIMEOUT, text=True,
+                           cwd=_WORKDIR, env=env)
+        r = json.loads(p.stdout)
+        body = json.loads(r["result"]["content"][0]["text"])
+        self.assertTrue(body.get("isError"))
+        self.assertIn("ACORE_SRC_ROOT", body["error"])
 
 
 class TestSpawnsTool(unittest.TestCase):
