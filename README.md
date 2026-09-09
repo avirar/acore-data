@@ -347,14 +347,15 @@ acore-data/
 │   ├── sql-auxiliary-stores.md
 │   └── cross-reference.md
 │
-├── generators/                  # Scripts to generate/update the registry
-│   ├── generate_registry.py
+├── generators/                  # Registry tooling (docs/datastores is human reference)
+│   ├── generate_registry.py     # docs->registry check (read-only; --write to regenerate)
 │   └── generate_supplementary.py
 │
 └── scripts/                     # Utility scripts for cross-refs, column mappings, etc.
     ├── add_cross_references.py
     ├── update_sql_column_mappings.py
-    └── ...
+    ├── audit_registry.py        # registry health gate (structural drift checks)
+    └── archive/                 # one-off registry migrations (phase_a–f, triage)
 ```
 
 ## How It Works

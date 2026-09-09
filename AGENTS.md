@@ -106,7 +106,7 @@ DBC file, SQL table, store variable) and traverse to the others.
   a new `capture_output_sizes.py` run; compare against the baseline dir.
 - After changing `datastore_registry.json`: run the audit gate
   `.venv/bin/python3 scripts/audit_registry.py --db` and confirm the
-  structural signals stay 0. `scripts/fix_registry_phase_[a-f].py` are the
+  structural signals stay 0. `scripts/archive/fix_registry_phase_[a-f].py` are the
   one-off migrations that brought the registry to that state (dangling refs,
   type-as-name, missing data sources, SpellEntry 115/116 swap, curated
   cross-refs, sql_column drift, phantom DBC fields, type-as-name residue);
