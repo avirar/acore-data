@@ -220,12 +220,15 @@ class AcoreDataServer:
                     tool_args = params.get("arguments", {})
 
                     result = self._call_tool(tool_name, tool_args)
+                    call_result = {
+                        "content": [{"type": "text", "text": json.dumps(result)}]
+                    }
+                    if isinstance(result, dict) and result.get("isError"):
+                        call_result["isError"] = True
                     response = {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
-                        "result": {
-                            "content": [{"type": "text", "text": json.dumps(result, indent=2)}]
-                        },
+                        "result": call_result,
                     }
 
                 else:
