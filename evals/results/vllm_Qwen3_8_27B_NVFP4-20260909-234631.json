@@ -1,0 +1,19 @@
+[
+  {
+    "model": "vllm/Qwen3.8-27B-NVFP4",
+    "task": "T1",
+    "run": 1,
+    "correct": false,
+    "answer_tail": "",
+    "tool_calls": 4,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_errors": [],
+    "error_messages": [],
+    "duration_s": 19.8,
+    "exit_code": 0,
+    "stderr_tail": "\u001b[93m\u001b[1m! \u001b[0mpermission requested: external_directory (/root/azerothcore-wotlk/src/server/*); auto-rejecting\n"
+  }
+]

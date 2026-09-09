@@ -1,0 +1,533 @@
+[
+  {
+    "model": "vllm/Qwen3.8-27B-NVFP4",
+    "task": "T1",
+    "run": 1,
+    "session_id": "ses_f7993398fffeKZDbUSfdH2e7ei",
+    "correct": true,
+    "answer_tail": "**Spell 118 \u2014 *Polymorph* (DBC source):**\n- **Base level / spell level: 8** (Rank 1)\n- **Mechanic: 17 = MECHANIC_POLYMORPH** (mechanic enum `SharedDefines.h:1330` in this build)\n\nSupporting details: Effect 6 (`APPLY_AURA`) with aura names [5=`MOD_CONFUSE`, 56=`TRANSFORM`], dispel class 1 (durable), cast time index 16, duration index 18, range index 4.",
+    "tool_calls": 30,
+    "tools_used": [
+      "acore_data_query",
+      "bash"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "SpellEntry",
+          "id": 118,
+          "fields": [
+            "Name",
+            "BaseLevel",
+            "Effect",
+            "Dispel",
+            "Category"
+          ],
+          "resolve": [
+            "enum",
+            "dbc"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 118,
+          "name": "SpellEntry",
+          "resolve": [
+            "enum",
+            "dbc"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"MCHAIR_\" /root/azerothcore-wotlk/src/server/game/Spell/ --no-heading | head -40",
+          "description": "Find mechanic type enum values in server source"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -l \"MCHAIR_POLYMORPH\" /root/azerothcore-wotlk/src 2>/dev/null; ls /root/azerothcore-wotlk 2>/dev/null",
+          "description": "Locate mechanic enum in WotLK source tree"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"MCHAIR_POLYMORPH|MCHAIR_ADD_DISEL\" /root/azerothcore-wotlk/src --no-heading | head; rg -rn \"MCHAIR_\" /root/azerothcore-wotlk/src --files-with-matches | head",
+          "description": "Search MCHAIR mechanic enum in source",
+          "timeout": 60000
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"enum MechanicType|MCHAIR\" /root/azerothcore-wotlk/src 2>&1 | head -20",
+          "description": "Find MechanicType enum definition",
+          "timeout": 60000
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "ls /root/azerothcore-wotlk/src; file /root/azerothcore-wotlk/src 2>/dev/null",
+          "description": "List src directory contents"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg --version >/dev/null 2>&1 && echo rg-ok; ls /root/azerothcore-wotlk/src/server | head; du -sh /root/azerothcore-wotlk/src 2>/dev/null",
+          "description": "Check rg availability and src size"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rn \"MCHAIR\" /root/azerothcore-wotlk/src/server/shared/SpellDefines.h 2>/dev/null | head -30; ls /root/azerothcore-wotlk/src/server/shared | head -30",
+          "description": "Look for mechanic enum in SpellDefines"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rln \"MECHANIC_POLYMORPH\\|MCHAIR_POLYMORPH\" /root/azerothcore-wotlk/src | head",
+          "description": "Find polymorph mechanic enum file"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"MCHAIR\" /root/azerothcore-wotlk/src/server/shared/SharedDefines.h | head -30",
+          "description": "List MCHAIR enum entries with values"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"MECHANIC_\" /root/azerothcore-wotlk/src/server/shared/SharedDefines.h | head -30",
+          "description": "List MECHANIC enum entries"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"SPELL_EFFECT_\" /root/azerothcore-wotlk/src/server/game/Spells/SpellEffects.h | sed -n '1,35p'",
+          "description": "List spell effect enum values"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rln \"SPELL_EFFECT_APPLY_AURA\" /root/azerothcore-wotlk/src | head -3",
+          "description": "Locate SpellEffectType enum file"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rn \"enum.*SpellEffectType\\|SPELL_EFFECT_INSTANTHEAL\\|SPELL_EFFECT_POLYMORPH\" /root/azerothcore-wotlk/src/common/ 2>/dev/null | head; grep -rn \"= 6,$\\|= 8,$\" /root/azerothcore-wotlk/src/common/MiscDefines.h 2>/dev/null | head -3; ls /root/azerothcore-wotlk/src/common",
+          "description": "Search spell effect enum in common defs"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rln \"SPELL_EFFECT_INSTANTHEAL\" /root/azerothcore-wotlk/src/server/game | head -3",
+          "description": "Find effect enum definition file"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "ls /root/azerothcore-wotlk/src/server/game/Spells | head -40; grep -rn \"NEW_AURAPROPERTIES\\|Polymorph\" /root/azerothcore-wotlk/src/server/game/Spells/SpellInfo.h 2>/dev/null | head",
+          "description": "List Spells dir and check SpellInfo"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rn \"MACHINERY\\|= 6,$\\|=6,$\" /root/azerothcore-wotlk/src/server/game/Spells/SpellDefines.h | head; grep -n \"enum\" /root/azerothcore-wotlk/src/server/game/Spells/SpellDefines.h | head -20",
+          "description": "Inspect SpellDefines enums"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rn \"NEW_AURAPROPERTIES\\|NewAurasProp\\|APPLY_AREA_AURA\" /root/azerothcore-wotlk/src/server/game/Spells/*.h /root/azerothcore-wotlk/src/server/game/Spells/*.cpp 2>/dev/null | head; grep -rln \"SCHOOL\" /root/azerothcore-wotlk/src/server/game/Spells/SpellInfo.h",
+          "description": "Search for effect enum and school masks"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"enum SpellEffectType\" -A 20 /root/azerothcore-wotlk/src/server/game/Spells/SpellInfo.h",
+          "description": "Read SpellEffectType enum values"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -rn \"SPELL_EFFECT_INSTANTHEAL\\|SpellEffect = \\|enum.*Effect\\b\" /root/azerothcore-wotlk/src/server/game/Spells/SpellEffects.cpp | head; sed -n '1,60p' /root/azerothcore-wotlk/src/server/game/Spells/SpellEffects.cpp",
+          "description": "Read top of SpellEffects.cpp"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"SPELL_EFFECT_INSTANTHEAL\\|NumSpellEffects\\|enum SpellEffectType\" /root/azerothcore-wotlk/src/server/game/Spells/Spell.h | head",
+          "description": "Find effect enum in Spell.h"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "sed -n '60,135p' /root/azerothcore-wotlk/src/server/game/Spells/SpellEffects.cpp",
+          "description": "Read effect handler table with indices"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"NEW_AURAPROPERTIES|Effect.*POLYMORPH|APPLY_AURA\" /root/azerothcore-data/datastore_registry.json | head; rg -n \"SpellEffect|effect\" /root/acore-data/core/type_resolver.py | head -30",
+          "description": "Check registry and resolver for effect enum"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"APPLY_AURA|NEW_AURAPROP\" /root/acore-data/datastore_registry.json | head -5; rg -rn \"enum\" /root/acore-data/core/type_resolver.py | head -20",
+          "description": "Search registry and type resolver for effect enum"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -n \"SPELL_AURA_POLYMORPH|POLYMORPH|SPELL_AURA_TRANSPORT|SPELL_AURA_DUMMY\" /root/azerothcore-wotlk/src/server/game/Spells/SpellAuraDefines.h | head; rg -n \"enum SpellAura\" -A 60 /root/azerothcore-wotlk/src/server/game/Spells/SpellAuraDefines.h | sed -n '1,70p'",
+          "description": "Read SpellAura enum for ids 5 and 56"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -rlln \"SPELL_AURA_POLYMORPH\" /root/azerothcore-wotlk/src 2>/dev/null | head -5",
+          "description": "Locate SpellAura enum definition files"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "ls /root/azerothcore-wotlk/src/server/game/Spells/Auras | head; rg -ln \"SPELL_AURA_DUMMY\" /root/azerothcore-wotlk/src | head",
+          "description": "List Auras dir and find aura enum"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"POLYMORPH\\|= 5,\" /root/azerothcore-wotlk/src/server/game/Spells/Auras/SpellAuraDefines.h | head -10",
+          "description": "Find aura id 5 and polymorph names"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "grep -n \"= 56,\\|= 6,\\|= 40,\\|= 55,\\|= 57,\" /root/azerothcore-wotlk/src/server/game/Spells/Auras/SpellAuraDefines.h",
+          "description": "Find aura names near id 56"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 762316,
+      "output": 2951,
+      "reasoning": 11089,
+      "total": 776356
+    },
+    "duration_s": 133.1,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "vllm/Qwen3.8-27B-NVFP4",
+    "task": "T2",
+    "run": 1,
+    "session_id": "ses_f79913179ffe0ulxmPo1m7fmTU",
+    "correct": true,
+    "answer_tail": "**Healing Potion**\n\nItem 118 (Minor Healing Potion) has `spellid_1 = 439`, which resolves to spell name **\"Healing Potion\"**.",
+    "tool_calls": 7,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query",
+      "acore_data_sql"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118,
+          "fields": [
+            "Name",
+            "SpellId"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "Name",
+            "spellid_1",
+            "spellid_2",
+            "spellid_3",
+            "spellid_4",
+            "spellid_5"
+          ],
+          "id": 118,
+          "name": "item_template",
+          "resolve": [
+            "sql",
+            "dbc",
+            "enum"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "item_template",
+          "detail": "schema"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "Name1",
+            "Spells"
+          ],
+          "id": 118,
+          "name": "item_template",
+          "resolve": true
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT entry, name, spellid_1, spellid_2, spellid_3, spellid_4, spellid_5 FROM item_template WHERE entry = 118"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 439,
+          "name": "Spell",
+          "fields": [
+            "Name"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 439,
+          "name": "Spell",
+          "resolve": true
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 157395,
+      "output": 510,
+      "reasoning": 817,
+      "total": 158722
+    },
+    "duration_s": 21.0,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "vllm/Qwen3.8-27B-NVFP4",
+    "task": "T3",
+    "run": 1,
+    "session_id": "ses_f7990df49ffeXitP00XaULKAJG",
+    "correct": true,
+    "answer_tail": "- **Creature template 32820**: \"Wild Turkey\"\n- **Spawns in map 0**: 3,125 (per the `creature` table)",
+    "tool_calls": 7,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query",
+      "acore_data_sql"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature_template",
+          "id": 32820,
+          "fields": [
+            "Id",
+            "Name",
+            "SubName",
+            "Rank"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT MAP, COUNT(*) AS spawns FROM creature WHERE id=32820 AND map=0 GROUP BY MAP"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "Name",
+            "SubName",
+            "Rank"
+          ],
+          "id": 32820,
+          "name": "creature_template"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "creature_template",
+          "detail": "summary"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "entry",
+            "name",
+            "subname",
+            "rank"
+          ],
+          "id": 32820,
+          "name": "creature_template"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT entry, name, subname, rank FROM creature_template WHERE entry=32820"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT entry, name, subname FROM creature_template WHERE entry=32820"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 121783,
+      "output": 439,
+      "reasoning": 467,
+      "total": 122689
+    },
+    "duration_s": 13.2,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "vllm/Qwen3.8-27B-NVFP4",
+    "task": "T4",
+    "run": 1,
+    "session_id": "ses_f7990abbaffetCOK6UvM1h6rFe",
+    "correct": true,
+    "answer_tail": "The field is `SpellName` (registry name in `SpellEntry`; collapses the DBC name locale array). Spell 118 = **\"Polymorph\"**.",
+    "tool_calls": 2,
+    "tools_used": [
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 118,
+          "fields": [
+            "Name"
+          ]
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "SpellName"
+          ],
+          "id": 118,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 49323,
+      "output": 153,
+      "reasoning": 261,
+      "total": 49737
+    },
+    "duration_s": 8.7,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]
