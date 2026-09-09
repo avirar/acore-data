@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, and database state audit. Exposes seven tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, and travel-graph verification. Exposes eight tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `travel`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -132,6 +132,30 @@ Database state audit for this install — no arguments. Reports the core/DB vers
 dbversion()
 → core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
   mod_playerbots_installed=true|false
+```
+
+### `travel`
+
+Inspect the mod-playerbots travel graph and verify paths against the MMap navmesh — no running server needed. Three modes (all read-only; requires `acore_playerbots`, its absence is a clean error):
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `map` | number | **Required.** Map id. |
+| `node` | number | Node mode: node details + named neighbours (capped 50 each). |
+| `from` / `to` | number | Path mode: decode the stored path between two nodes (requires both). |
+| `verify` | boolean | Path mode: check each point against MMap ground (default true; degrades to a note where the install has no .map data for the map). |
+
+**Examples:**
+
+```
+travel(map=0)
+→ 644 nodes, 3010 edges, 295623 path points, sample named nodes
+
+travel(map=0, node=0)
+→ "Human start" + neighbours (Goldshire innkeeper, Northshire Valley spirithealer, ...)
+
+travel(map=0, from=0, to=2776)
+→ "Human start" → "Elwynn Forest Goldshire": 103 path points + navmesh_verification
 ```
 
 ### `sql`

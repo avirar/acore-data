@@ -322,11 +322,12 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 7, "Should have exactly 7 tools")
+        self.assertEqual(len(tools), 8, "Should have exactly 8 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
         self.assertIn("dbversion", names)
+        self.assertIn("travel", names)
         self.assertIn("query", names)
 
 
@@ -1070,6 +1071,52 @@ class TestDbversionTool(unittest.TestCase):
         self.assertEqual(r["mod_playerbots_installed"], pb["installed"])
         # on this install the mod DB is present
         self.assertTrue(pb["installed"])
+
+
+class TestTravelTool(unittest.TestCase):
+    """travel tool: mod-playerbots travel graph (live DB)."""
+
+    def test_stats_mode(self):
+        r = call_tool("travel", {"map": 0})
+        self.assertEqual(r["mode"], "stats")
+        self.assertGreater(r["node_count"], 100)
+        self.assertGreater(r["edge_count"], 100)
+        self.assertGreater(r["path_point_count"], 1000)
+        self.assertTrue(r["sample_named_nodes"])
+
+    def test_node_mode(self):
+        r = call_tool("travel", {"map": 0, "node": 0})
+        self.assertEqual(r["mode"], "node")
+        self.assertEqual(r["node"]["name"], "Human start")
+        self.assertTrue(r["neighbours"]["outgoing"])
+        # neighbour names are resolved
+        self.assertTrue(any(n["name"] for n in r["neighbours"]["outgoing"]))
+
+    def test_path_mode_with_verification_field(self):
+        r = call_tool("travel", {"map": 0, "from": 0, "to": 2776})
+        self.assertEqual(r["mode"], "path")
+        self.assertEqual(r["from"]["name"], "Human start")
+        self.assertEqual(r["to"]["name"], "Elwynn Forest Goldshire")
+        self.assertGreater(r["point_count"], 50)
+        self.assertEqual(r["points"][0]["nr"], 0)
+        # verification must always be present in path mode (checked>0 when
+        # MMap data exists, otherwise a clear skip note)
+        v = r["navmesh_verification"]
+        self.assertIn("checked", v)
+        self.assertIn("off_ground_count", v)
+
+    def test_unknown_node_is_error(self):
+        r = call_tool("travel", {"map": 0, "node": 999999})
+        self.assertTrue(r.get("isError"))
+
+    def test_no_path_between_nodes_is_error(self):
+        r = call_tool("travel", {"map": 0, "from": 0, "to": 999999})
+        self.assertTrue(r.get("isError"))
+
+    def test_missing_map_is_error(self):
+        r = call_tool("travel", {})
+        self.assertTrue(r.get("isError"))
+        self.assertIn("map", r["error"])
 
 
 class TestSpawnsTool(unittest.TestCase):
