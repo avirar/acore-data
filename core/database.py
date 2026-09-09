@@ -6,6 +6,7 @@ and SQL query execution. Uses pymysql for connection management.
 Falls back to subprocess mysql CLI if pymysql is unavailable.
 """
 
+import os
 import sys
 import json
 import subprocess
@@ -278,6 +279,31 @@ class Database:
 
         # Fallback: subprocess mysql CLI (when pymysql is not available)
         try:
+            # Interpolate %s placeholders so parameterized queries work without pymysql.
+            # Values are escaped before interpolation to avoid quoting breakage.
+            if params:
+                values = list(params)
+                lit = []
+                for v in values:
+                    if v is None:
+                        lit.append("NULL")
+                    elif isinstance(v, bool):
+                        lit.append("1" if v else "0")
+                    elif isinstance(v, (int, float)):
+                        lit.append(repr(v))
+                    else:
+                        escaped = str(v).replace("\\", "\\\\").replace("'", "\\'")
+                        lit.append(f"'{escaped}'")
+                idx = [0]
+
+                def _sub(_m):
+                    val = lit[idx[0]]
+                    idx[0] += 1
+                    return val
+
+                sql = re.sub(r"%s", _sub, sql)
+
+            cli_env = {**os.environ, "MYSQL_PWD": self.db_password}
             cmd = [
                 "mysql",
                 "-h",
@@ -286,7 +312,6 @@ class Database:
                 self.db_port,
                 "-u",
                 self.db_user,
-                f"-p{self.db_password}",
                 "-D",
                 db,
                 "-e",
@@ -294,7 +319,9 @@ class Database:
                 "--batch",
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=15, env=cli_env
+            )
 
             if result.returncode != 0:
                 return None, result.stderr.strip()
