@@ -157,6 +157,10 @@ class AcoreDataServer:
             from tools import sql as sql_tool
             return sql_tool.sql_tools(self)
 
+        elif name == "config":
+            from tools import config as config_tool
+            return config_tool.config_tools(self)
+
         elif name == "explain":
             from tools import explain as explain_tool
             return explain_tool.explain_tools(self)
@@ -195,7 +199,7 @@ class AcoreDataServer:
         print(f"  Maps path: {self.maps_path}", file=sys.stderr)
         print(f"  VMaps path: {self.vmaps_path}", file=sys.stderr)
         print(f"  MMaps path: {self.mmaps_path}", file=sys.stderr)
-        print(f"  Tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, terrain, sql", file=sys.stderr)
+        print(f"  Tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, config, terrain, sql", file=sys.stderr)
 
         while True:
             try:
