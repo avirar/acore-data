@@ -72,18 +72,25 @@ class FormatParser:
         with open(self.dbcfmt_path, 'r') as f:
             content = f.read()
 
-        # Pattern matches:
-        # char constexpr Achievementfmt[] = "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii";
-        # char constexpr SkillLineAbilityfmt[] = "niiiixxiiiiixx";
-        pattern = r'char\s+constexpr\s+(\w+)fmt\[\]\s*=\s*"([^"]+)"'
+        # Pattern matches (tolerant of line wraps, const/constexpr variants,
+        # and concatenated string literals):
+        #   char constexpr Achievementfmt[] = "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii";
+        #   const char SkillLineAbilityfmt[] = "niiiixxiiiiixx";
+        #   char constexpr Somefmt[] =
+        #       "niii"
+        #       "xx";
+        pattern = (
+            r'(?:const\s+char|char)\s+(?:constexpr|const)\s+(\w+)fmt\[\]\s*=\s*'
+            r'((?:"(?:[^"\\]|\\.)*"\s*)+)'
+        )
 
         matches = re.findall(pattern, content)
 
-        for name, format_string in matches:
-            # Convert from "Achievementfmt" -> "Achievement"
-            # Convert from "SkillLineAbilityfmt" -> "SkillLineAbility"
-            dbc_name = name
-            self.formats[dbc_name] = format_string
+        for name, raw_value in matches:
+            # Drop quotes/whitespace/escapes from possibly concatenated literals
+            format_string = re.sub(r'[^A-Za-z0-9_]', '', raw_value)
+            if format_string:
+                self.formats[name] = format_string
 
         return self.formats
 

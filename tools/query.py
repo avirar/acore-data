@@ -663,6 +663,50 @@ def _query_sql_overlay(
     return rows, error, notes
 
 
+def _project_overlay_fields(
+    rows: List[Dict[str, Any]],
+    fields_param: Optional[List],
+    reg_entry: Optional[Dict],
+) -> Any:
+    """Project overlay rows to the requested DBC fields (strict on miss).
+
+    Live overlay tables use suffixed slot columns (e.g. EffectTriggerSpell_1)
+    while the registry maps C names (EffectTriggerSpell) - try the base and
+    the _1.._5 variants.
+    """
+    if not fields_param or not rows or not isinstance(rows[0], dict):
+        return rows
+    available = set(rows[0].keys())
+    fields_meta = (reg_entry or {}).get("fields", {})
+    selected: List[str] = []
+    for f in fields_param:
+        info: Optional[Dict] = None
+        if isinstance(f, str):
+            low = f.lower()
+            for v in fields_meta.values():
+                if v.get("name", "").lower() == low or v.get("sql_column", "").lower() == low:
+                    info = v
+                    break
+        elif isinstance(f, int) and not isinstance(f, bool):
+            info = fields_meta.get(str(f))
+        base = (info.get("sql_column") or info.get("name") or str(f)) if info else str(f)
+        cands = [base] + [f"{base}_{n}" for n in range(1, 6)]
+        cand = next((c for c in cands if c in available), None)
+        if cand is None:
+            return {
+                "error": (
+                    f"Field '{base}' has no matching column in the overlay row. "
+                    f"Available columns (sample): {sorted(available)[:15]}"
+                ),
+                "isError": True,
+            }
+        if cand not in selected:
+            selected.append(cand)
+    selected.append(next((c for c in ("ID", "Id") if c in available), ""))
+    selected = [c for c in selected if c]
+    return [{k: r[k] for k in selected if k in r} for r in rows]
+
+
 def _merge_dbc_sql(
     server,
     dbc_result: List,
@@ -675,7 +719,14 @@ def _merge_dbc_sql(
 ) -> Dict[str, Any]:
     """Merge DBC and SQL results with annotation."""
     if db_result and not dbc_result:
-        return {"result": db_result, "source": "database"}
+        projected = _project_overlay_fields(db_result, fields_param, reg_entry)
+        if isinstance(projected, dict) and projected.get("error"):
+            return projected
+        if compact and projected:
+            projected = compact_sql_rows(projected, None)
+        if single_record and isinstance(projected, list) and len(projected) == 1:
+            projected = projected[0]
+        return {"result": projected, "source": "database"}
 
     if dbc_result and not db_result:
         annotated = _annotate_dbc_result(

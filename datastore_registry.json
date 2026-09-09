@@ -6372,7 +6372,7 @@
       "dbc_file": "Map.dbc",
       "dbc_name": "Map",
       "sql_table": "map_dbc",
-      "sql_database": "db_world",
+      "sql_database": "acore_world",
       "store_variable": "sMapStore",
       "store_type": "",
       "format_variable": "MapEntryfmt",
@@ -9053,10 +9053,10 @@
           "reference_column": "ID"
         },
         "116": {
-          "name": "EffectTriggerSpell[0]",
-          "type": "uint32",
-          "sql_column": "EffectTriggerSpell",
-          "notes": "Duplicate of EffectTriggerSpell[0] in registry. Likely EffectMiscValueB[2] mislabeled."
+          "name": "EffectMiscValueB[2]",
+          "type": "int32",
+          "sql_column": "EffectMiscValueB",
+          "notes": "EffectMiscValueB for slot 2."
         },
         "117": {
           "name": "EffectTriggerSpell[1]",
