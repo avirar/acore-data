@@ -322,7 +322,7 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 10, "Should have exactly 10 tools")
+        self.assertEqual(len(tools), 11, "Should have exactly 11 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
@@ -330,6 +330,7 @@ class TestRegression(unittest.TestCase):
         self.assertIn("travel", names)
         self.assertIn("encounter", names)
         self.assertIn("explain", names)
+        self.assertIn("config", names)
         self.assertIn("query", names)
 
 
@@ -1193,6 +1194,59 @@ class TestExplainTool(unittest.TestCase):
     def test_unknown_store_gets_suggestion(self):
         r = call_tool("explain", {"name": "BogusStoreXYZ", "id": 1})
         self.assertTrue(r.get("isError") or r.get("suggestion"))
+
+
+class TestConfigTool(unittest.TestCase):
+    """config tool: mod-playerbots conf index (needs the mod source tree)."""
+
+    def _skip_if_no_mod(self):
+        import os
+        if not os.path.isfile(
+                "/root/azerothcore-wotlk/modules/mod-playerbots/conf/"
+                "playerbots.conf.dist"):
+            self.skipTest("mod-playerbots source tree not present")
+
+    def test_summary(self):
+        self._skip_if_no_mod()
+        r = call_tool("config", {})
+        self.assertGreater(r["summary"]["setting_count"], 500)
+        self.assertIn("AiPlayerbot", r["summary"]["prefixes"])
+
+    def test_key_detail_with_code_refs(self):
+        self._skip_if_no_mod()
+        r = call_tool(
+            "config", {"key": "AiPlayerbot.RandomBotCombatStrategies"})
+        self.assertEqual(r["key"], "AiPlayerbot.RandomBotCombatStrategies")
+        self.assertTrue(r["code_refs"])
+        self.assertIn("GetOption", r["code_refs"][0]["code"])
+        self.assertTrue(r["code_refs"][0]["file"].endswith(".cpp"))
+
+    def test_search(self):
+        self._skip_if_no_mod()
+        r = call_tool("config", {"search": "strategy"})
+        self.assertGreaterEqual(r["match_count"], 2)
+        self.assertTrue(all("strategy" in s["key"].lower() for s in r["settings"]))
+
+    def test_unknown_key_suggests(self):
+        self._skip_if_no_mod()
+        r = call_tool("config", {"key": "AiPlayerbot.RandomBotCombatStrategys"})
+        self.assertTrue(r.get("isError"))
+        self.assertTrue(r.get("did_you_mean"))
+
+    def test_missing_mod_is_clean_error(self):
+        # point the index at a nonexistent root -> clean error, no crash
+        import subprocess, json, sys
+        payload = {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                  "params": {"name": "config", "arguments": {}}}
+        env = dict(_ENV)
+        env["PLAYERBOTS_ROOT"] = "/nonexistent/mod-playerbots-xyz"
+        p = subprocess.run([sys.executable, SERVER_SCRIPT], input=json.dumps(payload),
+                           capture_output=True, timeout=TIMEOUT, text=True,
+                           cwd=_WORKDIR, env=env)
+        r = json.loads(p.stdout)
+        body = json.loads(r["result"]["content"][0]["text"])
+        self.assertTrue(body.get("isError"))
+        self.assertIn("PLAYERBOTS_ROOT", body["error"])
 
 
 class TestSpawnsTool(unittest.TestCase):

@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, and travel-graph verification. Exposes ten tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and travel-graph verification. Exposes eleven tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -132,6 +132,29 @@ Database state audit for this install — no arguments. Reports the core/DB vers
 dbversion()
 → core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
   mod_playerbots_installed=true|false
+```
+
+### `config`
+
+mod-playerbots configuration index — indexes `playerbots.conf.dist` (setting → default + line) and the C++ `GetOption` call sites that read each key in one cached pass. Answers "what does this setting do / what's its default / where is it used" without reading the 900-line conf or grepping the mod. The mod source tree is optional (override its location with `PLAYERBOTS_ROOT`); absence is a clean error.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `key` | string | Exact setting key → full detail incl. code refs. |
+| `search` | string | Case-insensitive substring match on key names (capped 50). |
+| `rebuild` | boolean | Force re-scanning the mod conf + source. |
+
+**Examples:**
+
+```
+config()
+→ 888 settings, 384 code refs, counts by prefix
+
+config(search="strategy")
+→ EnableNewRpgStrategy, Max/MinRandomBotChangeStrategyTime, ...
+
+config(key="AiPlayerbot.RandomBotCombatStrategies")
+→ default "", conf line 1370, code ref: PlayerbotAIConfig.cpp:459
 ```
 
 ### `explain`
