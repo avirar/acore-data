@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data and creature spawn analysis. Exposes six tools (`query`, `lookup`, `list`, `spawns`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, and database state audit. Exposes seven tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -120,6 +120,18 @@ spawns(entry=32820)
 
 spawns(entry=1)
 → template exists but has_world_spawn=false (Waypoint, GM-only)
+```
+
+### `dbversion`
+
+Database state audit for this install — no arguments. Reports the core/DB version row (`acore_world.version`), per-database SQL update state (RELEASED/ARCHIVED/CUSTOM/MODULE/PENDING counts plus applied/pending totals), pending update names, and which of the four AzerothCore databases are present. `acore_playerbots` only exists with mod-playerbots; its absence is reported as `installed: false`, not an error.
+
+**Examples:**
+
+```
+dbversion()
+→ core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
+  mod_playerbots_installed=true|false
 ```
 
 ### `sql`
