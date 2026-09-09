@@ -977,7 +977,8 @@ def get_schema() -> Dict[str, Any]:
             "annotate=true switches DBC rows to the legacy per-field arrays with DBC index, "
             "type, sql_column and source. hints=true adds field_references/referenced_by "
             "metadata. links=true adds a one-hop relation map (metadata.links) to related "
-            "rows across DBC/SQL tables. resolve=true gives type-aware field decoding."
+            "rows across DBC/SQL tables. resolve=true gives type-aware field decoding. "
+            "For aggregations (COUNT, SUM, GROUP BY) or cross-table joins, use the sql tool."
         ),
         "inputSchema": {
             "type": "object",
