@@ -8,11 +8,12 @@ Provides access to all game datastores: DBC binary files, SQL tables, and overla
 Version: 1.0.0
 """
 
+import difflib
 import json
 import sys
 import os
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 # Import core modules
 from core.formats import FormatParser
@@ -109,9 +110,36 @@ class AcoreDataServer:
         """List all available tools."""
         return get_tool_schemas()
 
+    def _validate_arguments(self, name: str, arguments: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Reject unknown argument keys with suggestions (prevents silent no-ops)."""
+        try:
+            schema = next(s for s in self._list_tools() if s.get("name") == name)
+        except StopIteration:
+            return None
+        known = set(schema.get("inputSchema", {}).get("properties", {}).keys())
+        if not known:
+            return None
+        unknown = [k for k in arguments if k not in known]
+        if not unknown:
+            return None
+        u = str(unknown[0])
+        sugg = difflib.get_close_matches(u.lower(), [k.lower() for k in known], n=3, cutoff=0.4)
+        msg = f"Unknown argument '{u}' for tool '{name}'."
+        if len(unknown) > 1:
+            msg += f" Unknown arguments: {', '.join(map(str, unknown))}."
+        if sugg:
+            msg += f" Did you mean: {', '.join(sugg)}?"
+        else:
+            msg += f" Valid arguments: {', '.join(sorted(known))}."
+        return {"error": msg, "isError": True}
+
     def _call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Dispatch tool call to appropriate handler."""
         self.args = arguments
+
+        invalid = self._validate_arguments(name, arguments)
+        if invalid:
+            return invalid
 
         if name == "query":
             from tools import query as query_tool
@@ -157,25 +185,25 @@ class AcoreDataServer:
 
                 request = json.loads(line.strip())
 
+                # Notifications carry no id and expect no response
+                if request.get("method", "").startswith("notifications/"):
+                    continue
+
                 if request.get("method") == "initialize":
+                    client_params = request.get("params", {}) or {}
                     response = {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
                         "result": {
-                            "protocolVersion": "2024-11-05",
+                            "protocolVersion": client_params.get(
+                                "protocolVersion", "2024-11-05"
+                            ),
                             "serverInfo": {
                                 "name": "acore-data",
                                 "version": "1.0.0",
                             },
                             "capabilities": {"tools": {}},
                         },
-                    }
-
-                elif request.get("method") == "notifications/initialized":
-                    response = {
-                        "jsonrpc": "2.0",
-                        "id": request.get("id"),
-                        "result": {},
                     }
 
                 elif request.get("method") == "tools/list":
@@ -192,12 +220,15 @@ class AcoreDataServer:
                     tool_args = params.get("arguments", {})
 
                     result = self._call_tool(tool_name, tool_args)
+                    call_result = {
+                        "content": [{"type": "text", "text": json.dumps(result)}]
+                    }
+                    if isinstance(result, dict) and result.get("isError"):
+                        call_result["isError"] = True
                     response = {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
-                        "result": {
-                            "content": [{"type": "text", "text": json.dumps(result, indent=2)}]
-                        },
+                        "result": call_result,
                     }
 
                 else:
@@ -233,7 +264,7 @@ class AcoreDataServer:
 
                 response = {
                     "jsonrpc": "2.0",
-                    "id": request.get("id") if "request" in dir() else None,
+                    "id": request.get("id") if "request" in locals() else None,
                     "error": {"code": -32000, "message": str(e)},
                 }
                 sys.stdout.write(json.dumps(response) + "\n")

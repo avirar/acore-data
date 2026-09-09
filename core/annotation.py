@@ -71,23 +71,36 @@ def _escape_like_pattern(pattern: str) -> str:
 
 
 def _dbc_filter_to_sql_where(
-    filter_dict: Dict[int, Any], reg_entry: Optional[Dict]
-) -> List[Tuple[str, Any]]:
+    filter_dict: Dict[int, Any],
+    reg_entry: Optional[Dict],
+    available_columns: Optional[set] = None,
+) -> Tuple[List[Tuple[str, Any]], List[str]]:
     """Convert DBC filter dict to SQL WHERE clause fragments + params.
 
     Args:
         filter_dict: Dictionary of field_index -> value
         reg_entry: Registry entry for SQL column mapping
+        available_columns: Optional set of live column names (lowercase) to
+            validate against; conditions on missing columns are skipped
+            with a note instead of producing a SQL error.
 
     Returns:
-        List of (fragment_with_%s, param_value) tuples
+        (List of (fragment_with_%s, param_value) tuples, list of skip notes)
     """
     clauses = []
+    notes = []
     fields_meta = reg_entry.get("fields", {}) if reg_entry else {}
 
     for idx, value in filter_dict.items():
         field_info = fields_meta.get(str(idx), {})
         sql_col = field_info.get("sql_column", f"field_{idx}")
+
+        if available_columns and sql_col.lower() not in available_columns:
+            notes.append(
+                f"filter on '{sql_col}' skipped: column not in SQL overlay "
+                f"(matched DBC-side only)"
+            )
+            continue
 
         operator, param_val = _parse_filter_value(value)
 
@@ -99,7 +112,7 @@ def _dbc_filter_to_sql_where(
         else:
             clauses.append((f"{sql_col} {operator} %s", param_val))
 
-    return clauses
+    return clauses, notes
 
 
 def _annotate_single_record(
@@ -161,13 +174,15 @@ def _annotate_single_record(
         if filter_indices is not None and idx_int not in filter_indices:
             continue
 
-        # Skip null, zero, and empty string values in compact mode
+        # Skip null, zero, and empty string values in compact mode,
+        # except the identity field (index 0) which is kept even when 0
         if compact:
             if value is None:
                 continue
             # Skip zero values for numeric fields (but keep empty strings)
             if isinstance(value, (int, float)) and value == 0:
-                continue
+                if idx_int != 0:
+                    continue
             # Also skip empty strings in compact mode
             if value == "":
                 continue

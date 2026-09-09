@@ -5,7 +5,11 @@ These tests don't require a live database connection.
 Run with: python3 tests/test_helpers.py (or pytest)
 """
 
+import os
+import sys
 import unittest
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tools.query import _build_sql_filter_clause, _resolve_sql_column, _escape_like_pattern
 
 

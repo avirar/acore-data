@@ -390,24 +390,43 @@ def build_indices(registry: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
 
 
 def main():
-    print("Generating datastore_registry.json from docs/datastores/...")
+    import argparse
+    ap = argparse.ArgumentParser(
+        description="Docs -> registry tool. READ-ONLY by default. "
+                    "datastore_registry.json is the curated source of truth; "
+                    "docs/datastores is a human reference and currently drifts.")
+    ap.add_argument("--write", action="store_true",
+        help="DESTRUCTIVE: overwrite datastore_registry.json from the docs. "
+             "Docs are incomplete (no sql_auxiliary category) and stale, so this "
+             "would LOSE curated data. Do not run casually.")
+    args = ap.parse_args()
 
     dbc = parse_dbc_backed()
-    print(f"  DBC-backed: {len(dbc)} entries")
-
     obj = parse_sql_objectmgr()
-    print(f"  SQL ObjectMgr: {len(obj)} entries")
-
     mgr = parse_sql_managers()
-    print(f"  SQL Manager: {len(mgr)} entries")
-
     registry = {}
     registry.update(dbc)
     registry.update(obj)
     registry.update(mgr)
+    print(f"[docs] derivable entries: {len(registry)} "
+          f"(dbc_backed={len(dbc)}, sql_objectmgr={len(obj)}, sql_manager={len(mgr)})")
 
-    indices = build_indices(registry)
+    reg_path = Path(__file__).parent.parent / "datastore_registry.json"
+    current = json.loads(reg_path.read_text()) if reg_path.exists() else {}
+    cur_entries = current.get("entries", {})
 
+    if not args.write:
+        gen, cur = set(registry), set(cur_entries)
+        only_cur, only_gen = sorted(cur - gen), sorted(gen - cur)
+        print(f"[check] current registry entries: {len(cur_entries)}")
+        print(f"[check] in registry but NOT derivable from docs: {len(only_cur)}")
+        print(f"[check] derivable from docs but not in registry: {len(only_gen)}")
+        if only_cur:
+            print(f"        e.g. {', '.join(only_cur[:12])}")
+        print("[check] read-only. Use --write to (destructively) overwrite.")
+        return
+
+    # --write: original destructive regenerate (explicit opt-in)
     output = {
         "_meta": {
             "description": "AzerothCore datastore registry",
@@ -416,21 +435,11 @@ def main():
             "total_entries": len(registry)
         },
         "entries": registry,
-        "indices": indices
+        "indices": build_indices(registry)
     }
-
-    out_path = Path(__file__).parent.parent / "datastore_registry.json"
-    with open(out_path, 'w') as f:
+    with open(reg_path, "w") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
-
-    total_fields = sum(len(e.get("fields", {})) for e in registry.values())
-    print(f"\n  Total: {len(registry)} entries, {total_fields} field mappings")
-    print(f"  Written to {out_path}")
-
-    # Category breakdown
-    for cat in ["dbc_backed", "sql_objectmgr", "sql_manager"]:
-        count = sum(1 for e in registry.values() if e["category"] == cat)
-        print(f"    {cat}: {count}")
+    print(f"[write] OVERWROTE {reg_path} with {len(registry)} entries (curated data lost).")
 
 
 if __name__ == "__main__":
