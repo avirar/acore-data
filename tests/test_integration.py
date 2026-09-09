@@ -304,7 +304,7 @@ class TestRegression(unittest.TestCase):
         self.assertNotIn("error", result)
 
     def test_list_tools(self):
-        """Should return 4 consolidated tools."""
+        """Should return 6 consolidated tools."""
         payload = {
             "jsonrpc": "2.0",
             "id": 1,
@@ -322,8 +322,11 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 5, "Should have exactly 5 tools")
-        self.assertIn("terrain", {t["name"] for t in tools})
+        self.assertEqual(len(tools), 6, "Should have exactly 6 tools")
+        names = {t["name"] for t in tools}
+        self.assertIn("terrain", names)
+        self.assertIn("spawns", names)
+        self.assertIn("query", names)
 
 
 class TestSQLOverlayRegEntry(unittest.TestCase):
@@ -1036,6 +1039,51 @@ class TestSpellResolution(unittest.TestCase):
         self.assertIn("warning", conds, "Should include warning when conditions exceed resolve_max")
         self.assertIn("191", conds["warning"], "Warning should mention total condition count")
         self.assertEqual(len(conds["requirements"]), 3, "Should show exactly resolve_max requirements")
+
+
+class TestSpawnsTool(unittest.TestCase):
+    """spawns tool: creature spawn analysis (live DB)."""
+
+    def test_wild_turkey_spawn_analysis(self):
+        r = call_tool("spawns", {"entry": 32820})
+        self.assertEqual(r["name"], "Wild Turkey")
+        self.assertTrue(r["template_exists"])
+        self.assertTrue(r["has_world_spawn"])
+        self.assertGreaterEqual(r["total_spawns"], 3000)
+        self.assertEqual(r["maps"][0]["map"], 0)
+        self.assertEqual(r["maps"][0]["map_name"], "Eastern Kingdoms")
+        self.assertTrue(r["samples"])
+
+    def test_multi_map_entry_with_name_resolution(self):
+        r = call_tool("spawns", {"entry": 4075, "limit": 2})
+        self.assertEqual(r["name"], "Rat")
+        # breakdown capped at 8, map_count is the exact distinct-map count
+        self.assertEqual(len(r["maps"]), 8)
+        self.assertGreater(r["map_count"], 8)
+        # every shown map must carry a resolved name (DBC Map fallback)
+        self.assertTrue(all(m["map_name"] for m in r["maps"]))
+
+    def test_no_spawn_entry_reports_false_not_error(self):
+        r = call_tool("spawns", {"entry": 1})  # Waypoint (GM-only)
+        self.assertEqual(r["total_spawns"], 0)
+        self.assertFalse(r["has_world_spawn"])
+        self.assertTrue(r["template_exists"])
+        self.assertNotIn("isError", r)
+
+    def test_unknown_entry_is_error(self):
+        r = call_tool("spawns", {"entry": 99999999})
+        self.assertTrue(r.get("isError"))
+        self.assertFalse(r["template_exists"])
+
+    def test_map_filter_restricts_analysis(self):
+        r = call_tool("spawns", {"entry": 32820, "map": 0, "limit": 2})
+        self.assertEqual(r["map_count"], 1)
+        self.assertEqual(len(r["samples"]), 2)
+        self.assertTrue(all(s["map"] == 0 for s in r["samples"]))
+
+    def test_invalid_entry_type_is_error(self):
+        r = call_tool("spawns", {"entry": "notanumber"})
+        self.assertTrue(r.get("isError"))
 
 
 if __name__ == "__main__":

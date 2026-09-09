@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data. Exposes five tools (`query`, `lookup`, `list`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data and creature spawn analysis. Exposes six tools (`query`, `lookup`, `list`, `spawns`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -100,6 +100,26 @@ list(category="dbc_backed")
 
 list(search="Quest")
 → Stores matching "Quest" in struct name, table, or DBC file
+```
+
+### `spawns`
+
+Creature spawn analysis for a `creature_template` entry — total world spawns, per-map breakdown (with map names resolved from DBC), and sample positions. Read-only; uses the `creature`, `creature_template` and `map`/`Map.dbc` tables. No mod required — works on any azerothcore-wotlk install.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `entry` | number | **Required.** `creature_template` entry (the creature id). |
+| `map` | number | Restrict the analysis to a single map ID. |
+| `limit` | number | Sample positions to return (default 3, max 20). |
+
+**Examples:**
+
+```
+spawns(entry=32820)
+→ Wild Turkey: 3125 spawns, map 0 (Eastern Kingdoms), sample positions
+
+spawns(entry=1)
+→ template exists but has_world_spawn=false (Waypoint, GM-only)
 ```
 
 ### `sql`
