@@ -12489,11 +12489,11 @@
           "sql_column": "guid",
           "notes": ""
         },
-        "id1": {
-          "name": "id1",
+        "id": {
+          "name": "id",
           "type": "uint32",
-          "sql_column": null,
-          "notes": "Primary creature entry"
+          "sql_column": "id",
+          "references": "CreatureTemplate"
         },
         "id2": {
           "name": "id2",
@@ -12575,6 +12575,18 @@
           "type": "uint32",
           "sql_column": "dynamicflags",
           "notes": "Override"
+        },
+        "zoneId": {
+          "name": "zoneId",
+          "type": "uint16",
+          "sql_column": "zoneId",
+          "references": "AreaTableEntry"
+        },
+        "areaId": {
+          "name": "areaId",
+          "type": "uint16",
+          "sql_column": "areaId",
+          "references": "AreaTableEntry"
         }
       }
     },

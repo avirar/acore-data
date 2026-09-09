@@ -317,6 +317,35 @@ class TestRegistryHygiene(unittest.TestCase):
         self.assertEqual(reg["_meta"]["total_entries"], len(reg["entries"]))
 
 
+class TestCreatureEntryFields(unittest.TestCase):
+    """The creature (spawn) table entry must carry the real `id` column.
+
+    Regression: id2/id3 were registered but `id` was missing, so
+    `query creature filter {id: ...}` failed with a misleading
+    "Did you mean: id3, id2, id1" error (found via LLM tool-calling eval).
+    A phantom `id1` (in neither C++ struct nor live table) was dropped."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(_WORKDIR, "datastore_registry.json"), "r") as f:
+            cls.entry = json.load(f)["entries"]["CreatureData"]
+
+    def test_id_field_present_with_fk(self):
+        f = self.entry["fields"]["id"]
+        self.assertEqual(f["sql_column"], "id")
+        self.assertEqual(f["references"], "CreatureTemplate")
+
+    def test_no_phantom_id1(self):
+        self.assertNotIn("id1", self.entry["fields"])
+        # id2/id3 are legit C++ members (creature_multispawn), sql_column None
+        self.assertIn("id2", self.entry["fields"])
+        self.assertIn("id3", self.entry["fields"])
+
+    def test_spatial_columns_registered(self):
+        for col in ("zoneId", "areaId"):
+            self.assertEqual(self.entry["fields"][col]["sql_column"], col)
+
+
 class TestFormatParser(unittest.TestCase):
     """DBCfmt parser robustness."""
 
