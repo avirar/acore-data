@@ -26,6 +26,7 @@ def list_tools(server):
     """
     search = server.args.get("search", "").lower()
     category = server.args.get("category", "all")
+    limit = int(server.args.get("limit", 50) or 50)
 
     entries = server.registry.registry.get("entries", {})
     result_list = []
@@ -59,17 +60,7 @@ def list_tools(server):
             format_string = server.format_parser.get_format(dbc_name)
             
             item["dbc_name"] = dbc_name
-            item["format"] = (
-                format_string[:60] + "..."
-                if format_string and len(format_string) > 60
-                else format_string or ""
-            )
             item["field_count"] = len(format_string) if format_string else 0
-            item["record_size"] = (
-                server.format_parser.get_record_size(format_string)
-                if format_string
-                else 0
-            )
         
         # SQL-only stores
         elif entry.get("category") in ("sql_objectmgr", "sql_manager", "sql_auxiliary"):
@@ -88,7 +79,17 @@ def list_tools(server):
     # Sort by struct name
     result_list.sort(key=lambda x: x["struct"].lower())
 
-    return {"result": result_list, "count": len(result_list)}
+    total = len(result_list)
+    shown = result_list[:limit]
+    result: Dict[str, Any] = {"result": shown, "count": len(shown)}
+    if total > len(shown):
+        result["metadata"] = {
+            "total": total,
+            "note": (
+                f"Showing first {limit} of {total}. Refine with search= or category=."
+            ),
+        }
+    return result
 
 
 def get_schema() -> Dict[str, Any]:
@@ -96,8 +97,9 @@ def get_schema() -> Dict[str, Any]:
     return {
         "name": "list",
         "description": (
-            "List available datastores. Merges list_stores + list_dbcs."
-            " Supports DBC binary files, SQL tables, and auxiliary stores."
+            "List available datastores by struct/table/DBC name. Each entry carries struct,"
+            " category, sql_table, dbc_file and field_count. Defaults to the first 50 matches"
+            "(alphabetical) - refine with search= when total is reported in metadata."
         ),
         "inputSchema": {
             "type": "object",
@@ -107,6 +109,10 @@ def get_schema() -> Dict[str, Any]:
                     "description": (
                         "Optional search term to filter by struct name, table, or DBC file"
                     )
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Max entries to return (default 50; total is reported in metadata when truncated)"
                 },
                 "category": {
                     "type": "string",
