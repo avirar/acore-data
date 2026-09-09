@@ -322,12 +322,13 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 8, "Should have exactly 8 tools")
+        self.assertEqual(len(tools), 9, "Should have exactly 9 tools")
         names = {t["name"] for t in tools}
         self.assertIn("terrain", names)
         self.assertIn("spawns", names)
         self.assertIn("dbversion", names)
         self.assertIn("travel", names)
+        self.assertIn("encounter", names)
         self.assertIn("query", names)
 
 
@@ -1117,6 +1118,45 @@ class TestTravelTool(unittest.TestCase):
         r = call_tool("travel", {})
         self.assertTrue(r.get("isError"))
         self.assertIn("map", r["error"])
+
+
+class TestEncounterTool(unittest.TestCase):
+    """encounter tool: map/instance rollup (live DB)."""
+
+    def test_instance_rollup(self):
+        r = call_tool("encounter", {"map": 43, "limit": 5})
+        self.assertEqual(r["map_name"], "Wailing Caverns")
+        self.assertTrue(r["is_instance"])
+        self.assertEqual(r["instance"]["script"], "instance_wailing_caverns")
+        self.assertTrue(r["creatures"])
+        c = r["creatures"][0]
+        self.assertTrue(c["name"])
+        self.assertGreaterEqual(c["spawn_count"], 1)
+        self.assertIsNotNone(c["minlevel"])
+
+    def test_outdoor_map_rollup_with_gameobjects(self):
+        r = call_tool("encounter", {"map": 0, "limit": 2})
+        self.assertFalse(r["is_instance"])
+        self.assertNotIn("instance", r)
+        self.assertTrue(r["creatures"])
+        self.assertEqual(r["creatures"][0]["name"], "Wild Turkey")
+        # outdoor maps carry game objects (ores, nodes, ...
+        self.assertTrue(r["gameobjects"])
+        self.assertIn("name", r["gameobjects"][0])
+
+    def test_unknown_map_degrades_gracefully(self):
+        r = call_tool("encounter", {"map": 9999})
+        self.assertEqual(r["creatures"], [])
+        self.assertNotIn("isError", r)
+        self.assertTrue(r["metadata"]["note"])
+
+    def test_missing_map_is_error(self):
+        r = call_tool("encounter", {})
+        self.assertTrue(r.get("isError"))
+
+    def test_limit_validation(self):
+        r = call_tool("encounter", {"map": 0, "limit": 500})
+        self.assertTrue(r.get("isError"))
 
 
 class TestSpawnsTool(unittest.TestCase):
