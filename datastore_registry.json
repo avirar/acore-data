@@ -8,7 +8,7 @@
       "sql_manager",
       "sql_objectmgr"
     ],
-    "total_entries": 467,
+    "total_entries": 475,
     "cross_reference_stats": {
       "total_cross_ref_fields": 418,
       "entries_with_refs": 233,
@@ -31905,6 +31905,292 @@
       "category": "sql_manager",
       "sql_table": "battleground_template",
       "reference_notes": "Battleground master data"
+    },
+    "Updates": {
+      "category": "sql_auxiliary",
+      "sql_table": "updates",
+      "sql_database": "acore_world",
+      "c_struct": "Updates",
+      "fields": {
+        "0": {
+          "name": "name",
+          "type": "string",
+          "sql_column": "name"
+        },
+        "1": {
+          "name": "hash",
+          "type": "string",
+          "sql_column": "hash"
+        },
+        "2": {
+          "name": "state",
+          "type": "string",
+          "sql_column": "state"
+        },
+        "3": {
+          "name": "timestamp",
+          "type": "string",
+          "sql_column": "timestamp"
+        },
+        "4": {
+          "name": "speed",
+          "type": "uint32",
+          "sql_column": "speed"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "SQL update-management table. Present in all four databases (acore_world, acore_characters, acore_auth, acore_playerbots); rows track which .sql updates are applied (state RELEASED/ARCHIVED/CUSTOM). For another DB, query via sql tool with `USE <db>;` prefix."
+    },
+    "UpdatesInclude": {
+      "category": "sql_auxiliary",
+      "sql_table": "updates_include",
+      "sql_database": "acore_world",
+      "c_struct": "UpdatesInclude",
+      "fields": {
+        "0": {
+          "name": "path",
+          "type": "string",
+          "sql_column": "path"
+        },
+        "1": {
+          "name": "state",
+          "type": "string",
+          "sql_column": "state"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "SQL update-management table (directory includes), present in all four databases."
+    },
+    "Version": {
+      "category": "sql_auxiliary",
+      "sql_table": "version",
+      "sql_database": "acore_world",
+      "c_struct": "Version",
+      "fields": {
+        "0": {
+          "name": "core_version",
+          "type": "string",
+          "sql_column": "core_version"
+        },
+        "1": {
+          "name": "core_revision",
+          "type": "string",
+          "sql_column": "core_revision"
+        },
+        "2": {
+          "name": "db_version",
+          "type": "string",
+          "sql_column": "db_version"
+        },
+        "3": {
+          "name": "cache_id",
+          "type": "uint32",
+          "sql_column": "cache_id"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "AzerothCore core/DB version row (single row in acore_world)."
+    },
+    "PlayerbotsBisGear": {
+      "category": "sql_auxiliary",
+      "sql_table": "playerbots_bis_gear",
+      "sql_database": "acore_playerbots",
+      "c_struct": "PlayerbotsBisGear",
+      "fields": {
+        "0": {
+          "name": "class",
+          "type": "uint32",
+          "sql_column": "class"
+        },
+        "1": {
+          "name": "tab",
+          "type": "uint32",
+          "sql_column": "tab"
+        },
+        "2": {
+          "name": "slot",
+          "type": "uint32",
+          "sql_column": "slot"
+        },
+        "3": {
+          "name": "faction",
+          "type": "uint32",
+          "sql_column": "faction"
+        },
+        "4": {
+          "name": "auto_gear_score_limit",
+          "type": "uint32",
+          "sql_column": "auto_gear_score_limit"
+        },
+        "5": {
+          "name": "item_id",
+          "type": "uint32",
+          "sql_column": "item_id",
+          "references": "ItemTemplate"
+        },
+        "6": {
+          "name": "phase",
+          "type": "string",
+          "sql_column": "phase"
+        },
+        "7": {
+          "name": "class_name",
+          "type": "string",
+          "sql_column": "class_name"
+        },
+        "8": {
+          "name": "spec_name",
+          "type": "string",
+          "sql_column": "spec_name"
+        },
+        "9": {
+          "name": "slot_name",
+          "type": "string",
+          "sql_column": "slot_name"
+        },
+        "10": {
+          "name": "faction_name",
+          "type": "string",
+          "sql_column": "faction_name"
+        },
+        "11": {
+          "name": "item_name",
+          "type": "string",
+          "sql_column": "item_name"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "mod-playerbots: best-in-slot gear per class/spec/phase used by bot gear selection. Optional table - only present when mod-playerbots is installed (absent on upstream AzerothCore installs); item_id references item_template."
+    },
+    "RbacPermissions": {
+      "category": "sql_auxiliary",
+      "sql_table": "rbac_permissions",
+      "sql_database": "acore_auth",
+      "c_struct": "RbacPermissions",
+      "fields": {
+        "0": {
+          "name": "id",
+          "type": "uint32",
+          "sql_column": "id"
+        },
+        "1": {
+          "name": "name",
+          "type": "string",
+          "sql_column": "name"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "RBAC: permission definitions (GM role names). permissionId in the other rbac_* tables references this id."
+    },
+    "RbacAccountPermissions": {
+      "category": "sql_auxiliary",
+      "sql_table": "rbac_account_permissions",
+      "sql_database": "acore_auth",
+      "c_struct": "RbacAccountPermissions",
+      "fields": {
+        "0": {
+          "name": "accountId",
+          "type": "uint32",
+          "sql_column": "accountId"
+        },
+        "1": {
+          "name": "permissionId",
+          "type": "uint32",
+          "sql_column": "permissionId",
+          "references": "RbacPermissions"
+        },
+        "2": {
+          "name": "granted",
+          "type": "uint8",
+          "sql_column": "granted"
+        },
+        "3": {
+          "name": "realmId",
+          "type": "int32",
+          "sql_column": "realmId"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "RBAC: per-account permission grants. accountId -> accounts in acore_auth; permissionId -> rbac_permissions.id."
+    },
+    "RbacDefaultPermissions": {
+      "category": "sql_auxiliary",
+      "sql_table": "rbac_default_permissions",
+      "sql_database": "acore_auth",
+      "c_struct": "RbacDefaultPermissions",
+      "fields": {
+        "0": {
+          "name": "secId",
+          "type": "uint32",
+          "sql_column": "secId"
+        },
+        "1": {
+          "name": "permissionId",
+          "type": "uint32",
+          "sql_column": "permissionId",
+          "references": "RbacPermissions"
+        },
+        "2": {
+          "name": "realmId",
+          "type": "int32",
+          "sql_column": "realmId"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "RBAC: default permissions per security level (secId = SecurityLevel enum). permissionId -> rbac_permissions.id."
+    },
+    "RbacLinkedPermissions": {
+      "category": "sql_auxiliary",
+      "sql_table": "rbac_linked_permissions",
+      "sql_database": "acore_auth",
+      "c_struct": "RbacLinkedPermissions",
+      "fields": {
+        "0": {
+          "name": "id",
+          "type": "uint32",
+          "sql_column": "id"
+        },
+        "1": {
+          "name": "linkedId",
+          "type": "uint32",
+          "sql_column": "linkedId",
+          "references": "RbacPermissions"
+        }
+      },
+      "loader_function": "",
+      "store_variable": "",
+      "header_file": "",
+      "container_type": "",
+      "is_leaf": true,
+      "reference_notes": "RBAC: linked permissions (id -> rbac_permissions.id, grants also include linkedId)."
     }
   },
   "indices": {
@@ -32372,7 +32658,15 @@
       "PlayerbotsWeightscales": "PlayerbotsWeightscales",
       "VersionDbPlayerbots": "VersionDbPlayerbots",
       "VehicleTemplateAccessory": "VehicleTemplateAccessory",
-      "PetAuraCharacter": "PetAuraCharacter"
+      "PetAuraCharacter": "PetAuraCharacter",
+      "Updates": "Updates",
+      "UpdatesInclude": "UpdatesInclude",
+      "Version": "Version",
+      "PlayerbotsBisGear": "PlayerbotsBisGear",
+      "RbacPermissions": "RbacPermissions",
+      "RbacAccountPermissions": "RbacAccountPermissions",
+      "RbacDefaultPermissions": "RbacDefaultPermissions",
+      "RbacLinkedPermissions": "RbacLinkedPermissions"
     },
     "by_sql_table": {
       "achievement_dbc": "AchievementEntry",
@@ -32831,7 +33125,15 @@
       "playerbots_weightscales": "PlayerbotsWeightscales",
       "version_db_playerbots": "VersionDbPlayerbots",
       "vehicle_template_accessory": "VehicleTemplateAccessory",
-      "pet_aura": "PetAuraCharacter"
+      "pet_aura": "PetAuraCharacter",
+      "updates": "Updates",
+      "updates_include": "UpdatesInclude",
+      "version": "Version",
+      "playerbots_bis_gear": "PlayerbotsBisGear",
+      "rbac_permissions": "RbacPermissions",
+      "rbac_account_permissions": "RbacAccountPermissions",
+      "rbac_default_permissions": "RbacDefaultPermissions",
+      "rbac_linked_permissions": "RbacLinkedPermissions"
     },
     "by_dbc_file": {
       "Achievement.dbc": "AchievementEntry",
