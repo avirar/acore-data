@@ -79,8 +79,10 @@ class FormatParser:
         #   char constexpr Somefmt[] =
         #       "niii"
         #       "xx";
+        # Accept: char constexpr Xfmt[], constexpr char Xfmt[],
+        #         const char Xfmt[], char const Xfmt[]
         pattern = (
-            r'(?:const\s+char|char)\s+(?:constexpr|const)\s+(\w+)fmt\[\]\s*=\s*'
+            r'(?:\b\w+\s+)*\bchar\b\s*(?:(?:constexpr|const)\s+)?(\w+)fmt\[\]\s*=\s*'
             r'((?:"(?:[^"\\]|\\.)*"\s*)+)'
         )
 

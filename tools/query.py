@@ -379,8 +379,9 @@ def _query_dbc(
             parts.append("overlay: " + "; ".join(dict.fromkeys(overlay_notes)))
         detail = " | ".join(parts) if parts else ""
         suffix = f": {detail}" if detail else ""
+        id_part = f" (id {id_value})" if id_value is not None else ""
         return {
-            "error": f"No data found for '{name}'{suffix}",
+            "error": f"No data found for '{name}'{id_part}{suffix}",
             "isError": True,
         }
 
@@ -994,6 +995,13 @@ def get_schema() -> Dict[str, Any]:
                 "compact": {
                     "type": "boolean",
                     "description": "Strip null fields (default: true)"
+                },
+                "info": {
+                    "type": "boolean",
+                    "description": (
+                        "Return DBC file metadata (file, record_count, field_count, "
+                        "record_size) instead of records (default false)"
+                    )
                 },
                 "resolve": {
                     "oneOf": [

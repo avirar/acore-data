@@ -322,7 +322,8 @@ class TestRegression(unittest.TestCase):
         )
         r = json.loads(p.stdout)
         tools = r["result"]["tools"]
-        self.assertEqual(len(tools), 4, "Should have exactly 4 tools")
+        self.assertEqual(len(tools), 5, "Should have exactly 5 tools")
+        self.assertIn("terrain", {t["name"] for t in tools})
 
 
 class TestSQLOverlayRegEntry(unittest.TestCase):
