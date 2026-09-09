@@ -57,10 +57,29 @@ DBC file, SQL table, store variable) and traverse to the others.
 - The DBC set is a reduced WotLK extraction: Map id 571 = "Northrend",
   id 0 = "Eastern Kingdoms"; not every high spell/item id exists in DBC
   (ids may only live in the SQL overlay — e.g. spell 4051).
+- **Registry audit** — `scripts/audit_registry.py` is the health gate. Run
+  `.venv/bin/python3 scripts/audit_registry.py --db` (add `--json out.json`
+  for machine output). Checks: dangling_refs, duplicate_identifiers (two
+  fields with the identical full name), type_as_name, missing_data_source,
+  dbc_index_drift (registry index past the DBC/format field_count),
+  sql_column_drift (field's sql_column absent from the live table — full
+  uncapped columns, array/family and dbc_backed sparse-overlay skipped,
+  cross-DB tables resolved), and missing_cross_refs (heuristic FK gap).
+  As of this branch all structural signals are 0 except ~3 legit `string`
+  column names and ~300 low-confidence missing_cross_refs (PKs/enum ids/guids
+  intentionally left un-annotated).
+- The registry's `sql_column` values are aligned to the **live AzerothCore**
+  schema, not vanilla WotLK. Several tables were restructured (e.g.
+  `quest_template` `Level`→`QuestLevel`, `Details`→`QuestDescription`,
+  `CompletedText`→`QuestCompletionLog`; `creature_template` uses
+  `difficulty_entry_1`; `spell_target_position` `TargetX`→`PositionX`).
+  Fields whose column was dropped in this build carry `sql_column: None`
+  (kept as C++ members, not DB-projectable).
 - Registry quirks are allowed but audited by `tests/test_regression.py`
-  (`TestRegistryAudit`): ~11 generated entries use raw type strings as field
-  names (known defect); duplicate real field-identifier names per entry are
-  **not** allowed (that was the Spell idx 116 bug).
+  (`TestRegistryAudit`): duplicate real field-identifier names per entry are
+  **not** allowed (the old Spell idx 115/116 swap is fixed — 115 =
+  `EffectMiscValueB[2]`, 116 = `EffectTriggerSpell[0]`, per DBCStructure.h;
+  see `test_spell_effect_indices_match_dbc_structure`).
 - `core/formats.py` parses `DBCfmt.h` with a tolerant regex (const/constexpr
   variants, line-wrapped, string-concatenated literals) — 114 formats
   expected.
@@ -85,3 +104,10 @@ DBC file, SQL table, store variable) and traverse to the others.
   messages (`fix(query): …`, `feat(list+lookup): …`).
 - After changing tool output: re-run `tests/test_regression.py` and capture
   a new `capture_output_sizes.py` run; compare against the baseline dir.
+- After changing `datastore_registry.json`: run the audit gate
+  `.venv/bin/python3 scripts/audit_registry.py --db` and confirm the
+  structural signals stay 0. `scripts/fix_registry_phase_[a-f].py` are the
+  one-off migrations that brought the registry to that state (dangling refs,
+  type-as-name, missing data sources, SpellEntry 115/116 swap, curated
+  cross-refs, sql_column drift, phantom DBC fields, type-as-name residue);
+  re-running them is a no-op once applied.

@@ -219,10 +219,17 @@ class TestRegistryAudit(unittest.TestCase):
         with open(os.path.join(_WORKDIR, "datastore_registry.json"), "r") as f:
             cls.registry = json.load(f)["entries"]
 
-    def test_spell_index_116_is_effect_misc_value_b2(self):
+    def test_spell_effect_indices_match_dbc_structure(self):
+        # Authoritative layout from DBCStructure.h:
+        #   EffectMiscValue  110-112
+        #   EffectMiscValueB 113-115
+        #   EffectTriggerSpell 116-118
+        # (the old registry had 115/116 swapped; index 116 is EffectTriggerSpell[0])
         f = self.registry["SpellEntry"]["fields"]
-        self.assertEqual(f["116"]["name"], "EffectMiscValueB[2]")
-        self.assertEqual(f["116"]["sql_column"], "EffectMiscValueB")
+        self.assertEqual(f["115"]["name"], "EffectMiscValueB[2]")
+        self.assertEqual(f["115"]["sql_column"], "EffectMiscValueB")
+        self.assertEqual(f["116"]["name"], "EffectTriggerSpell[0]")
+        self.assertEqual(f["116"]["sql_column"], "EffectTriggerSpell")
 
     def test_map_entry_sql_database(self):
         self.assertEqual(self.registry["MapEntry"]["sql_database"], "acore_world")
