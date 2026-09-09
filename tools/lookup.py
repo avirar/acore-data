@@ -133,10 +133,12 @@ def _build_lookup_result(
                 "name": info.get("name", ""),
                 "type": info.get("type", ""),
                 "sql_column": info.get("sql_column", ""),
-                "is_primary_key": (idx_str == "0"),
             }
-            if info.get("notes"):
-                field_entry["notes"] = info.get("notes", "")
+            if idx_str == "0":
+                field_entry["is_primary_key"] = True
+            notes = info.get("notes")
+            if notes and notes != "-":
+                field_entry["notes"] = notes
             if info.get("references"):
                 field_entry["references"] = info["references"]
             all_fields.append(field_entry)
@@ -150,17 +152,20 @@ def _build_lookup_result(
             for k, v in sample
         ]
 
-    # Add live SQL columns from database if available
-    if sql_table and server.database.db_available:
+    # Add live SQL columns from database if available.
+    # DBC-backed entries already carry a full per-field sql_column mapping,
+    # so the live schema only adds value for SQL-native tables (types/PK).
+    if (
+        sql_table
+        and category != "dbc_backed"
+        and server.database.db_available
+    ):
         target_db = server.database._resolve_table_database(sql_table, server.database.db_name)
         schema = server.database._get_table_schema(sql_table, target_db)
         if schema:
             result["sql_columns"] = [
-                {
-                    "name": c["COLUMN_NAME"],
-                    "type": c["DATA_TYPE"],
-                    "is_primary_key": c.get("is_primary_key", False),
-                }
+                f"{c['COLUMN_NAME']}:{c['DATA_TYPE']}"
+                + (" [PK]" if c.get("is_primary_key") else "")
                 for c in schema
             ]
 
@@ -205,9 +210,11 @@ def get_schema() -> Dict[str, Any]:
     return {
         "name": "lookup",
         "description": (
-            "Get schema/metadata for a datastore. Merges lookup_datastore + describe_fields."
-            " Resolves by struct name, SQL table, DBC file, or store variable."
-            " Use detail='schema' for complete field list (default) or detail='summary' for compact output."
+            "Get schema/metadata for a datastore. Resolves by struct name, SQL table,"
+            " DBC file, or store variable. detail='schema' (default) returns the full field"
+            " mapping: {index, name, type, sql_column} per field plus notes/references where"
+            " available, the C access pattern (hints), and referenced_by. detail='summary'"
+            " returns 10 sample fields plus entry-level metadata."
         ),
         "inputSchema": {
             "type": "object",
