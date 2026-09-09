@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and travel-graph verification. Exposes eleven tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and C++ enum decoding. Exposes twelve tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `enums`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -132,6 +132,30 @@ Database state audit for this install — no arguments. Reports the core/DB vers
 dbversion()
 → core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
   mod_playerbots_installed=true|false
+```
+
+### `enums`
+
+C++ enum decoder — indexes every named enum in the AzerothCore source tree (~1,044 enums, ~17.7k members, one cached scan) and resolves magic numbers. Answers "what does this value mean?" (`enums(enum='Mechanics', value=17)` → `MECHANIC_POLYMORPH`) without the agent grepping the source. The source tree is optional (override with `ACORE_SRC_ROOT`); absence is a clean error.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `enum` | string | Exact enum name. |
+| `value` | number | Value to decode (with `enum=`) or scan across all enums. |
+| `member` | string | Member-name substring for reverse lookup (with `enum=`). |
+| `search` | string | Case-insensitive substring match on enum names. |
+
+**Examples:**
+
+```
+enums()
+→ 1044 enums, 17713 members, largest enums by size
+
+enums(enum="Mechanics", value=17)
+→ MECHANIC_POLYMORPH (src/server/shared/SharedDefines.h)
+
+enums(enum="SpellEffects")          full value table (capped)
+enums(value=17)                     which enums contain 17 (ambiguity note)
 ```
 
 ### `config`
