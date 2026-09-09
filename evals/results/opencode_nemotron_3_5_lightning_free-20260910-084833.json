@@ -1,0 +1,302 @@
+[
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T1",
+    "run": 1,
+    "session_id": "ses_f77a6320cffeJf5SBRFC0KWZ7I",
+    "correct": true,
+    "answer_tail": "Spell 118 (Polymorph) in this WotLK world:\n\n- **Base Level**: 8\n- **Mechanic**: 17 (Spell)",
+    "tool_calls": 1,
+    "tools_used": [
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 118
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 35843,
+      "output": 119,
+      "reasoning": 412,
+      "total": 36374
+    },
+    "duration_s": 14.5,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T2",
+    "run": 1,
+    "session_id": "ses_f77a5f931ffeIl7sSStiaUAHaq",
+    "correct": true,
+    "answer_tail": "The spell referenced by `spellid_1` for item entry\u202f118 (Minor Healing Potion) is **Healing Potion** (spell\u202fID\u202f439).",
+    "tool_calls": 5,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query",
+      "acore_data_sql"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 118,
+          "fields": [
+            "spellid_1"
+          ],
+          "name": "item_template"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "detail": "schema",
+          "query": "item_template"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "spellid_1..5"
+          ],
+          "id": 118,
+          "name": "item_template"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT spellid_1 FROM item_template WHERE entry = 118;"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 439,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Unknown field 'spellid_1' for table 'item_template'. Did you mean: spellid_1..5, Spells, SellPrice, displayid, ScriptId? \", \"isError\": true}",
+      "{\"error\": \"Database error: (1064, \\\"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.5 FROM item_template WHERE entry = 118 LIMIT 100' at line 1\\\")\", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 9798,
+      "output": 349,
+      "reasoning": 587,
+      "total": 128238
+    },
+    "duration_s": 23.5,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T3",
+    "run": 1,
+    "session_id": "ses_f77a59d72ffebWB7NHN3v7F4fC",
+    "correct": false,
+    "answer_tail": "There are **0** creature spawns with\u202fid\u202f32820 in map\u202f0 (the live `creature` table contains no rows matching that entry on that map). The creature template for entry\u202f32820 is named **\u201cWild Turkey\u201d** (`creature_template` row `entry\u202f32820 \u2192 name \u201cWild Turkey\u201d`).",
+    "tool_calls": 13,
+    "tools_used": [
+      "acore_data_list",
+      "acore_data_lookup",
+      "acore_data_query",
+      "bash",
+      "grep"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature_template",
+          "fields": [
+            "name"
+          ],
+          "filter": {
+            "entry": 32820
+          }
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "filter": {
+            "map": 0,
+            "entry": 32820
+          },
+          "name": "creature_spawns"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "filter": {
+            "map": 0,
+            "entry": 32820
+          },
+          "name": "creature_respawn"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "creature_respawn",
+          "detail": "summary"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_list",
+        "input": {
+          "search": "creature"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "filter": {
+            "mapId": 0,
+            "entry": 32820
+          },
+          "name": "creature"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "detail": "summary",
+          "query": "creature"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "filter": {
+            "id": 32820,
+            "map": 0
+          },
+          "name": "creature"
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature",
+          "filter": {
+            "mapid": 0
+          }
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature",
+          "filter": {
+            "id": 32820
+          },
+          "limit": 1000
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature",
+          "limit": 1000,
+          "filter": {
+            "mapid": 0
+          }
+        },
+        "error": false
+      },
+      {
+        "tool": "grep",
+        "input": {
+          "pattern": "32820",
+          "path": "/root/.local/share/opencode/tool-output/tool_0885b6b370010Z38rzSrZQSlNu"
+        },
+        "error": false
+      },
+      {
+        "tool": "bash",
+        "input": {
+          "command": "rg -c '32820' /root/.local/share/opencode/tool-output/tool_0885b6b370010Z38rzSrZQSlNu",
+          "workdir": "/root/acore-data"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Store 'creature_spawns' not found.\", \"suggestion\": \"Did you mean: creature_respawn (table), creaturerespawn (struct), creature_multispawn (table), creature_sparring (table), creaturesparring (struct)?\", \"isError\": true}",
+      "{\"error\": \"Unknown field 'map' for table 'creature_respawn'. Did you mean: mapId? \", \"isError\": true}",
+      "{\"error\": \"Unknown field 'entry' for table 'creature'. Did you mean: MovementType, currentwaypoint? \", \"isError\": true}",
+      "{\"error\": \"Unknown field 'id' for table 'creature'. Did you mean: id3, id2, id1, guid, mapid? \", \"isError\": true}",
+      "{\"error\": \"Unknown field 'id' for table 'creature'. Did you mean: id3, id2, id1, guid, mapid? \", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 35014,
+      "output": 870,
+      "reasoning": 1398,
+      "total": 365858
+    },
+    "duration_s": 82.1,
+    "exit_code": 0,
+    "stderr_tail": ""
+  },
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T4",
+    "run": 1,
+    "session_id": "ses_f77a45c48ffep1TTFnd92ETgzE",
+    "correct": true,
+    "answer_tail": "Spell 118's name field is `SpellName`, and its value is **Polymorph**.",
+    "tool_calls": 1,
+    "tools_used": [
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 118,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 1057,
+      "output": 78,
+      "reasoning": 177,
+      "total": 36128
+    },
+    "duration_s": 12.7,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]
