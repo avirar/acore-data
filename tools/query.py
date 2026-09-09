@@ -353,9 +353,12 @@ def _query_dbc(
             server, sql_table, id_value, dbc_filter, limit, reg_entry
         )
 
+    annotate_mode = bool(args.get("annotate", False))
+
     # Merge results
     merged = _merge_dbc_sql(
-        server, dbc_result, db_result, reg_entry, fields_param, compact, id_value is not None
+        server, dbc_result, db_result, reg_entry, fields_param, compact,
+        id_value is not None, annotate_mode
     )
 
     if merged.get("error"):
@@ -386,21 +389,26 @@ def _query_dbc(
 
     metadata = {
         "source": merged.pop("source", "unknown"),
-        "dbc_exists": dbc_result is not None,
-        "db_table": sql_table,
-        "db_exists": db_result is not None,
-        "field_annotations": True,
     }
 
     if reg_entry:
-        metadata["c_struct"] = reg_entry.get("c_struct", "")
-        metadata["sql_table"] = sql_table
-        metadata["store_variable"] = reg_entry.get("store_variable", "")
-        refs = _extract_field_references(reg_entry)
-        if refs:
-            metadata["field_references"] = refs
-        if reg_entry.get("referenced_by"):
-            metadata["referenced_by"] = reg_entry["referenced_by"]
+        c_struct = reg_entry.get("c_struct", "")
+        if c_struct:
+            metadata["c_struct"] = c_struct
+        if sql_table:
+            metadata["sql_table"] = sql_table
+        store_variable = reg_entry.get("store_variable", "")
+        if store_variable:
+            metadata["store_variable"] = store_variable
+        if args.get("hints"):
+            refs = _extract_field_references(reg_entry)
+            if refs:
+                metadata["field_references"] = refs
+            referenced_by = [
+                rb for rb in reg_entry.get("referenced_by", []) if rb.get("field")
+            ]
+            if referenced_by:
+                metadata["referenced_by"] = referenced_by
 
     if filter_notes:
         metadata["filter_notes"] = filter_notes
@@ -418,6 +426,17 @@ def _query_dbc(
             if resolved:
                 metadata["$resolved_fields"] = resolved
                 metadata["type_resolved"] = True
+
+    # Opt-in relation map: one hop to related rows (the C<->DBC<->SQL traversal)
+    if args.get("links") and merged.get("result"):
+        raw_rows = _extract_rows_for_resolution(merged["result"], id_value is not None)
+        if raw_rows:
+            resolved_links = resolve_type_fields(
+                server, dbc_load_name, raw_rows[:25], True, 1
+            )
+            links = _shape_links(resolved_links)
+            if links:
+                metadata["links"] = links
 
     return {"result": merged.get("result", []), "metadata": metadata}
 
@@ -552,16 +571,27 @@ def _query_sql(
         "primary_key": server.database._find_primary_key(reg_entry, sql_table),
     }
 
-    # Add cross-reference hints
-    refs = _extract_field_references(reg_entry)
-    if refs:
-        metadata["field_references"] = refs
-    if reg_entry.get("referenced_by"):
-        metadata["referenced_by"] = reg_entry["referenced_by"]
+    # Add cross-reference hints (opt-in)
+    if args.get("hints"):
+        refs = _extract_field_references(reg_entry)
+        if refs:
+            metadata["field_references"] = refs
+        referenced_by = [
+            rb for rb in reg_entry.get("referenced_by", []) if rb.get("field")
+        ]
+        if referenced_by:
+            metadata["referenced_by"] = referenced_by
 
     mgr = reg_entry.get("manager_singleton", "")
     if mgr:
         metadata["manager_singleton"] = mgr
+
+    if args.get("annotate") and server.database.db_available:
+        schema = server.database._get_table_schema(sql_table, target_db)
+        if schema:
+            metadata["types"] = {
+                c["COLUMN_NAME"]: c["DATA_TYPE"] for c in schema
+            }
 
     if resolved:
         metadata["$resolved_fields"] = resolved
@@ -582,6 +612,13 @@ def _query_sql(
         schema = server.database._get_table_schema(sql_table, target_db)
         if schema:
             metadata["columns"] = [c["COLUMN_NAME"] for c in schema]
+
+    # Opt-in relation map: one hop to related rows
+    if args.get("links") and rows:
+        resolved_links = resolve_type_fields(server, sql_table, rows[:25], True, 1)
+        links = _shape_links(resolved_links)
+        if links:
+            metadata["links"] = links
 
     return {"result": rows or [], "count": len(rows or []), "metadata": metadata}
 
@@ -633,7 +670,8 @@ def _merge_dbc_sql(
     reg_entry: Optional[Dict],
     fields_param: Optional[List],
     compact: bool,
-    single_record: bool
+    single_record: bool,
+    annotate: bool = False,
 ) -> Dict[str, Any]:
     """Merge DBC and SQL results with annotation."""
     if db_result and not dbc_result:
@@ -641,17 +679,44 @@ def _merge_dbc_sql(
 
     if dbc_result and not db_result:
         annotated = _annotate_dbc_result(
-            dbc_result, reg_entry, None, fields_param, compact, single_record
+            dbc_result, reg_entry, None, fields_param, compact, single_record, annotate
         )
         return {"result": annotated, "source": "dbc"}
 
     if dbc_result and db_result:
         annotated = _annotate_dbc_result(
-            dbc_result, reg_entry, db_result, fields_param, compact, single_record
+            dbc_result, reg_entry, db_result, fields_param, compact, single_record, annotate
         )
         return {"result": annotated, "source": "hybrid"}
 
     return {"error": "No data found", "isError": True}
+
+
+def _row_to_flat(row_fields: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Convert an annotated DBC row (list of field dicts) to a flat {name: value}.
+
+    Locale/array fields (e.g. name[0..15]) are collapsed into their base
+    name: a single non-empty slot becomes the scalar value, multiple
+    non-empty slots become a list.
+    """
+    flat: Dict[str, Any] = {}
+    groups: Dict[str, List[Any]] = {}
+
+    for f in row_fields:
+        name = f.get("name") or f"Field{f.get('index')}"
+        m = re.match(r'^(.*?)\[(\d+)\]$', name)
+        if m:
+            groups.setdefault(m.group(1), []).append(f.get("value"))
+        elif name not in flat:
+            flat[name] = f.get("value")
+
+    for base, vals in groups.items():
+        non_empty = [v for v in vals if v is not None and v != ""]
+        if len(non_empty) == 1:
+            flat[base] = non_empty[0]
+        elif len(non_empty) > 1:
+            flat[base] = non_empty
+    return flat
 
 
 def _annotate_dbc_result(
@@ -660,26 +725,81 @@ def _annotate_dbc_result(
     db_result: Optional[List] = None,
     fields_param: Optional[List] = None,
     compact: bool = True,
-    single_record: bool = False
+    single_record: bool = False,
+    annotate: bool = False,
 ) -> Any:
-    """Annotate DBC results. Wrap/unwrap based on single_record flag."""
+    """Annotate DBC results.
+
+    Output shape:
+      annotate=True : legacy per-field arrays ({index, name, value, type, ...});
+                      single-record id lookups return a flat list of field dicts,
+                      multi-record results return a list of such rows.
+      annotate=False: flat {name: value} dicts (locale arrays collapsed);
+                      single-record id lookups return one dict,
+                      multi-record results return a list of dicts.
+    """
     if not result:
         return []
 
-    # Convert fields_param=False to None for annotation
     actual_fields = fields_param if fields_param is not False else None
 
-    # For single record lookups, unwrap to flat list
-    if single_record and len(result) == 1:
-        annotated = _annotate_dbc_impl(
-            result[0], reg_entry, db_result, actual_fields, compact
-        )
-        return annotated.get("result", []) if isinstance(annotated, dict) else annotated
-
-    # Multi-record: return nested lists
-    return _annotate_dbc_impl(result, reg_entry, db_result, actual_fields, compact).get(
-        "result", []
+    annotated = _annotate_dbc_impl(
+        result, reg_entry, db_result, actual_fields, compact
     )
+    rows = annotated.get("result", []) if isinstance(annotated, dict) else annotated
+
+    if annotate:
+        if single_record and len(result) == 1:
+            return rows[0] if rows else []
+        return rows
+
+    flat_rows = [_row_to_flat(r) for r in rows]
+    if single_record:
+        return flat_rows[0] if flat_rows else {}
+    return flat_rows
+
+
+def _shape_links(resolved: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Shape resolve_type_fields output into a budgeted relation map.
+
+    Handles both resolver output shapes:
+      generic: {pk: {col: {meaning, raw, resolved_to, items?}}}
+      quest:   {pk: {starters|enders: [{type, id, name}], items: {col: {id, name}}}}
+    """
+    out = []
+    for pk, fields in resolved.items():
+        items = []
+        for col, v in list(fields.items())[:12]:
+            if isinstance(v, list):
+                for e in v[:3]:
+                    if isinstance(e, dict):
+                        items.append({
+                            "field": col,
+                            "target": e.get("type", ""),
+                            "value": e.get("id"),
+                            "target_name": e.get("name"),
+                        })
+            elif isinstance(v, dict):
+                if "resolved_to" in v or ("meaning" in v and "raw" in v):
+                    entry: Dict[str, Any] = {
+                        "field": v.get("meaning") or col, "value": v.get("raw")
+                    }
+                    if v.get("resolved_to") is not None:
+                        entry["target_name"] = v["resolved_to"]
+                    if v.get("items"):
+                        entry["items"] = list(v["items"])[:1]
+                    if "target_name" in entry or "items" in entry:
+                        items.append(entry)
+                elif "id" in v and "name" in v:
+                    items.append({"field": col, "value": v.get("id"), "target_name": v.get("name")})
+                elif v and all(
+                    isinstance(x, dict) and "id" in x and "name" in x for x in v.values()
+                ):
+                    for sub, sv in list(v.items())[:5]:
+                        items.append({"field": sub, "value": sv.get("id"), "target_name": sv.get("name")})
+        if items:
+            out.append({"id": pk, "links": items[:15]})
+    return out
 
 
 def _extract_field_references(reg_entry: Optional[Dict]) -> Optional[Dict[str, List]]:
@@ -708,6 +828,10 @@ def _extract_rows_for_resolution(merged_result: Any, single_record: bool) -> Lis
     """
     if not merged_result:
         return []
+
+    # Single flat record dict (default DBC shape for id lookups)
+    if isinstance(merged_result, dict):
+        return [merged_result]
 
     # If already a list of plain dicts (e.g., SQL-only merge), pass through
     if isinstance(merged_result, list) and merged_result:
@@ -745,11 +869,15 @@ def get_schema() -> Dict[str, Any]:
     return {
         "name": "query",
         "description": (
-            "Query any datastore. Merged from query_game_data + query_dbc."
-            " Supports DBC binary files, SQL tables, overlays, and auxiliary stores."
-            " Use id= for O(1) lookup, filter={...} for named field queries,"
-            " fields=[...] for column selection, compact=true (default) to strip nulls."
-            " Use resolve=true to get type-aware field resolution for tables like gameobject_template."
+            "Query any datastore (DBC binary, SQL table, or overlay). "
+            "Result rows are flat {field: value} objects; id/row_index lookups return one "
+            "object (or an error if the id is missing), filter/unconstrained queries return "
+            "a list, capped by limit (default 100). Unknown argument/field names are errors "
+            "with suggestions. compact (default true) strips null/0/empty values. "
+            "annotate=true switches DBC rows to the legacy per-field arrays with DBC index, "
+            "type, sql_column and source. hints=true adds field_references/referenced_by "
+            "metadata. links=true adds a one-hop relation map (metadata.links) to related "
+            "rows across DBC/SQL tables. resolve=true gives type-aware field decoding."
         ),
         "inputSchema": {
             "type": "object",
@@ -763,7 +891,10 @@ def get_schema() -> Dict[str, Any]:
                 },
                 "id": {
                     "type": "number",
-                    "description": "Primary key ID for O(1) lookup. Mutually exclusive with filter."
+                    "description": (
+                        "Primary key ID for O(1) lookup. If a filter is also given, both "
+                        "must match (AND); an existing record that fails the filter is an error."
+                    )
                 },
                 "filter": {
                     "type": "object",
@@ -779,7 +910,30 @@ def get_schema() -> Dict[str, Any]:
                     "items": {"type": ["number", "string"]},
                     "description": (
                         "Select specific fields by index [38, 39] or name ['BaseLevel', 'SpellLevel']."
-                        " None = all fields."
+                        " Strict: unknown names are errors with suggestions. None = all fields."
+                    )
+                },
+                "annotate": {
+                    "type": "boolean",
+                    "description": (
+                        "Return DBC rows as legacy per-field arrays with DBC index, type, "
+                        "sql_column, source and sql_override (default false = flat {name: value}). "
+                        "On SQL tables, attaches column types to metadata."
+                    )
+                },
+                "hints": {
+                    "type": "boolean",
+                    "description": (
+                        "Include cross-reference metadata: field_references and referenced_by "
+                        "(default false)"
+                    )
+                },
+                "links": {
+                    "type": "boolean",
+                    "description": (
+                        "Add metadata.links: one-hop relation map for the returned rows - for each "
+                        "registered cross-reference field with a non-trivial value, the related row's "
+                        "identity (default false; capped at 25 rows x 10 fields)"
                     )
                 },
                 "limit": {
