@@ -29,3 +29,7 @@ htmlcov/
 
 # Logs
 *.log
+
+# Transient registry-analysis artifacts (inputs to one-off fix scripts)
+scripts/_drift_triage.json
+scripts/_*.json
