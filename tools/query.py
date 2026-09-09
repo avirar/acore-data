@@ -432,6 +432,31 @@ def _query_dbc(
     if args.get("links") and merged.get("result"):
         raw_rows = _extract_rows_for_resolution(merged["result"], id_value is not None)
         if raw_rows:
+            # When `fields` narrowed the output, resolve against full rows
+            # (bounded side-lookup on the PK) so link columns are present.
+            if fields_param and reg_entry and sql_table and server.database.db_available:
+                identity_name = (
+                    reg_entry.get("fields", {}).get("0", {}).get("name", "ID")
+                )
+                ids = [
+                    r.get(identity_name) for r in raw_rows[:25]
+                    if isinstance(r, dict) and r.get(identity_name) is not None
+                ] or [
+                    r.get("ID") for r in raw_rows[:25]
+                    if isinstance(r, dict) and r.get("ID") is not None
+                ]
+                if ids:
+                    pk_col = server.database._find_primary_key(reg_entry, sql_table)
+                    placeholders = ", ".join(["%s"] * len(ids))
+                    link_sql = f"SELECT * FROM {sql_table} WHERE {pk_col} IN ({placeholders})"
+                    full_rows, link_err = server.database._query_database(
+                        link_sql, params=tuple(ids)
+                    )
+                    if not link_err and full_rows:
+                        raw_rows = full_rows
+                        metadata["links_note"] = (
+                            "links resolved against full rows (extra lookup on selected ids)"
+                        )
             resolved_links = resolve_type_fields(
                 server, dbc_load_name, raw_rows[:25], True, 1
             )
@@ -479,10 +504,15 @@ def _query_sql(
 
     # Field selection (strict: unknown names are errors)
     fields_param = args.get("fields")
+    pk_col = server.database._find_primary_key(reg_entry, sql_table)
     selected_cols: List[str] = []
     if fields_param:
         fields_meta = reg_entry.get("fields", {})
         seen_cols = set()
+        # Identity column always travels with a narrowed selection
+        if pk_col:
+            seen_cols.add(pk_col.lower())
+            selected_cols.append(pk_col)
         for f in fields_param:
             col = None
             if isinstance(f, bool):
@@ -521,8 +551,7 @@ def _query_sql(
     where_fragments = []
     params: list = []
 
-    if id_value is not None:
-        pk_col = server.database._find_primary_key(reg_entry, sql_table)
+    if id_value is not None and pk_col:
         where_fragments.append(f"{pk_col} = %s")
         params.append(id_value)
 
@@ -569,7 +598,7 @@ def _query_sql(
         "sql_table": sql_table,
         "c_struct": reg_entry.get("c_struct", ""),
         "store_variable": reg_entry.get("store_variable", ""),
-        "primary_key": server.database._find_primary_key(reg_entry, sql_table),
+        "primary_key": pk_col,
     }
 
     # Add cross-reference hints (opt-in)
@@ -614,9 +643,28 @@ def _query_sql(
         if schema:
             metadata["columns"] = [c["COLUMN_NAME"] for c in schema]
 
-    # Opt-in relation map: one hop to related rows
-    if args.get("links") and rows:
-        resolved_links = resolve_type_fields(server, sql_table, rows[:25], True, 1)
+    # Opt-in relation map: one hop to related rows. Resolves against full
+    # rows (bounded side-lookup on the PK) so link columns are present even
+    # when `fields` narrowed the output.
+    if args.get("links") and rows and pk_col:
+        link_rows = rows
+        if selected_cols:
+            ids = [
+                r.get(pk_col) for r in rows[:25]
+                if isinstance(r, dict) and r.get(pk_col) is not None
+            ]
+            if ids:
+                placeholders = ", ".join(["%s"] * len(ids))
+                link_sql = f"SELECT * FROM {sql_table} WHERE {pk_col} IN ({placeholders})"
+                link_rows, link_err = server.database._query_database(
+                    link_sql, db_name=target_db, params=tuple(ids)
+                )
+                if not link_err and link_rows:
+                    metadata["links_note"] = (
+                        "links resolved against full rows (extra lookup on selected ids)"
+                    )
+                link_rows = link_rows or rows
+        resolved_links = resolve_type_fields(server, sql_table, link_rows[:25], True, 1)
         links = _shape_links(resolved_links)
         if links:
             metadata["links"] = links
