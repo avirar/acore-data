@@ -89,6 +89,9 @@ def main():
         "dangling_refs", "duplicate_identifiers", "type_as_name",
         "missing_data_source", "dbc_index_drift", "sql_column_drift",
         "missing_cross_refs",
+        # live-DB signals (only with --db)
+        "coverage_gap",            # live tables not registered (non-noise)
+        "optional_table_absent",   # informational: optional (mod) table not in this install
     ]}
 
     # ---- 1. dangling refs ------------------------------------------------
@@ -213,9 +216,16 @@ def main():
                     table = e["sql_table"]
                     cols = _full_cols(table)
                     if not cols:
-                        report["sql_column_drift"].append(
-                            {"entry": n, "table": table, "issue": "TABLE_MISSING"}
-                        )
+                        # Optional mod DB (acore_playerbots): absence is expected on
+                        # installs without mod-playerbots -> informational, not drift.
+                        if e.get("sql_database") == "acore_playerbots":
+                            report["optional_table_absent"].append(
+                                {"entry": n, "table": table}
+                            )
+                        else:
+                            report["sql_column_drift"].append(
+                                {"entry": n, "table": table, "issue": "TABLE_MISSING"}
+                            )
                         continue
                     for k, f in e.get("fields", {}).items():
                         sc = (f.get("sql_column") or "").strip()
@@ -243,6 +253,30 @@ def main():
                         report["sql_column_drift"].append(
                             {"entry": n, "table": table, "field": k,
                              "name": f.get("name"), "sql_column": sc})
+
+                # 6b. coverage gap: live tables with no registry entry.
+                #     Curated-out tables (other modules / niche core tables) are
+                #     intentional exclusions, not gaps.
+                curated_out = {
+                    "chat_filter", "creature_multispawn", "spawn_group", "spell_cone",
+                    "creature_text_options", "creature_text_option_sets",
+                    "auctionhousebot_professionitems",  # mod-ah-bot table
+                }
+                registered_tables = {
+                    (e.get("sql_table") or "").lower()
+                    for e in E.values() if e.get("sql_table")
+                }
+                for db_name, live_tables in sorted(db._db_tables_cache.items()):
+                    for t in sorted(live_tables):
+                        if t in registered_tables:
+                            continue
+                        if t in curated_out:
+                            continue
+                        if t.startswith("mod_"):
+                            continue
+                        report["coverage_gap"].append(
+                            {"db": db_name, "table": t}
+                        )
         except Exception as ex:
             print(f"[warn] DB check failed: {ex}", file=sys.stderr)
 

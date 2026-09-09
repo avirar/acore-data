@@ -69,9 +69,14 @@ DBC file, SQL table, store variable) and traverse to the others.
   dbc_index_drift (registry index past the DBC/format field_count),
   sql_column_drift (field's sql_column absent from the live table — full
   uncapped columns, array/family and dbc_backed sparse-overlay skipped,
-  cross-DB tables resolved), and missing_cross_refs (heuristic FK gap).
-  As of this branch all structural signals are 0 except ~3 legit `string`
-  column names and ~300 low-confidence missing_cross_refs (PKs/enum ids/guids
+  cross-DB tables resolved), missing_cross_refs (heuristic FK gap),
+  coverage_gap (live tables in any DB with no registry entry — curated-out
+  tables are listed in the script's `curated_out` set), and
+  optional_table_absent (informational: a registered `acore_playerbots`
+  table missing from this install — expected on installs without
+  mod-playerbots, never a structural failure). As of this branch all
+  structural signals are 0 except ~3 legit `string` column names and
+  ~300 low-confidence missing_cross_refs (PKs/enum ids/guids
   intentionally left un-annotated).
 - The registry's `sql_column` values are aligned to the **live AzerothCore**
   schema, not vanilla WotLK. Several tables were restructured (e.g.
@@ -114,5 +119,7 @@ DBC file, SQL table, store variable) and traverse to the others.
   structural signals stay 0. `scripts/archive/fix_registry_phase_[a-f].py` are the
   one-off migrations that brought the registry to that state (dangling refs,
   type-as-name, missing data sources, SpellEntry 115/116 swap, curated
-  cross-refs, sql_column drift, phantom DBC fields, type-as-name residue);
-  re-running them is a no-op once applied.
+  cross-refs, sql_column drift, phantom DBC fields, type-as-name residue), and
+  `scripts/archive/update_registry_hygiene.py` registers the live-but-unregistered
+  tables found by the coverage audit (playerbots_bis_gear, updates/updates_include,
+  version, rbac_*). All are idempotent no-ops once applied.
