@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, and travel-graph verification. Exposes nine tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, and travel-graph verification. Exposes ten tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -132,6 +132,28 @@ Database state audit for this install — no arguments. Reports the core/DB vers
 dbversion()
 → core_version (with fork/branch marker), db_version, per-DB tables/applied/pending,
   mod_playerbots_installed=true|false
+```
+
+### `explain`
+
+Agent-friendly digest of a single record from any datastore — wraps the query pipeline (annotate + links) and distills it to: a one-line summary, the non-trivial fields (capped at 20, name pinned first), one-hop cross-references with resolved target names, and source provenance. For DBC-backed stores it reports which fields the live SQL overlay changed vs the vanilla DBC (`overlay_overrides`), and flags overlay-only records (ids that exist only in the `*_dbc` overlay tables, as in this reduced build).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `name` | string | **Required.** Datastore name. |
+| `id` | number | **Required.** The record's primary key (0 allowed). |
+
+**Examples:**
+
+```
+explain(name="Spell", id=118)
+→ Polymorph (dbc) — 46 fields with values, 20 shown — 4 cross-reference(s)
+
+explain(name="Spell", id=19)
+→ SWORDSPECIAL (DND) — overlay-only record (no vanilla DBC row)
+
+explain(name="quest_template", id=46)
+→ Bounty on Murlocs — starters/enders: Guard Thomas, reward items resolved
 ```
 
 ### `encounter`

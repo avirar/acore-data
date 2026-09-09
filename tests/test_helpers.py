@@ -199,5 +199,70 @@ class TestTTLCache(unittest.TestCase):
         self.assertEqual(_get_persistent("fresh"), "value")
 
 
+class TestExplainHelpers(unittest.TestCase):
+    """explain tool: pure helpers (no DB)."""
+
+    def test_nontrivial(self):
+        from tools.explain import _nontrivial
+        self.assertFalse(_nontrivial(None))
+        self.assertFalse(_nontrivial(0))
+        self.assertFalse(_nontrivial(""))
+        self.assertFalse(_nontrivial("  "))
+        self.assertFalse(_nontrivial(False))
+        self.assertFalse(_nontrivial([]))
+        self.assertTrue(_nontrivial(1))
+        self.assertTrue(_nontrivial("x"))
+        self.assertTrue(_nontrivial([1]))
+
+    def test_flatten_links_caps_and_shapes(self):
+        from tools.explain import _flatten_links
+        self.assertEqual(_flatten_links(None), [])
+        self.assertEqual(_flatten_links("not a list"), [])
+        big = [{"links": [{"field": f"f{i}", "value": i,
+                           "target": "t", "target_name": f"n{i}"} for i in range(50)]}]
+        out = _flatten_links(big)
+        self.assertEqual(len(out), 15)
+        self.assertEqual(out[0]["target_name"], "n0")
+
+    def test_dbc_overrides_diffs_and_reports_absent_dbc(self):
+        from tools.explain import _dbc_overrides
+
+        class _Reader:
+            def get_record_by_id(self, i):
+                return {0: 100, 1: 5} if i == 100 else None
+
+        class _RegEntry:
+            pass
+
+        class _Registry:
+            def _resolve_entry(self, name):
+                return ("FakeEntry", {
+                    "dbc_file": "Fake.dbc",
+                    "fields": {
+                        "0": {"name": "Id", "type": "uint32"},
+                        "1": {"name": "Value", "type": "uint32"},
+                        "2": {"name": "Other", "type": "uint32"},
+                    },
+                })
+
+        class _Server:
+            registry = _Registry()
+
+            def _load_dbc(self, name):
+                self.loaded = name
+                return _Reader()
+
+        s = _Server()
+        row = {"ID": 100, "Value": 9, "Other": 0}
+        overrides, exists = _dbc_overrides(s, "Fake", 100, row)
+        self.assertTrue(exists)
+        self.assertEqual(overrides, {"Value": 9})  # case-insensitive match
+        self.assertEqual(s.loaded, "Fake")  # .dbc stripped
+
+        overrides, exists = _dbc_overrides(s, "Fake", 99999, row)
+        self.assertFalse(exists)
+        self.assertEqual(overrides, {})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
