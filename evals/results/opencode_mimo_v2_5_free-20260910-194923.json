@@ -1,0 +1,58 @@
+[
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T1",
+    "run": 1,
+    "session_id": "ses_f75479968ffeflcr9wvXSkmmSF",
+    "correct": true,
+    "answer_tail": "**Spell 118 (Polymorph):**\n- **Base Level:** 8\n- **Mechanic:** MECHANIC_POLYMORPH (value 17)",
+    "tool_calls": 3,
+    "tools_used": [
+      "acore_data_enums",
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "SpellEntry"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "SpellEntry",
+          "id": 118,
+          "fields": [
+            "Id",
+            "SpellName",
+            "BaseLevel",
+            "Mechanic"
+          ],
+          "resolve": "[\"enum\"]"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_enums",
+        "input": {
+          "enum": "Mechanics",
+          "value": 17
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 28081,
+      "output": 659,
+      "reasoning": 0,
+      "total": 109188
+    },
+    "duration_s": 28.5,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

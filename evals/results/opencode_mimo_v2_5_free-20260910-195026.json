@@ -1,0 +1,80 @@
+[
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T2",
+    "run": 1,
+    "session_id": "ses_f7546a16effes5zsvNyVo0wa9N",
+    "correct": true,
+    "answer_tail": "The spell is **Healing Potion** (spell ID 439).",
+    "tool_calls": 5,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query",
+      "acore_data_sql"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118,
+          "fields": [
+            "spellid_1"
+          ]
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "item_template",
+          "detail": "schema"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118,
+          "fields": [
+            "Spells"
+          ]
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_sql",
+        "input": {
+          "query": "SELECT spellid_1 FROM item_template WHERE entry = 118"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 439,
+          "fields": [
+            "Id",
+            "SpellName"
+          ]
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Unknown field 'spellid_1' for table 'item_template'. Did you mean: spellid_1..5, Spells, SellPrice, displayid, ScriptId? \", \"isError\": true}",
+      "{\"error\": \"Database error: (1064, \\\"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.5 FROM item_template WHERE entry = 118 LIMIT 100' at line 1\\\")\", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 5328,
+      "output": 452,
+      "reasoning": 0,
+      "total": 139860
+    },
+    "duration_s": 28.0,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

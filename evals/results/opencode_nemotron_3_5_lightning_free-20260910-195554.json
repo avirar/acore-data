@@ -1,0 +1,72 @@
+[
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T2",
+    "run": 1,
+    "session_id": "ses_f75427894ffeHLRchNNPbiaNEx",
+    "correct": true,
+    "answer_tail": "The spell referenced is **Healing Potion** (spell ID\u202f439).",
+    "tool_calls": 5,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "item_template",
+          "detail": "summary"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "detail": "schema",
+          "query": "item_template"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "fields": [
+            "spellid_1"
+          ],
+          "name": "item_template",
+          "id": 118
+        },
+        "error": true
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "item_template",
+          "id": 118
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 439,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [
+      "{\"error\": \"Unknown field 'spellid_1' for table 'item_template'. Did you mean: spellid_1..5, Spells, SellPrice, displayid, ScriptId? \", \"isError\": true}"
+    ],
+    "tokens": {
+      "input": 39785,
+      "output": 280,
+      "reasoning": 337,
+      "total": 147026
+    },
+    "duration_s": 83.3,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T1",
+    "run": 1,
+    "session_id": "ses_f75442992ffex7iyaTBJ6ucs0x",
+    "correct": true,
+    "answer_tail": "- **Base level**:\u202f8 (from `BaseLevel` field)  \n- **Mechanic**:\u202f`MECHANIC_POLYMORPH` (value\u202f17)",
+    "tool_calls": 2,
+    "tools_used": [
+      "acore_data_enums",
+      "acore_data_explain"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_explain",
+        "input": {
+          "id": 118,
+          "name": "Spell"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_enums",
+        "input": {
+          "value": 17
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 22776,
+      "output": 144,
+      "reasoning": 157,
+      "total": 62245
+    },
+    "duration_s": 75.8,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

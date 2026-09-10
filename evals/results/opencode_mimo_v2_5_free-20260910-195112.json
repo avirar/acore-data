@@ -1,0 +1,46 @@
+[
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T3",
+    "run": 1,
+    "session_id": "ses_f7545ab47ffe4ojN0gtwUoyke9",
+    "correct": true,
+    "answer_tail": "There are **3,125** spawns of creature id 32820 in map 0 (Eastern Kingdoms). The template name is **Wild Turkey**.",
+    "tool_calls": 2,
+    "tools_used": [
+      "acore_data_query",
+      "acore_data_spawns"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_spawns",
+        "input": {
+          "entry": 32820,
+          "map": 0
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "creature_template",
+          "id": 32820,
+          "fields": [
+            "Name"
+          ]
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 18808,
+      "output": 377,
+      "reasoning": 0,
+      "total": 40881
+    },
+    "duration_s": 11.7,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]
