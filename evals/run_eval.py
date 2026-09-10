@@ -51,7 +51,7 @@ TASKS = {
     "T3": {
         "prompt": "How many creature spawns with id 32820 exist in map 0, and what is the template name of that creature?",
         # expected: 3125 spawns, Wild Turkey
-        "check": lambda a: re.search(r"3,?125", a) and re.search(r"wild\s+turkey", a, re.I),
+        "check": lambda a: re.search(r"3[\s\u00a0\u202f]?125", a) and re.search(r"wild\s+turkey", a, re.I),
         "note": "SQL count + creature_template join",
     },
     "T4": {

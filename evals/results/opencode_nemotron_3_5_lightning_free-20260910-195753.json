@@ -1,0 +1,34 @@
+[
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T4",
+    "run": 1,
+    "session_id": "ses_f753fa667ffetKkHv3ZiblHdOD",
+    "correct": true,
+    "answer_tail": "Spell 118's name field is `SpellName` and its value is **Polymorph**.",
+    "tool_calls": 1,
+    "tools_used": [
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "id": 118,
+          "name": "Spell"
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 1603,
+      "output": 69,
+      "reasoning": 114,
+      "total": 40954
+    },
+    "duration_s": 17.6,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

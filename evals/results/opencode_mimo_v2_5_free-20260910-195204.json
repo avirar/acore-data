@@ -1,0 +1,47 @@
+[
+  {
+    "model": "opencode/mimo-v2.5-free",
+    "task": "T4",
+    "run": 1,
+    "session_id": "ses_f7544f4ccffee7y6Tji6H1oEM7",
+    "correct": true,
+    "answer_tail": "The Name field is called `SpellName` in the spell DBC. Spell 118 is **Polymorph**.",
+    "tool_calls": 2,
+    "tools_used": [
+      "acore_data_lookup",
+      "acore_data_query"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_lookup",
+        "input": {
+          "query": "Spell",
+          "detail": "schema"
+        },
+        "error": false
+      },
+      {
+        "tool": "acore_data_query",
+        "input": {
+          "name": "Spell",
+          "id": 118,
+          "fields": [
+            "SpellName"
+          ],
+          "compact": true
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 9649,
+      "output": 342,
+      "reasoning": 0,
+      "total": 78983
+    },
+    "duration_s": 17.0,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]

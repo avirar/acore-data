@@ -1,0 +1,34 @@
+[
+  {
+    "model": "opencode/nemotron-3.5-lightning-free",
+    "task": "T3",
+    "run": 1,
+    "session_id": "ses_f753e7144ffe015ifoDpcHAspt",
+    "correct": true,
+    "answer_tail": "- **Count**: 3\u202f125 creature spawns (all in map\u202f0).  \n- **Template name**: **Wild Turkey**.",
+    "tool_calls": 1,
+    "tools_used": [
+      "acore_data_spawns"
+    ],
+    "tool_inputs": [
+      {
+        "tool": "acore_data_spawns",
+        "input": {
+          "entry": 32820,
+          "map": 0
+        },
+        "error": false
+      }
+    ],
+    "error_messages": [],
+    "tokens": {
+      "input": 1460,
+      "output": 106,
+      "reasoning": 115,
+      "total": 40849
+    },
+    "duration_s": 14.7,
+    "exit_code": 0,
+    "stderr_tail": ""
+  }
+]
