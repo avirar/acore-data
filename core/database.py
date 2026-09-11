@@ -63,13 +63,27 @@ class Database:
         # Connection cache (pymysql)
         self._connections: Dict[str, Any] = {}
 
+        # Per-database credentials (shared-DB topologies: e.g. acore_auth on a
+        # different MySQL host than acore_world). Empty = single connection for
+        # all DBs (default behavior).
+        self._db_creds: Dict[str, Dict[str, str]] = {}
+
         # Database priority order for routing
         self._db_priority_order = [
             "acore_world", "acore_characters", "acore_auth", "acore_playerbots"
         ]
 
     def _auto_detect_db_config(self) -> None:
-        """Auto-detect database config from worldserver.conf."""
+        """Auto-detect database config from worldserver.conf.
+
+        Parses the three *DatabaseInfo lines. AzerothCore allows each of
+        Login (acore_auth), World (acore_world) and Character
+        (acore_characters) to point at a different MySQL host/credential set
+        (shared auth DB across realm machines). World is the base connection;
+        differing Login/Character lines are stored as per-DB overrides.
+        acore_playerbots is not configured by worldserver and rides the base
+        (world) connection - set explicit DB_* env vars to override.
+        """
         for conf_path in [
             Path("/root/azerothcore-wotlk/env/dist/etc/worldserver.conf"),
             Path.home() / "azerothcore-wotlk/env/dist/etc/worldserver.conf"
@@ -78,35 +92,82 @@ class Database:
                 continue
             try:
                 text = conf_path.read_text()
+            except Exception:
+                continue
+
+            lines = {}
+            for key, db in [
+                ("LoginDatabaseInfo", "acore_auth"),
+                ("WorldDatabaseInfo", "acore_world"),
+                ("CharacterDatabaseInfo", "acore_characters"),
+            ]:
                 m = re.search(
-                    r'^WorldDatabaseInfo\s*=\s*"([^"]+)"', text, re.MULTILINE
+                    rf"^{key}\s*=\s*\"([^\"]+)\"", text, re.MULTILINE
                 )
                 if m:
                     parts = m.group(1).split(";")
                     if len(parts) >= 5:
-                        self.db_host = parts[0]
-                        self.db_port = parts[1]
-                        self.db_user = parts[2]
-                        self.db_password = parts[3]
-                        self.db_name = parts[4]
-                        print(f"Auto-detected DB config from {conf_path}", file=sys.stderr)
-                        return
-            except Exception:
+                        lines[db] = {
+                            "host": parts[0],
+                            "port": parts[1],
+                            "user": parts[2],
+                            "password": parts[3],
+                            "name": parts[4],
+                        }
+
+            if not lines.get("acore_world"):
                 continue
+
+            base = lines["acore_world"]
+            self.db_host = base["host"]
+            self.db_port = base["port"]
+            self.db_user = base["user"]
+            self.db_password = base["password"]
+            self.db_name = base["name"]
+
+            for db, creds in lines.items():
+                if db == "acore_world":
+                    continue
+                if any(creds[k] != base[k] for k in ("host", "port", "user", "password")):
+                    self._db_creds[db] = creds
+
+            print(f"Auto-detected DB config from {conf_path}", file=sys.stderr)
+            if self._db_creds:
+                for db, creds in sorted(self._db_creds.items()):
+                    print(
+                        f"  per-DB override: {db} -> {creds['user']}@"
+                        f"{creds['host']}:{creds['port']}/{creds['name']}",
+                        file=sys.stderr,
+                    )
+            return
 
         self.db_host = self.db_host or "localhost"
         self.db_user = self.db_user or "root"
         self.db_password = self.db_password or ""
 
+    def _creds_for(self, db_name: str) -> Dict[str, str]:
+        """Credentials for the given database (per-DB override or base)."""
+        creds = self._db_creds.get(db_name)
+        if creds:
+            return creds
+        return {
+            "host": self.db_host,
+            "port": self.db_port,
+            "user": self.db_user,
+            "password": self.db_password,
+            "name": db_name,
+        }
+
     def _get_connection(self, db_name: str):
         """Get (or create) a pymysql connection for the given database."""
         if db_name not in self._connections:
+            creds = self._creds_for(db_name)
             try:
                 conn = pymysql.connect(
-                    host=self.db_host,
-                    port=int(self.db_port),
-                    user=self.db_user,
-                    password=self.db_password,
+                    host=creds["host"],
+                    port=int(creds["port"]),
+                    user=creds["user"],
+                    password=creds["password"],
                     database=db_name,
                     cursorclass=pymysql.cursors.DictCursor,
                     connect_timeout=10,
@@ -303,15 +364,16 @@ class Database:
 
                 sql = re.sub(r"%s", _sub, sql)
 
-            cli_env = {**os.environ, "MYSQL_PWD": self.db_password}
+            creds = self._creds_for(db)
+            cli_env = {**os.environ, "MYSQL_PWD": creds["password"]}
             cmd = [
                 "mysql",
                 "-h",
-                self.db_host,
+                creds["host"],
                 "-P",
-                self.db_port,
+                creds["port"],
                 "-u",
-                self.db_user,
+                creds["user"],
                 "-D",
                 db,
                 "-e",
