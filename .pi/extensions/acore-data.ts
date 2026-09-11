@@ -71,7 +71,12 @@ function schemaToTypebox(schema: any): any {
 				props[k] = required.has(k) ? sub : Type.Optional(sub);
 			}
 			if (Object.keys(props).length === 0) {
-				return schema.additionalProperties ? Type.Record(Type.String(), Type.Any(), opts) : Type.Any();
+				// No-arg tools (e.g. dbversion): an empty object schema, NOT Any()
+				// (which serializes without a `type` and is rejected by strict
+				// OpenAI-compatible providers with "type: null").
+				return schema.additionalProperties === true
+					? Type.Record(Type.String(), Type.Any(), opts)
+					: Type.Object({}, opts);
 			}
 			return Type.Object(props, opts);
 		}
