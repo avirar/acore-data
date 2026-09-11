@@ -19,6 +19,14 @@ DBC file, SQL table, store variable) and traverse to the others.
   works, but it is slower and the test harness uses the venv).
 - `DB_*` env vars auto-detect from
   `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf` when unset.
+  Auto-detection parses all three `*DatabaseInfo` lines (Login/World/
+  Character): World is the base connection, differing Login/Character lines
+  become per-DB credential overrides (shared-DB topologies, e.g. a realm
+  machine whose `acore_auth` lives on another host — `REDACTED-LAN-HOST`
+  reaches its shared auth DB on `.233` this way). `acore_playerbots` is not
+  in worldserver.conf and rides the base (world) connection. Explicit
+  `DB_*` env vars still disable auto-detection entirely (single connection
+  for all DBs).
 - DBC path: `/root/azerothcore-wotlk/env/dist/bin/dbc`; format file
   (single source of format strings):
   `/root/azerothcore-wotlk/src/server/shared/DataStores/DBCfmt.h`.
