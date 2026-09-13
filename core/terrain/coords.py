@@ -32,9 +32,15 @@ class TileCoord(NamedTuple):
 
 
 def world_to_gridcoord(x: float, y: float) -> GridCoord:
-    """Convert world coordinates to grid coordinate (0-63)."""
-    gx = int(x / GRID_SIZE)
-    gy = int(y / GRID_SIZE)
+    """Convert world coordinates to grid coordinate (0-63).
+
+    WotLK 3.3.5 world coordinates are center-origin: the map spans
+    [-MAP_SIZE/2, +MAP_SIZE/2] and tile (0,0) is at the far +x,+y corner.
+    Hence tile = 32 - world / GRID_SIZE (see MapDefines.h SIZE_OF_GRIDS
+    and the file naming {map:03d}{tx:02d}{ty:02d}).
+    """
+    gx = int(32 - x / GRID_SIZE)
+    gy = int(32 - y / GRID_SIZE)
     return GridCoord(
         x=max(0, min(MAX_GRIDS - 1, gx)),
         y=max(0, min(MAX_GRIDS - 1, gy)),
@@ -44,8 +50,8 @@ def world_to_gridcoord(x: float, y: float) -> GridCoord:
 def gridcoord_to_world(gx: int, gy: int) -> Tuple[float, float]:
     """Convert grid coordinate to world coordinate (center of grid)."""
     return (
-        (gx + 0.5) * GRID_SIZE,
-        (gy + 0.5) * GRID_SIZE,
+        (32 - gx - 0.5) * GRID_SIZE,
+        (32 - gy - 0.5) * GRID_SIZE,
     )
 
 
@@ -96,9 +102,14 @@ def mmap_main_filename(map_id: int) -> str:
 
 
 def world_to_local_tile(x: float, y: float, tile_x: int, tile_y: int) -> Tuple[float, float]:
-    """Convert world coords to local tile coords (0-1 range within tile)."""
-    grid_x = tile_x * GRID_SIZE
-    grid_y = tile_y * GRID_SIZE
+    """Convert world coords to local tile coords (0-1 range within tile).
+
+    Tile (tile_x, tile_y) spans world x in
+    [(32 - tile_x - 1) * GRID_SIZE, (32 - tile_x) * GRID_SIZE) —
+    centered origin; world x increases toward decreasing tile index.
+    """
+    grid_x = (32 - tile_x - 1) * GRID_SIZE
+    grid_y = (32 - tile_y - 1) * GRID_SIZE
     return ((x - grid_x) / GRID_SIZE, (y - grid_y) / GRID_SIZE)
 
 
@@ -106,8 +117,8 @@ def local_tile_to_world(local_x: float, local_y: float,
                         tile_x: int, tile_y: int) -> Tuple[float, float]:
     """Convert local tile coordinates back to world coordinates."""
     return (
-        tile_x * GRID_SIZE + local_x * GRID_SIZE,
-        tile_y * GRID_SIZE + local_y * GRID_SIZE,
+        (32 - tile_x - 1) * GRID_SIZE + local_x * GRID_SIZE,
+        (32 - tile_y - 1) * GRID_SIZE + local_y * GRID_SIZE,
     )
 
 
