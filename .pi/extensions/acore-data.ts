@@ -10,8 +10,10 @@
  * Committed at .pi/extensions/acore-data.ts — pi loads it automatically.
  */
 import { spawn, type ChildProcess } from "node:child_process";
-import { join } from "node:path";
-import { existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { existsSync, realpathSync } from "node:fs";
+import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 
@@ -21,8 +23,41 @@ const CALL_TIMEOUT_MS = 300_000; // terrain pathfind / heavy SQL can be slow
 // inherits the ambient environment (DB_*, DBC_*, DATA_PATH flow through if
 // set) and fills the rest in: DBC paths default to the standard AzerothCore
 // layout, and DB credentials are auto-detected from worldserver.conf when
-// unset. Override the project root (default: pi's cwd) with ACORE_DATA_ROOT.
-const PROJECT_ROOT = process.env.ACORE_DATA_ROOT || process.cwd();
+// unset. Override the project root with ACORE_DATA_ROOT.
+//
+// The project root is located without relying on pi's cwd (which is the
+// AzerothCore checkout, not this repo, when the bridge is installed globally):
+//   1. ACORE_DATA_ROOT (explicit override)
+//   2. pi's cwd (running from inside the acore-data repo)
+//   3. the extension's own location, symlink-resolved (the global
+//      ~/.pi/agent/extensions/acore-data.ts -> <repo>/.pi/extensions/… link)
+//   4. the conventional ~/acore-data install location
+// Candidates are validated by the presence of server.py before use.
+function resolveAcoreDataRoot(): string {
+	if (process.env.ACORE_DATA_ROOT) return process.env.ACORE_DATA_ROOT;
+
+	const candidates: string[] = [process.cwd()];
+
+	try {
+		const here = realpathSync(fileURLToPath(import.meta.url));
+		// <repo>/.pi/extensions/acore-data.ts -> repo root is three levels up
+		candidates.push(dirname(dirname(dirname(here))));
+	} catch {
+		// ignore — fall through to the next candidate
+	}
+
+	candidates.push(join(homedir(), "acore-data"));
+
+	for (const c of candidates) {
+		if (existsSync(join(c, "server.py"))) return c;
+	}
+
+	// Nothing matched: fall back to cwd so the bridge surfaces the existing
+	// clear "server.py not found … set ACORE_DATA_ROOT" error.
+	return process.cwd();
+}
+
+const PROJECT_ROOT = resolveAcoreDataRoot();
 
 // ------------------------------------------------------------ JSON Schema -> typebox
 

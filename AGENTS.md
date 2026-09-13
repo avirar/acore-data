@@ -36,8 +36,11 @@ DBC file, SQL table, store variable) and traverse to the others.
 - `.pi/extensions/acore-data.ts` is the pi bridge (pi loads it
   automatically; it spawns `server.py` over stdio JSON-RPC). It must NOT
   hardcode paths or credentials — it inherits the environment and the server
-  self-configures (DBC defaults + DB creds from `worldserver.conf`); override
-  the project root with `ACORE_DATA_ROOT`.
+  self-configures (DBC defaults + DB creds from `worldserver.conf`). The
+  project root is auto-located: `ACORE_DATA_ROOT` env → pi's cwd → the
+  extension's own symlink-resolved location (the global
+  `~/.pi/agent/extensions/acore-data.ts` symlink) → `~/acore-data`, each
+  validated by the presence of `server.py`. Override with `ACORE_DATA_ROOT`.
 
 ## Tool semantics (post rework, branch fix/mcp-ergonomics)
 

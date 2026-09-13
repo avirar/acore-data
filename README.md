@@ -413,7 +413,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/py
 
 ### pi (coding agent)
 
-This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers the server's tools (`query`, `lookup`, `list`, `sql`, `terrain`) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
+This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers the server's tools (`query`, `lookup`, `list`, `sql`, `terrain`) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). The project root is auto-located (in order): `ACORE_DATA_ROOT` env, pi's cwd, the extension's own symlink-resolved location (so a global `~/.pi/agent/extensions/acore-data.ts` symlink works from any cwd), then `~/acore-data`. To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
 
 ## Testing
 
