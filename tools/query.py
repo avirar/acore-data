@@ -686,6 +686,10 @@ def _query_sql_overlay(
     params: list = []
     notes: list = []
 
+    target_db = None
+    if server.database.db_available:
+        target_db = server.database._resolve_table_database(sql_table, server.database.db_name)
+
     if id_value is not None:
         pk_col = "ID"
         if len(dbc_filter) == 0:
@@ -694,8 +698,7 @@ def _query_sql_overlay(
 
     if dbc_filter:
         available_columns = None
-        if server.database.db_available:
-            target_db = server.database._resolve_table_database(sql_table, server.database.db_name)
+        if target_db is not None:
             schema = server.database._get_table_schema(sql_table, target_db)
             if schema:
                 available_columns = {c["COLUMN_NAME"].lower() for c in schema}
@@ -708,7 +711,7 @@ def _query_sql_overlay(
         sql += " WHERE " + " AND ".join(where_fragments)
     sql += f" LIMIT {limit}"
 
-    rows, error = server.database._query_database(sql, params=tuple(params))
+    rows, error = server.database._query_database(sql, db_name=target_db, params=tuple(params))
     return rows, error, notes
 
 

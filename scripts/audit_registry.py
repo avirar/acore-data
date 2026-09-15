@@ -193,9 +193,14 @@ def main():
 
                 def _full_cols(table):
                     d = db._resolve_table_database(table, db.db_name) or db.db_name
+                    # db_name= is required for shared-DB topologies: the
+                    # table_schema filter is only valid on the connection
+                    # that actually hosts that schema (e.g. acore_auth on a
+                    # different MySQL host).
                     rows, _ = db._query_database(
                         "SELECT COLUMN_NAME FROM information_schema.columns "
-                        "WHERE table_schema=%s AND table_name=%s", params=(d, table))
+                        "WHERE table_schema=%s AND table_name=%s",
+                        db_name=d, params=(d, table))
                     return {r["COLUMN_NAME"].lower() for r in rows}
 
                 def _family_covers(sc, cols):
