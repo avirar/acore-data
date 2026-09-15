@@ -58,7 +58,9 @@ class WDBCReader:
         Returns:
             True if successful, False otherwise
         """
-        if not self.dbc_path.exists():
+        from core.paths import safe_exists
+
+        if not safe_exists(self.dbc_path):
             raise FileNotFoundError(f"DBC file not found: {self.dbc_path}")
 
         with open(self.dbc_path, 'rb') as f:

@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from core.paths import safe_is_dir
 from core.terrain import coords
 from core.terrain.pathfinder import Pathfinder
 from core.terrain.tile_manager import TileManager
@@ -96,7 +97,7 @@ def _cmd_list_maps(server) -> dict:
 
     # Count .map files per map ID
     map_counts: Dict[int, int] = {}
-    if paths["maps"].exists():
+    if safe_is_dir(paths["maps"]):
         for f in paths["maps"].iterdir():
             if f.suffix == ".map" and len(f.stem) >= 5:
                 mid = int(f.stem[:3])
@@ -104,7 +105,7 @@ def _cmd_list_maps(server) -> dict:
 
     # Count .vmtile files per map ID
     vmap_counts: Dict[int, int] = {}
-    if paths["vmaps"].exists():
+    if safe_is_dir(paths["vmaps"]):
         for f in paths["vmaps"].iterdir():
             if f.suffix == ".vmtile" and len(f.stem) >= 4:
                 mid = int(f.stem[:3])
@@ -112,7 +113,7 @@ def _cmd_list_maps(server) -> dict:
 
     # Count .mmtile files per map ID
     mmap_counts: Dict[int, int] = {}
-    if paths["mmaps"].exists():
+    if safe_is_dir(paths["mmaps"]):
         for f in paths["mmaps"].iterdir():
             if f.suffix == ".mmtile" and len(f.stem) >= 5:
                 mid = int(f.stem[:3])
@@ -151,7 +152,7 @@ def _cmd_list_tiles(server, data_type: str, map_id: int) -> dict:
     paths = coords.get_data_paths()
 
     if data_type == "maps":
-        if not paths["maps"].exists():
+        if not safe_is_dir(paths["maps"]):
             return {"result": [], "count": 0}
         prefix = f"{map_id:03d}"
         tiles = sorted(

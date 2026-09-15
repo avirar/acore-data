@@ -26,7 +26,9 @@ class Registry:
         self.registry: Dict[str, Any] = {"entries": {}, "indices": {}}
         self._field_name_cache: Dict[str, Dict[str, List[Dict]]] = {}
 
-        if self.registry_path.exists():
+        from core.paths import safe_exists
+
+        if safe_exists(self.registry_path):
             try:
                 with open(self.registry_path, 'r') as f:
                     self.registry = json.load(f)

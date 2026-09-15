@@ -523,6 +523,28 @@ class TestPerDbCreds(unittest.TestCase):
         # no crash, and no empty-string candidate consulted
         self.assertEqual(db.db_host, "h")
 
+    @unittest.skipIf(
+        hasattr(os, "geteuid") and os.geteuid() == 0,
+        "root bypasses mode-000 permissions",
+    )
+    def test_safe_path_helpers_tolerate_inaccessible_parent(self):
+        """pathlib exists()/is_dir() RAISE PermissionError under an
+        inaccessible parent dir (e.g. /root on CI runners); the safe_*
+        helpers must report 'absent' instead."""
+        import core.paths as P
+
+        with tempfile.TemporaryDirectory() as td:
+            locked = Path(td) / "locked"
+            (locked / "dbc").mkdir(parents=True)
+            (locked / "dbc" / "x.dbc").write_text("x")
+            locked.chmod(0o000)
+            try:
+                self.assertFalse(P.safe_is_dir(locked / "dbc"))
+                self.assertFalse(P.safe_is_file(locked / "dbc" / "x.dbc"))
+                self.assertFalse(P.safe_exists(locked))
+            finally:
+                locked.chmod(0o755)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -106,8 +106,10 @@ class Database:
             env_conf = os.environ.get("ACORE_WORLDSERVER_CONF", "").strip()
             if env_conf:
                 candidates.insert(0, Path(env_conf))
+        from core.paths import safe_exists
+
         for conf_path in candidates:
-            if not conf_path.exists():
+            if not safe_exists(conf_path):
                 continue
             try:
                 text = conf_path.read_text()

@@ -66,7 +66,9 @@ class FormatParser:
         Raises:
             FileNotFoundError: If DBCfmt.h file doesn't exist
         """
-        if not self.dbcfmt_path.exists():
+        from core.paths import safe_exists
+
+        if not safe_exists(self.dbcfmt_path):
             raise FileNotFoundError(f"DBCfmt.h not found at: {self.dbcfmt_path}")
 
         with open(self.dbcfmt_path, 'r') as f:

@@ -20,6 +20,7 @@ from core.formats import FormatParser
 from core.registry import Registry
 from core.database import Database
 from core.dbc import WDBCReader
+from core.paths import safe_exists, safe_is_dir, safe_is_file
 
 # Import tools
 from tools import get_tool_schemas
@@ -48,12 +49,12 @@ class AcoreDataServer:
         # Validate data assets up front: clear, actionable startup errors
         # instead of opaque per-query failures later.
         self._asset_errors: List[str] = []
-        if not self.dbc_path.is_dir():
+        if not safe_is_dir(self.dbc_path):
             self._asset_errors.append(
                 f"DBC path does not exist: {self.dbc_path} "
                 "(set ACORE_DBC_PATH or DBC_PATH)"
             )
-        if not Path(self.format_file).is_file():
+        if not safe_is_file(self.format_file):
             self._asset_errors.append(
                 f"DBC format file not found: {self.format_file} "
                 "(set ACORE_FORMAT_FILE or DBC_FORMAT_FILE)"
@@ -100,7 +101,7 @@ class AcoreDataServer:
             ("VMaps", self.vmaps_path),
             ("MMaps", self.mmaps_path),
         ):
-            if not p.is_dir():
+            if not safe_is_dir(p):
                 print(
                     f"WARNING: {label} data not found at {p} — terrain queries "
                     f"will fail (set ACORE_DATA_PATH or DATA_PATH).",
@@ -130,14 +131,17 @@ class AcoreDataServer:
 
         # Try exact path first, then case-insensitive search
         dbc_file = self.dbc_path / f"{dbc_name}.dbc"
-        if not dbc_file.exists():
+        if not safe_exists(dbc_file):
             dbc_name_lower = dbc_name.lower()
-            for f in self.dbc_path.glob("*.dbc"):
-                if f.stem.lower() == dbc_name_lower:
-                    dbc_file = f
-                    break
+            try:
+                for f in self.dbc_path.glob("*.dbc"):
+                    if f.stem.lower() == dbc_name_lower:
+                        dbc_file = f
+                        break
+            except OSError:
+                pass
 
-        if not dbc_file.exists():
+        if not safe_exists(dbc_file):
             raise FileNotFoundError(f"DBC file not found: {dbc_name}.dbc")
 
         reader = WDBCReader(str(dbc_file), format_string)
