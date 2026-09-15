@@ -17,6 +17,18 @@ DBC file, SQL table, store variable) and traverse to the others.
   `python3` has no `pymysql` — the server falls back to a `mysql` CLI
   subprocess (it now interpolates params and honors `MYSQL_PWD`, so it
   works, but it is slower and the test harness uses the venv).
+- **Windows**: the venv lives at `.venv\Scripts\python.exe` (create with
+  `python -m venv .venv`; `setup.sh` is the POSIX twin). Dot-source the
+  machine-local `env.local.ps1` (gitignored; contains DB creds + all the
+  `ACORE_*`/`DB_*`/`PLAYERBOTS_ROOT`/`ACORE_SRC_ROOT` overrides for the
+  `C:\GIT\azerothcore-wotlk` checkout). The Windows checkout has no
+  worldserver.conf, so explicit `DB_*` vars are required (auto-detection
+  cannot work). Client data (dbc/maps/vmaps/mmaps) lands in
+  `C:\GIT\azerothcore-wotlk\env\dist\bin` via `./acore.sh client-data`
+  (Git Bash) — same layout as Linux. `test_helpers` skips the chmod-000
+  inaccessible-parent test on Windows (mode bits are no-ops there).
+  Deleting a stray file literally named `nul` needs the `\\?\` long-path
+  prefix (e.g. PowerShell `Remove-Item -LiteralPath '\\?\C:\...\nul'`).
 - `DB_*` env vars auto-detect from
   `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf` when unset
   (`ACORE_WORLDSERVER_CONF` overrides the conf location, checked first).

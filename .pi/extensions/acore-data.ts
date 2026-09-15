@@ -2,7 +2,9 @@
  * acore-data.ts — bridges the local acore-data MCP server (stdio) into
  * first-class pi tools.
  *
- * Spawns `.venv/bin/python3 server.py` in the project root, speaks JSON-RPC
+ * Spawns the project venv python (`server.py`) in the project root —
+ * `.venv/bin/python3` on POSIX, `.venv/Scripts/python.exe` on Windows —
+ * speaking JSON-RPC
  * over its stdio, and registers the server's tools (query, lookup, list,
  * sql, terrain) with their real names, descriptions and parameter schemas.
  * No MCP runtime, no proxy indirection, no extra dependencies.
@@ -148,7 +150,16 @@ class McpBridge {
 			this.pending.clear();
 			throw fail;
 		}
-		const cmd = join(this.cwd, ".venv", "bin", "python3");
+		// Venv layout differs by platform (POSIX: .venv/bin/python3,
+		// Windows: .venv/Scripts/python.exe). Prefer the project venv;
+		// fall back to the system python (the server degrades gracefully
+		// without pymysql and warns on stderr).
+		const venvCandidates = [
+			join(this.cwd, ".venv", "Scripts", "python.exe"),
+			join(this.cwd, ".venv", "bin", "python3"),
+		].filter((c) => existsSync(c));
+		const cmd =
+			venvCandidates[0] ?? (process.platform === "win32" ? "python" : "python3");
 		const proc = spawn(cmd, [serverPy], {
 			cwd: this.cwd,
 			env: process.env,

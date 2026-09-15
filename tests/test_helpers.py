@@ -527,6 +527,11 @@ class TestPerDbCreds(unittest.TestCase):
         hasattr(os, "geteuid") and os.geteuid() == 0,
         "root bypasses mode-000 permissions",
     )
+    @unittest.skipIf(
+        os.name == "nt",
+        "Windows ignores POSIX mode bits — chmod(0o000) is a no-op, "
+        "so the inaccessible-parent premise cannot be created",
+    )
     def test_safe_path_helpers_tolerate_inaccessible_parent(self):
         """pathlib exists()/is_dir() RAISE PermissionError under an
         inaccessible parent dir (e.g. /root on CI runners); the safe_*

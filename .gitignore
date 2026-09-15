@@ -22,6 +22,10 @@ build/
 .DS_Store
 Thumbs.db
 
+# Local machine environment (DB credentials) — created per-machine
+env.local.ps1
+.env.local
+
 # Testing
 .pytest_cache/
 .coverage
