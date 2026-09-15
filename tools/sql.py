@@ -76,14 +76,20 @@ def sql_tools(server):
             )
 
     rows, error = server.database._query_database(query, db_name=target_db)
+    primary_error = error
 
     if error:
         # Check for wrong database and try all databases
+        other_errors: Dict[str, str] = {}
         if "Unknown table" in error or "doesn't exist" in error:
             for db in server.database._db_priority_order:
                 if db == target_db:
                     continue
-                rows, error = server.database._query_database(query, db_name=db)
+                rows, err = server.database._query_database(query, db_name=db)
+                if not err:
+                    error = None
+                else:
+                    other_errors[db] = err
                 if not error and rows is not None:
                     print(f"Retried successfully in {db}", file=sys.stderr)
                     # Update cache
@@ -117,13 +123,24 @@ def sql_tools(server):
 
                     return {"result": rows or [], "count": len(rows or [])}
 
-            # Build error with suggestions
-            msg = f"Database query failed: {error}"
+            # Build error with suggestions from the PRIMARY attempt
+            # (the registry-resolved database), not the last retry's error.
+            msg = f"Database query failed: {primary_error}"
+            other_errors_text = ""
+            if other_errors:
+                other_errors_text = "\nAlso tried: " + "; ".join(
+                    f"{db}: {e.splitlines()[0][:80]}" for db, e in other_errors.items()
+                )
             table_match = re.search(
-                r"Table '(\w+)\.(\w+)' doesn't exist", error
-            )
+                r"Table '(\w+)\.(\w+)' doesn't exist", primary_error
+            ) or re.search(r"Unknown table '([^']+)'", primary_error)
             if not table_match:
-                table_match = re.search(r"Unknown table '([^']+)'", error)
+                for e in other_errors.values():
+                    table_match = re.search(
+                        r"Table '(\w+)\.(\w+)' doesn't exist", e
+                    ) or re.search(r"Unknown table '([^']+)'", e)
+                    if table_match:
+                        break
 
             if table_match:
                 bad_table = (
@@ -161,17 +178,19 @@ def sql_tools(server):
                     msg += f"\n\nDid you mean: {', '.join(suggestion_info)}?"
 
                 msg += f"\n\nUse lookup(query='{bad_table}') to verify table and get schema."
-                msg += f"\nNote: Searched databases: {', '.join(server.database._db_priority_order)}"
+
+            if other_errors_text:
+                msg += other_errors_text
 
             return {"error": msg, "isError": True}
 
-        if "Unknown column" in error:
-            msg = f"Database query failed: {error}"
+        if "Unknown column" in primary_error:
+            msg = f"Database query failed: {primary_error}"
             col_match = re.search(
-                r"Unknown column '([^']+)' in '([^']*)'", error
+                r"Unknown column '([^']+)' in '([^']*)'", primary_error
             )
             if not col_match:
-                col_match = re.search(r"Unknown column '([^']+)'", error)
+                col_match = re.search(r"Unknown column '([^']+)'", primary_error)
 
             if col_match:
                 bad_col = col_match.group(1)
