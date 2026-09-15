@@ -45,9 +45,32 @@ class AcoreDataServer:
         db_password = os.environ.get("DB_PASSWORD", "")
         db_name = os.environ.get("DB_NAME", "acore_world")
 
+        # Validate data assets up front: clear, actionable startup errors
+        # instead of opaque per-query failures later.
+        self._asset_errors: List[str] = []
+        if not self.dbc_path.is_dir():
+            self._asset_errors.append(
+                f"DBC path does not exist: {self.dbc_path} "
+                "(set ACORE_DBC_PATH or DBC_PATH)"
+            )
+        if not Path(self.format_file).is_file():
+            self._asset_errors.append(
+                f"DBC format file not found: {self.format_file} "
+                "(set ACORE_FORMAT_FILE or DBC_FORMAT_FILE)"
+            )
+
         # Initialize core modules
-        self.format_parser = FormatParser(self.format_file)
-        self.format_parser.parse()
+        if self._asset_errors:
+            self.format_parser = None
+            for e in self._asset_errors:
+                print(f"ERROR: {e}", file=sys.stderr)
+            print(
+                "  DBC queries are disabled; SQL tools still work.",
+                file=sys.stderr,
+            )
+        else:
+            self.format_parser = FormatParser(self.format_file)
+            self.format_parser.parse()
 
         registry_path = Path(__file__).parent / "datastore_registry.json"
         self.registry = Registry(str(registry_path))
@@ -72,6 +95,17 @@ class AcoreDataServer:
         self.maps_path = data_base / "maps"
         self.vmaps_path = data_base / "vmaps"
         self.mmaps_path = data_base / "mmaps"
+        for label, p in (
+            ("Maps", self.maps_path),
+            ("VMaps", self.vmaps_path),
+            ("MMaps", self.mmaps_path),
+        ):
+            if not p.is_dir():
+                print(
+                    f"WARNING: {label} data not found at {p} — terrain queries "
+                    f"will fail (set ACORE_DATA_PATH or DATA_PATH).",
+                    file=sys.stderr,
+                )
 
         # Cache for DBC readers
         self.dbc_cache: Dict[str, WDBCReader] = {}
@@ -82,6 +116,11 @@ class AcoreDataServer:
 
     def _load_dbc(self, dbc_name: str) -> WDBCReader:
         """Load DBC file with caching."""
+        if self.format_parser is None:
+            raise ValueError(
+                "DBC support unavailable (startup asset check failed: "
+                + "; ".join(self._asset_errors) + ")"
+            )
         if dbc_name in self.dbc_cache:
             return self.dbc_cache[dbc_name]
 

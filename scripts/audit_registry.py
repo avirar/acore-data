@@ -327,6 +327,20 @@ def main():
         ))
         print(f"\n[report written to {args.json}]")
 
+    # Quality gate: structural signals must be 0 (CI relies on this exit
+    # code). type_as_name (legit `string` column names), missing_cross_refs
+    # (low-confidence heuristic) and optional_table_absent (informational)
+    # are accepted residuals and never fail the gate.
+    structural = (
+        "dangling_refs", "duplicate_identifiers", "missing_data_source",
+        "dbc_index_drift", "sql_column_drift", "coverage_gap",
+    )
+    failed = [c for c in structural if report[c]]
+    if failed:
+        print(f"\n[STRUCTURAL AUDIT FAILED: {', '.join(failed)}]")
+        sys.exit(1)
+    print("\n[audit ok]")
+
 
 if __name__ == "__main__":
     main()

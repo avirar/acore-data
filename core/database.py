@@ -147,6 +147,15 @@ class Database:
                     )
             return
 
+        if not self.db_host and not self.db_user:
+            print(
+                "Warning: no DB_HOST/DB_USER env vars set and no worldserver.conf "
+                "found for auto-detection — falling back to root@localhost. "
+                "SQL queries will likely fail; set DB_HOST/DB_USER/DB_PASSWORD "
+                "(and DB_NAME) explicitly or place a worldserver.conf in the "
+                "standard location.",
+                file=sys.stderr,
+            )
         self.db_host = self.db_host or "localhost"
         self.db_user = self.db_user or "root"
         self.db_password = self.db_password or ""

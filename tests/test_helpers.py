@@ -466,6 +466,36 @@ class TestPerDbCreds(unittest.TestCase):
             db = Database(db_host="h", db_user="u")
         self.assertEqual(db._env_db_creds, {})
 
+    def test_auto_detect_fallback_warns(self):
+        """No worldserver.conf + no env vars -> explicit stderr warning,
+        not a silent root@localhost fallback."""
+        import contextlib
+        import io
+        import core.database as D
+
+        real_path = D.Path
+
+        class _FakePath(real_path):
+            @classmethod
+            def home(cls):
+                return real_path("/nonexistent-acore-data-test-home")
+
+            def exists(self):
+                if "worldserver.conf" in str(self):
+                    return False
+                return real_path(str(self)).exists()
+
+        buf = io.StringIO()
+        with unittest.mock.patch.object(D, "Path", _FakePath), \
+             contextlib.redirect_stderr(buf):
+            db = D.Database()
+            db._auto_detect_db_config()
+
+        out = buf.getvalue()
+        self.assertIn("falling back to root@localhost", out)
+        self.assertEqual(db.db_host, "localhost")
+        self.assertEqual(db.db_user, "root")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
