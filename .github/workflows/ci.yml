@@ -25,8 +25,11 @@ jobs:
           .venv/bin/pip install --upgrade pip
           .venv/bin/pip install -r requirements.txt
 
-      - name: Unit + regression tests (no live DB required)
-        run: .venv/bin/python -m pytest tests/test_helpers.py tests/test_regression.py -q
+      # DB-free suites only: test_regression.py and test_integration.py
+      # need a live AzerothCore install (MySQL + DBC files) and run
+      # locally, not in CI.
+      - name: Unit + boot smoke tests (no live DB required)
+        run: .venv/bin/python -m pytest tests/test_helpers.py tests/test_smoke.py -q
 
       - name: Registry structural audit (quality gate, no --db)
         run: .venv/bin/python scripts/audit_registry.py

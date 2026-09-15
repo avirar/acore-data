@@ -160,15 +160,24 @@ the source-scanning index is `core/enum_index.py`. Do not merge/rename.
 
 ## Tests
 
+- `tests/test_helpers.py` — 42 fast unit tests (no DB), incl. enum-index
+  parser coverage, per-DB credential precedence, overlay projection and
+  worldserver.conf auto-detection.
+- `tests/test_smoke.py` — 3 boot smoke tests (DB-free; spawn `server.py`
+  in degraded asset-less mode and assert the MCP protocol answers —
+  the "stranger clones the repo" path).
 - `tests/test_regression.py` — 29 tests, the rework's contract (shape,
-  strictness, links, protocol, registry audit, format parser).
+  strictness, links, protocol, registry audit, format parser). Requires
+  live DBC + MySQL (install-local).
 - `tests/test_integration.py` — 110 tests (live DB + DBC; each test spawns
   the server via subprocess and needs ~10 s). One test class per tool, incl.
   TestConfigTool and TestEnumsTool (skip gracefully when the mod-playerbots /
   azerothcore source trees are absent) and `test_list_tools` (asserts the
   exact tool set — update it when adding a tool).
-- `tests/test_helpers.py` — 40 fast unit tests (no DB), incl. enum-index
-  parser coverage, per-DB credential precedence, and overlay projection.
+- CI (`.github/workflows/ci.yml`) runs only the DB-free gate on
+  Python 3.10/3.12/3.13: `test_helpers` + `test_smoke` + the structural
+  registry audit. `test_regression` / `test_integration` need a live
+  install and stay install-local.
 - No `npm`/build step; no lint config. Run all suites with:
   `.venv/bin/python3 -m pytest tests/ -q` (or the standalone runners).
 

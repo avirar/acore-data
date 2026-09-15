@@ -475,23 +475,10 @@ class TestPerDbCreds(unittest.TestCase):
         import io
         import core.database as D
 
-        real_path = D.Path
-
-        class _FakePath(real_path):
-            @classmethod
-            def home(cls):
-                return real_path("/nonexistent-acore-data-test-home")
-
-            def exists(self):
-                if "worldserver.conf" in str(self):
-                    return False
-                return real_path(str(self)).exists()
-
         buf = io.StringIO()
-        with unittest.mock.patch.object(D, "Path", _FakePath), \
-             contextlib.redirect_stderr(buf):
+        with contextlib.redirect_stderr(buf):
             db = D.Database()
-            db._auto_detect_db_config()
+            db._auto_detect_db_config(candidates=[])
 
         out = buf.getvalue()
         self.assertIn("falling back to root@localhost", out)

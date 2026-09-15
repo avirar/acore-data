@@ -79,7 +79,9 @@ class Database:
             "acore_world", "acore_characters", "acore_auth", "acore_playerbots"
         ]
 
-    def _auto_detect_db_config(self) -> None:
+    def _auto_detect_db_config(
+        self, candidates: Optional[List[Path]] = None
+    ) -> None:
         """Auto-detect database config from worldserver.conf.
 
         Parses the three *DatabaseInfo lines. AzerothCore allows each of
@@ -92,14 +94,18 @@ class Database:
 
         Set ACORE_WORLDSERVER_CONF to point at a non-default conf location;
         it is checked before the standard paths.
+
+        `candidates` overrides the standard conf search paths (tests pass
+        an empty list to exercise the fallback deterministically).
         """
-        candidates = [
-            Path("/root/azerothcore-wotlk/env/dist/etc/worldserver.conf"),
-            Path.home() / "azerothcore-wotlk/env/dist/etc/worldserver.conf",
-        ]
-        env_conf = os.environ.get("ACORE_WORLDSERVER_CONF", "").strip()
-        if env_conf:
-            candidates.insert(0, Path(env_conf))
+        if candidates is None:
+            candidates = [
+                Path("/root/azerothcore-wotlk/env/dist/etc/worldserver.conf"),
+                Path.home() / "azerothcore-wotlk/env/dist/etc/worldserver.conf",
+            ]
+            env_conf = os.environ.get("ACORE_WORLDSERVER_CONF", "").strip()
+            if env_conf:
+                candidates.insert(0, Path(env_conf))
         for conf_path in candidates:
             if not conf_path.exists():
                 continue
