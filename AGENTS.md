@@ -26,7 +26,11 @@ DBC file, SQL table, store variable) and traverse to the others.
   reaches its shared auth DB on `.233` this way). `acore_playerbots` is not
   in worldserver.conf and rides the base (world) connection. Explicit
   `DB_*` env vars still disable auto-detection entirely (single connection
-  for all DBs).
+  for all DBs) — but per-DB env overrides `DB_AUTH_*` / `DB_CHAR_*`
+  (`_HOST/_PORT/_USER/_PASSWORD/_NAME`) work on top of ANY base config and
+  have the highest precedence (env > conf auto-detect > base, merged
+  per-key), so explicit-config topologies can still route acore_auth /
+  acore_characters to a different host.
 - DBC path: `/root/azerothcore-wotlk/env/dist/bin/dbc`; format file
   (single source of format strings):
   `/root/azerothcore-wotlk/src/server/shared/DataStores/DBCfmt.h`.

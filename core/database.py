@@ -68,6 +68,12 @@ class Database:
         # all DBs (default behavior).
         self._db_creds: Dict[str, Dict[str, str]] = {}
 
+        # Per-database credentials from explicit env vars (DB_AUTH_*,
+        # DB_CHAR_*). Highest priority: wins over worldserver.conf
+        # auto-detection and the base connection alike.
+        self._env_db_creds: Dict[str, Dict[str, str]] = {}
+        self._load_env_db_overrides()
+
         # Database priority order for routing
         self._db_priority_order = [
             "acore_world", "acore_characters", "acore_auth", "acore_playerbots"
@@ -145,18 +151,57 @@ class Database:
         self.db_user = self.db_user or "root"
         self.db_password = self.db_password or ""
 
+    def _load_env_db_overrides(self) -> None:
+        """Load per-database credential overrides from env vars.
+
+        Supports explicit DB_* base config (which disables worldserver.conf
+        auto-detection) combined with per-DB overrides for shared-DB
+        topologies: DB_AUTH_* (acore_auth) and DB_CHAR_* (acore_characters).
+        Partial overrides merge over the base connection's credentials.
+        """
+        for db_name, prefix in (
+            ("acore_auth", "DB_AUTH"),
+            ("acore_characters", "DB_CHAR"),
+        ):
+            keys = {
+                "host": os.environ.get(f"{prefix}_HOST", ""),
+                "port": os.environ.get(f"{prefix}_PORT", ""),
+                "user": os.environ.get(f"{prefix}_USER", ""),
+                "password": os.environ.get(f"{prefix}_PASSWORD", ""),
+                "name": os.environ.get(f"{prefix}_NAME", ""),
+            }
+            keys = {k: v for k, v in keys.items() if v}
+            if keys:
+                self._env_db_creds[db_name] = keys
+                print(
+                    f"  per-DB override (env): {db_name} -> "
+                    f"{keys.get('user', self.db_user)}@"
+                    f"{keys.get('host', self.db_host)}"
+                    f":{keys.get('port', self.db_port)}/"
+                    f"{keys.get('name', db_name)}",
+                    file=sys.stderr,
+                )
+
     def _creds_for(self, db_name: str) -> Dict[str, str]:
-        """Credentials for the given database (per-DB override or base)."""
+        """Credentials for the given database.
+
+        Precedence (highest wins): explicit DB_* env vars (DB_AUTH_*/
+        DB_CHAR_*) > worldserver.conf per-DB auto-detection > base
+        connection. Env vars merge per-key over the lower layers.
+        """
         creds = self._db_creds.get(db_name)
         if creds:
-            return creds
-        return {
-            "host": self.db_host,
-            "port": self.db_port,
-            "user": self.db_user,
-            "password": self.db_password,
-            "name": db_name,
-        }
+            result = dict(creds)
+        else:
+            result = {
+                "host": self.db_host,
+                "port": self.db_port,
+                "user": self.db_user,
+                "password": self.db_password,
+                "name": db_name,
+            }
+        result.update(self._env_db_creds.get(db_name, {}))
+        return result
 
     def _get_connection(self, db_name: str):
         """Get (or create) a pymysql connection for the given database."""
@@ -168,7 +213,7 @@ class Database:
                     port=int(creds["port"]),
                     user=creds["user"],
                     password=creds["password"],
-                    database=db_name,
+                    database=creds.get("name") or db_name,
                     cursorclass=pymysql.cursors.DictCursor,
                     connect_timeout=10,
                     charset="utf8mb4",
@@ -375,7 +420,7 @@ class Database:
                 "-u",
                 creds["user"],
                 "-D",
-                db,
+                creds.get("name") or db,
                 "-e",
                 sql,
                 "--batch",

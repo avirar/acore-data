@@ -388,8 +388,10 @@ query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 | `DB_USER` | Auto-detected |
 | `DB_PASSWORD` | Auto-detected |
 | `DB_NAME` | `acore_world` |
+| `DB_AUTH_{HOST,PORT,USER,PASSWORD,NAME}` | base credentials |
+| `DB_CHAR_{HOST,PORT,USER,PASSWORD,NAME}` | base credentials |
 
-When `DB_HOST` and `DB_USER` are empty, the server attempts auto-detection from common AzerothCore configuration files.
+When `DB_HOST` and `DB_USER` are empty, the server attempts auto-detection from common AzerothCore configuration files. The `*DatabaseInfo` lines of `worldserver.conf` may point Login (acore_auth) and Character (acore_characters) at a different MySQL host — the detected differences are applied as per-database connection overrides, so a shared auth DB across realm machines works out of the box. The `DB_AUTH_*` / `DB_CHAR_*` env vars do the same for explicit `DB_*` configurations and take highest precedence (merged per key over the auto-detected or base credentials).
 
 ### Running
 

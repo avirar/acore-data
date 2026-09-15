@@ -8,6 +8,7 @@ Run with: python3 tests/test_helpers.py (or pytest)
 import os
 import sys
 import unittest
+import unittest.mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tools.query import _build_sql_filter_clause, _resolve_sql_column, _escape_like_pattern
@@ -309,6 +310,90 @@ class TestExplainHelpers(unittest.TestCase):
         overrides, exists = _dbc_overrides(s, "Fake", 99999, row)
         self.assertFalse(exists)
         self.assertEqual(overrides, {})
+
+
+class TestPerDbCreds(unittest.TestCase):
+    """core.database: per-database credential overrides (DB_AUTH_*/DB_CHAR_*).
+
+    Shared-DB topologies: explicit DB_* base config disables worldserver.conf
+    auto-detection, but DB_AUTH_*/DB_CHAR_* env vars still route individual
+    databases to a different MySQL host/credential set.
+    """
+
+    def _db(self, env=None):
+        from core.database import Database
+        with unittest.mock.patch.dict(
+            os.environ, env or {}, clear=False
+        ):
+            db = Database(
+                db_host="127.0.0.1",
+                db_port="3306",
+                db_user="acore",
+                db_password="acore",
+                db_name="acore_world",
+            )
+        # Env vars are read once in __init__; the instance is stable after.
+        return db
+
+    def test_no_env_overrides(self):
+        db = self._db()
+        creds = db._creds_for("acore_auth")
+        self.assertEqual(creds["host"], "127.0.0.1")
+        self.assertEqual(creds["user"], "acore")
+        self.assertEqual(creds["name"], "acore_auth")
+
+    def test_env_override_wins_over_conf_override(self):
+        db = self._db(env={
+            "DB_AUTH_HOST": "10.0.0.5",
+            "DB_AUTH_USER": "remote",
+            "DB_AUTH_PASSWORD": "secret",
+        })
+        # Simulate worldserver.conf auto-detection having found a third host.
+        db._db_creds["acore_auth"] = {
+            "host": "10.9.9.9", "port": "3307", "user": "confuser",
+            "password": "confpass", "name": "acore_auth",
+        }
+        creds = db._creds_for("acore_auth")
+        self.assertEqual(creds["host"], "10.0.0.5")
+        self.assertEqual(creds["user"], "remote")
+        self.assertEqual(creds["password"], "secret")
+        # Unset keys merge over the conf layer, not the base.
+        self.assertEqual(creds["port"], "3307")
+        self.assertEqual(creds["name"], "acore_auth")
+
+    def test_partial_env_merge_over_base(self):
+        db = self._db(env={"DB_AUTH_PORT": "3307"})
+        creds = db._creds_for("acore_auth")
+        self.assertEqual(creds["port"], "3307")
+        self.assertEqual(creds["host"], "127.0.0.1")
+        self.assertEqual(creds["user"], "acore")
+        self.assertEqual(creds["password"], "acore")
+
+    def test_char_env_override(self):
+        db = self._db(env={
+            "DB_CHAR_HOST": "10.0.0.6",
+            "DB_CHAR_NAME": "chars_realm2",
+        })
+        creds = db._creds_for("acore_characters")
+        self.assertEqual(creds["host"], "10.0.0.6")
+        self.assertEqual(creds["name"], "chars_realm2")
+
+    def test_other_databases_untouched(self):
+        db = self._db(env={"DB_AUTH_HOST": "10.0.0.5"})
+        for name in ("acore_world", "acore_playerbots"):
+            creds = db._creds_for(name)
+            self.assertEqual(creds["host"], "127.0.0.1")
+            self.assertEqual(creds["user"], "acore")
+
+    def test_no_env_vars_means_no_overrides(self):
+        from core.database import Database
+        env = {
+            k: v for k, v in os.environ.items()
+            if not k.startswith(("DB_AUTH_", "DB_CHAR_"))
+        }
+        with unittest.mock.patch.dict(os.environ, env, clear=True):
+            db = Database(db_host="h", db_user="u")
+        self.assertEqual(db._env_db_creds, {})
 
 
 if __name__ == "__main__":
