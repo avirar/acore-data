@@ -89,11 +89,18 @@ class Database:
         differing Login/Character lines are stored as per-DB overrides.
         acore_playerbots is not configured by worldserver and rides the base
         (world) connection - set explicit DB_* env vars to override.
+
+        Set ACORE_WORLDSERVER_CONF to point at a non-default conf location;
+        it is checked before the standard paths.
         """
-        for conf_path in [
+        candidates = [
             Path("/root/azerothcore-wotlk/env/dist/etc/worldserver.conf"),
-            Path.home() / "azerothcore-wotlk/env/dist/etc/worldserver.conf"
-        ]:
+            Path.home() / "azerothcore-wotlk/env/dist/etc/worldserver.conf",
+        ]
+        env_conf = os.environ.get("ACORE_WORLDSERVER_CONF", "").strip()
+        if env_conf:
+            candidates.insert(0, Path(env_conf))
+        for conf_path in candidates:
             if not conf_path.exists():
                 continue
             try:
@@ -150,10 +157,10 @@ class Database:
         if not self.db_host and not self.db_user:
             print(
                 "Warning: no DB_HOST/DB_USER env vars set and no worldserver.conf "
-                "found for auto-detection — falling back to root@localhost. "
-                "SQL queries will likely fail; set DB_HOST/DB_USER/DB_PASSWORD "
-                "(and DB_NAME) explicitly or place a worldserver.conf in the "
-                "standard location.",
+                "found for auto-detection (ACORE_WORLDSERVER_CONF not set) — "
+                "falling back to root@localhost. SQL queries will likely fail; "
+                "set DB_HOST/DB_USER/DB_PASSWORD (and DB_NAME) explicitly, or "
+                "point ACORE_WORLDSERVER_CONF at your worldserver.conf.",
                 file=sys.stderr,
             )
         self.db_host = self.db_host or "localhost"

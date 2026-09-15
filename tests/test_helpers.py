@@ -7,8 +7,10 @@ Run with: python3 tests/test_helpers.py (or pytest)
 
 import os
 import sys
+import tempfile
 import unittest
 import unittest.mock
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tools.query import _build_sql_filter_clause, _resolve_sql_column, _escape_like_pattern
@@ -495,6 +497,44 @@ class TestPerDbCreds(unittest.TestCase):
         self.assertIn("falling back to root@localhost", out)
         self.assertEqual(db.db_host, "localhost")
         self.assertEqual(db.db_user, "root")
+
+    def test_worldserver_conf_env_override(self):
+        """ACORE_WORLDSERVER_CONF points at a non-default conf location."""
+        import core.database as D
+
+        conf = (
+            'LoginDatabaseInfo = "authhost;3306;authuser;authpass;acore_auth"\n'
+            'WorldDatabaseInfo = "worldhost;3307;worlduser;worldpass;acore_world"\n'
+            'CharacterDatabaseInfo = "worldhost;3307;worlduser;worldpass;acore_characters"\n'
+        )
+        with tempfile.TemporaryDirectory() as td:
+            conf_path = Path(td) / "worldserver.conf"
+            conf_path.write_text(conf)
+            with unittest.mock.patch.dict(
+                os.environ, {"ACORE_WORLDSERVER_CONF": str(conf_path)}
+            ):
+                db = D.Database()
+                db._auto_detect_db_config()
+
+        self.assertEqual(db.db_host, "worldhost")
+        self.assertEqual(db.db_port, "3307")
+        self.assertEqual(db.db_user, "worlduser")
+        # differing Login line becomes a per-DB override
+        self.assertEqual(db._db_creds["acore_auth"]["host"], "authhost")
+        # identical Character line does NOT override
+        self.assertNotIn("acore_characters", db._db_creds)
+
+    def test_worldserver_conf_env_override_empty_ignored(self):
+        import core.database as D
+
+        env = {
+            k: v for k, v in os.environ.items()
+            if k != "ACORE_WORLDSERVER_CONF"
+        }
+        with unittest.mock.patch.dict(os.environ, env, clear=True):
+            db = D.Database(db_host="h", db_user="u")
+        # no crash, and no empty-string candidate consulted
+        self.assertEqual(db.db_host, "h")
 
 
 if __name__ == "__main__":

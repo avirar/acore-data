@@ -18,7 +18,8 @@ DBC file, SQL table, store variable) and traverse to the others.
   subprocess (it now interpolates params and honors `MYSQL_PWD`, so it
   works, but it is slower and the test harness uses the venv).
 - `DB_*` env vars auto-detect from
-  `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf` when unset.
+  `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf` when unset
+  (`ACORE_WORLDSERVER_CONF` overrides the conf location, checked first).
   Auto-detection parses all three `*DatabaseInfo` lines (Login/World/
   Character): World is the base connection, differing Login/Character lines
    become per-DB credential overrides (shared-DB topologies, e.g. a realm
