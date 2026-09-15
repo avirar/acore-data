@@ -539,9 +539,14 @@ class TestPerDbCreds(unittest.TestCase):
             (locked / "dbc" / "x.dbc").write_text("x")
             locked.chmod(0o000)
             try:
+                # The locked dir itself is still stat-able via the
+                # accessible parent (exists, but cannot be entered)...
+                self.assertTrue(P.safe_exists(locked))
+                # ...but anything under it hits EACCES in pathlib and
+                # must report as absent:
+                self.assertFalse(P.safe_exists(locked / "dbc"))
                 self.assertFalse(P.safe_is_dir(locked / "dbc"))
                 self.assertFalse(P.safe_is_file(locked / "dbc" / "x.dbc"))
-                self.assertFalse(P.safe_exists(locked))
             finally:
                 locked.chmod(0o755)
 
