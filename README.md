@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **~462 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and C++ enum decoding. Exposes twelve tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `enums`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **475 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and C++ enum decoding. Exposes twelve tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `enums`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -368,30 +368,32 @@ query(name="gameobject_template", id=12345, resolve=["loot"], resolve_max=20)
 
 ### Requirements
 
-- Python 3.9+
+- Python 3.10+
 - `pymysql` — installed via `requirements.txt` into `.venv`
 - Access to an AzerothCore MySQL instance (for SQL tools)
 - DBC binary files and `DBCfmt.h` from the AzerothCore source/build
-- MMap data files (`.mmtile`, `.mm`) for terrain/pathfinding queries
+- MMap data files (`.mmtile`, `.mm`) for terrain/pathfinding queries (optional — terrain tool degrades cleanly without them)
 
 ### Environment Variables
 
-| Variable | Default |
-|----------|---------|
-| `ACORE_DBC_PATH` | `/root/azerothcore-wotlk/env/dist/bin/dbc` |
-| `ACORE_FORMAT_FILE` | `/root/azerothcore-wotlk/src/server/shared/DataStores/DBCfmt.h` |
-| `ACORE_MMAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/mmaps` |
-| `ACORE_VMAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/vmaps` |
-| `ACORE_MAP_PATH` | `/root/azerothcore-wotlk/env/dist/bin/maps` |
-| `DB_HOST` | Auto-detected |
-| `DB_PORT` | `3306` |
-| `DB_USER` | Auto-detected |
-| `DB_PASSWORD` | Auto-detected |
-| `DB_NAME` | `acore_world` |
-| `DB_AUTH_{HOST,PORT,USER,PASSWORD,NAME}` | base credentials |
-| `DB_CHAR_{HOST,PORT,USER,PASSWORD,NAME}` | base credentials |
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ACORE_DBC_PATH` (alias `DBC_PATH`) | `/root/azerothcore-wotlk/env/dist/bin/dbc` | DBC binary directory |
+| `ACORE_FORMAT_FILE` (alias `DBC_FORMAT_FILE`) | `/root/azerothcore-wotlk/src/server/shared/DataStores/DBCfmt.h` | DBC format strings |
+| `ACORE_DATA_PATH` (alias `DATA_PATH`) | `/root/azerothcore-wotlk/env/dist/bin` | Terrain data base dir (uses `maps/`, `vmaps/`, `mmaps/` subdirectories) |
+| `DB_HOST` / `DB_USER` / `DB_PASSWORD` | auto-detected | Base DB connection (see below) |
+| `DB_PORT` | `3306` | Base DB port |
+| `DB_NAME` | `acore_world` | Base database name |
+| `DB_AUTH_{HOST,PORT,USER,PASSWORD,NAME}` | — | Per-database override for `acore_auth` |
+| `DB_CHAR_{HOST,PORT,USER,PASSWORD,NAME}` | — | Per-database override for `acore_characters` |
+| `ACORE_SRC_ROOT` | `/root/azerothcore-wotlk` | AzerothCore source tree (`enums` tool; optional) |
+| `PLAYERBOTS_ROOT` | `/root/azerothcore-wotlk/modules/mod-playerbots` | mod-playerbots tree (`config` tool; optional) |
+| `ACORE_SQL_TOOL_MODE` | `full` | `full` = any statement (destructive blocked), `readonly` = `SELECT` only |
+| `ACORE_DATA_ROOT` | — | Project root for the pi bridge (see below) |
 
-When `DB_HOST` and `DB_USER` are empty, the server attempts auto-detection from common AzerothCore configuration files. The `*DatabaseInfo` lines of `worldserver.conf` may point Login (acore_auth) and Character (acore_characters) at a different MySQL host — the detected differences are applied as per-database connection overrides, so a shared auth DB across realm machines works out of the box. The `DB_AUTH_*` / `DB_CHAR_*` env vars do the same for explicit `DB_*` configurations and take highest precedence (merged per key over the auto-detected or base credentials).
+**Database configuration.** When `DB_HOST` and `DB_USER` are unset, the server auto-detects from `worldserver.conf` (checked at `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf`, then `~/azerothcore-wotlk/env/dist/etc/worldserver.conf`). The `*DatabaseInfo` lines may point Login (`acore_auth`) and Character (`acore_characters`) at a different MySQL host — detected differences are applied as per-database connection overrides, so a shared auth DB across realm machines works out of the box. `acore_playerbots` is not configured by worldserver and rides the base connection. Explicit `DB_*` env vars disable auto-detection entirely (single connection for all DBs). Precedence, merged per key: **`DB_AUTH_*` / `DB_CHAR_*` env > `worldserver.conf` auto-detection > base config**. If neither env vars nor a detectable `worldserver.conf` exist, the server warns on stderr and falls back to `root@localhost`.
+
+Missing DBC path or format file produces a clear error at startup (and the server continues in SQL-only mode); missing terrain data warns and the `terrain` tool degrades cleanly per query.
 
 ### Running
 
@@ -415,7 +417,18 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/py
 
 ### pi (coding agent)
 
-This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers the server's tools (`query`, `lookup`, `list`, `sql`, `terrain`) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). The project root is auto-located (in order): `ACORE_DATA_ROOT` env, pi's cwd, the extension's own symlink-resolved location (so a global `~/.pi/agent/extensions/acore-data.ts` symlink works from any cwd), then `~/acore-data`. To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
+This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers **all** of the server's tools (fetched live via `tools/list`, so every current and future tool is available) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). The project root is auto-located (in order): `ACORE_DATA_ROOT` env, pi's cwd, the extension's own symlink-resolved location (so a global `~/.pi/agent/extensions/acore-data.ts` symlink works from any cwd), then `~/acore-data`. To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
+
+## Design boundaries
+
+This is a **local agent tool for a single AzerothCore WotLK install**: one process, stdio JSON-RPC, reading local DBC/terrain files and the local (or realm-shared) MySQL. It is deliberately not a service, and the following are non-goals rather than gaps:
+
+- **No Docker/systemd packaging, SLA, or backup strategy** — it runs next to the realm it describes. `dbversion` is the identity/health check by design.
+- **No metrics, rate limiting, or HTTP health endpoint** — the consumer is an LLM agent on a private stdio channel.
+- **No structured error codes or JSON logging** — actionable string errors with suggestions (did-you-mean, schema hints) are the right interface for an LLM consumer.
+- **No eviction policy on the DBC cache** — the store set is bounded (~114 DBCs, one reader per store); it is not a cache of unbounded working set.
+- **No input validation beyond statement blocking on `sql`** — it is a deliberate admin escape hatch; set `ACORE_SQL_TOOL_MODE=readonly` to restrict to `SELECT`.
+- **Single-install scope** — no multi-realm aggregation; point it at the install you care about.
 
 ## Testing
 
@@ -426,7 +439,7 @@ This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi
 # Integration tests — 75 tests (requires running MySQL + DBC files)
 .venv/bin/python3 tests/test_integration.py
 
-# Fast unit tests — 20 tests (no DB)
+# Fast unit tests — 40 tests (no DB)
 .venv/bin/python3 tests/test_helpers.py
 
 # Everything at once
@@ -445,66 +458,86 @@ Output-size baselines (for LLM context budgeting):
 ```
 acore-data/
 ├── server.py                    # MCP server entry point (JSON-RPC over stdio)
-├── datastore_registry.json      # Static metadata for all ~467 datastores
-├── requirements.txt             # pymysql >= 1.1, pytest >= 7.0
+├── datastore_registry.json      # Static metadata for all 475 datastores
+├── requirements.txt             # pymysql / pytest (pinned)
 │
 ├── core/
-    │   ├── annotation.py            # DBC field annotation, filter conversion, schema errors
-    │   ├── database.py              # MySQL connection (pymysql), table discovery, smart routing
-    │   ├── dbc.py                   # WDBC binary file reader
-    │   ├── enums.py                 # Shared enum dicts: condition types, SOURCE_TYPE, TYPEID …
-    │   ├── formats.py               # DBCfmt.h parser (format strings → field types)
-    │   ├── registry.py              # Datastore registry: name resolution, fuzzy matching
-    │   ├── type_resolver.py         # Dispatcher + generic registry-driven resolution engine
-    │   ├── resolvers/               # Specialized table-specific resolver modules
-    │   └── terrain/                 # Terrain data: map/vmap/mmap readers, navmesh pathfinding
-    │       ├── coords.py            # World ↔ tile coordinate conversions
-    │       ├── map_reader.py        # ADT map file reader (height, liquid, area)
-    │       ├── vmap_reader.py       # VMap model file reader
-    │       ├── mmap_reader.py       # MMap navmesh tile index reader
-    │       ├── detour_parser.py     # Detour tile parser (polygons, BV tree, vertices)
-    │       ├── tile_manager.py      # On-demand tile loading, cross-tile link resolution
-    │       └── pathfinder.py        # A* search, corridor steering, cross-tile pathfinding
-    │
-│       ├── __init__.py          # Resolver registry (table_name → func)
-│       ├── gameobject.py        # data[0-19] annotation for GAMEOBJECT_TYPE subtypes
-│       ├── smart_scripts.py     # EVENT_ID/ACTION_ID/TARGET_ID enum + value meaning
-│       ├── quest.py             # Starter/ender NPCs, POIs, chain info (prev/next/breadcrumb)
-│       ├── condition.py         # Polymorphic: SourceType → entity, ConditionType (~49 types), TYPEID/GENDER/RACE enums
-│       ├── achievement_criteria.py  # CriterionType-specific field interpretation
-│       ├── item.py              # Loot template for openable items (Flags & 0x04)
-│       ├── spell.py             # Cast conditions from `conditions` table with full enum resolution
-│       └── ref_utils.py         # Shared helpers: resolve_dbc_ref, resolve_sql_ref, batch_resolve_sql, resolve_loot_ref
+│   ├── annotation.py            # DBC field annotation, filter conversion, schema errors
+│   ├── database.py              # MySQL connection (pymysql), table discovery, smart routing,
+│   │                            # per-DB credentials (shared-DB topologies)
+│   ├── dbc.py                   # WDBC binary file reader
+│   ├── enums.py                 # Shared enum dicts: condition types, SOURCE_TYPE, TYPEID
+│   ├── enum_index.py            # C++ source-tree enum scanner (~1,044 enums, one cached pass)
+│   ├── formats.py               # DBCfmt.h parser (format strings → field types)
+│   ├── registry.py              # Datastore registry: name resolution, fuzzy matching
+│   ├── type_resolver.py         # Dispatcher + generic registry-driven resolution engine
+│   ├── resolvers/               # Specialized table-specific resolver modules
+│   │   ├── __init__.py          # Resolver registry (table_name → func)
+│   │   ├── gameobject.py        # data[0-19] annotation for GAMEOBJECT_TYPE subtypes
+│   │   ├── smart_scripts.py     # EVENT_ID/ACTION_ID/TARGET_ID enum + value meaning
+│   │   ├── quest.py             # Starter/ender NPCs, POIs, chain info (prev/next/breadcrumb)
+│   │   ├── condition.py         # Polymorphic: SourceType → entity, ConditionType, enums
+│   │   ├── achievement_criteria.py  # CriterionType-specific field interpretation
+│   │   ├── item.py              # Loot template for openable items (Flags & 0x04)
+│   │   ├── spell.py             # Cast conditions from `conditions` table with enum resolution
+│   │   └── ref_utils.py         # Shared helpers: resolve_dbc_ref, resolve_sql_ref, …
+│   └── terrain/                 # Terrain data: map/vmap/mmap readers, navmesh pathfinding
+│       ├── coords.py            # World ↔ tile coordinate conversions
+│       ├── map_reader.py        # ADT map file reader (height, liquid, area)
+│       ├── vmap_reader.py       # VMap model file reader
+│       ├── mmap_reader.py       # MMap navmesh tile index reader
+│       ├── detour_parser.py     # Detour tile parser (polygons, BV tree, vertices)
+│       ├── tile_manager.py      # On-demand tile loading, cross-tile link resolution
+│       └── pathfinder.py        # A* search, corridor steering, cross-tile pathfinding
 │
 ├── tools/
-    │   ├── query.py                 # Unified query tool (DBC + SQL + overlay merge)
-    │   ├── lookup.py                # Schema/metadata lookup tool
-    │   ├── list.py                  # Datastore listing tool
-    │   ├── sql.py                   # Raw SQL execution with routing and suggestions
-    │   └── terrain.py               # Terrain/pathfinding tool (map/vmap/mmap, A* navmesh)
-    │
+│   ├── __init__.py              # Tool schema registry, SQL-mode gate (ACORE_SQL_TOOL_MODE)
+│   ├── query.py                 # Unified query tool (DBC + SQL + overlay merge)
+│   ├── lookup.py                # Schema/metadata lookup tool
+│   ├── list.py                  # Datastore listing tool
+│   ├── sql.py                   # Raw SQL execution with routing and suggestions
+│   ├── terrain.py               # Terrain/pathfinding tool (map/vmap/mmap, A* navmesh)
+│   ├── spawns.py                # Creature spawn rollup (where does creature N spawn?)
+│   ├── dbversion.py             # Server state: core/DB version, per-DB update state
+│   ├── encounter.py             # Instance/map encounter rollup (creatures, gameobjects)
+│   ├── travel.py                # mod-playerbots travel graph + navmesh path verification
+│   ├── explain.py               # Agent-friendly single-record digest
+│   ├── config.py                # mod-playerbots conf index (settings + C++ call sites)
+│   └── enums.py                 # C++ enum decoder (magic numbers → MECHANIC_POLYMORPH …)
+│
+├── scripts/
+│   ├── audit_registry.py        # Registry health gate (CI: structural signals must be 0)
+│   ├── capture_output_sizes.py  # LLM context-budget output baselines + diff
+│   ├── source_crossrefs.py      # FK heuristic cross-reference discovery
+│   └── archive/                 # One-off registry migrations (idempotent no-ops)
+│
+├── generators/                  # Registry generation tooling (docs/datastores is the
+│   ├── generate_registry.py     # human reference; --write regenerates the registry)
+│   ├── generate_supplementary.py
+│   └── … (cross-ref / annotation generators)
+│
+├── evals/
+│   ├── run_eval.py              # LLM tool-calling eval harness (optional, time-costly)
+│   └── report.py
+│
+├── .pi/extensions/
+│   └── acore-data.ts            # pi bridge (spawns server.py over stdio JSON-RPC)
+│
+├── .github/workflows/
+│   └── ci.yml                   # Fast suites + structural audit on push/PR
+│
 ├── tests/
-│   ├── test_integration.py      # Integration tests (live DB)
-│   └── test_helpers.py          # Unit tests
+│   ├── test_helpers.py          # Fast unit tests (no DB)
+│   ├── test_regression.py       # Rework contract: shape, strictness, links, protocol, audit
+│   └── test_integration.py      # Integration tests (live DB + DBC)
 │
-├── docs/datastores/             # Technical reference for AzerothCore datastore internals
-│   ├── README.md                # Overview of DBC pipeline, SQL overlay, format strings
-│   ├── dbc-backed-stores.md
-│   ├── sql-objectmgr-stores.md
-│   ├── sql-manager-stores.md
-│   ├── sql-auxiliary-stores.md
-│   └── cross-reference.md
-│
-├── generators/                  # Registry tooling (docs/datastores is human reference)
-│   ├── generate_registry.py     # docs->registry check (read-only; --write to regenerate)
-│   └── generate_supplementary.py
-│
-└── scripts/                     # Utility scripts for cross-refs, column mappings, etc.
-    ├── add_cross_references.py
-    ├── update_sql_column_mappings.py
-    ├── audit_registry.py        # registry health gate (structural drift checks)
-    └── archive/                 # one-off registry migrations (phase_a–f, triage)
-```
+└── docs/datastores/             # Technical reference for AzerothCore datastore internals
+    ├── README.md                # Overview of DBC pipeline, SQL overlay, format strings
+    ├── dbc-backed-stores.md
+    ├── sql-objectmgr-stores.md
+    ├── sql-manager-stores.md
+    ├── sql-auxiliary-stores.md
+    └── cross-reference.md
 
 ## How It Works
 
@@ -516,7 +549,7 @@ acore-data/
    server.py  ───────────────────────────────────────
          │
          ├─► registry.py        datastore_registry.json
-         │     Name resolution, fuzzy matching        (462 entries)
+         │     Name resolution, fuzzy matching        (475 entries)
          │
          ├─► tools/query.py     ┌──► dbc.py           .dbc binary files
          │     Unified query    │    WDBCReader        (Spell.dbc, Map.dbc, …)
