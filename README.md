@@ -555,6 +555,7 @@ acore-data/
     ├── sql-manager-stores.md
     ├── sql-auxiliary-stores.md
     └── cross-reference.md
+```
 
 ## How It Works
 
