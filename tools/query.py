@@ -375,6 +375,11 @@ def _query_dbc(
             parts.append(f"SQL overlay {sql_table}: query not run (db unavailable)")
         elif sql_table and db_result == []:
             parts.append(f"SQL overlay {sql_table}: 0 matching rows")
+        elif sql_table and db_result:
+            parts.append(
+                f"SQL overlay {sql_table}: {len(db_result)} matching row(s) but "
+                f"field projection failed (see registry sql_column mapping)"
+            )
         if overlay_notes:
             parts.append("overlay: " + "; ".join(dict.fromkeys(overlay_notes)))
         detail = " | ".join(parts) if parts else ""
@@ -715,6 +720,15 @@ def _query_sql_overlay(
     return rows, error, notes
 
 
+# WotLK 3.3.5 DBC locale order (LanguageSet.dbc). Live *_dbc overlay tables
+# store locale columns as <Base>_Lang_<token> (e.g. Name_Lang_enUS).
+_LOCALE_TOKENS = [
+    "enUS", "deDE", "frFR", "esES", "zhCN", "zhTW",
+    "koKR", "ruRU", "enGB", "esMX", "ptBR", "itIT",
+    "UNK", "ptPT", "enCN", "enTW",
+]
+
+
 def _project_overlay_fields(
     rows: List[Dict[str, Any]],
     fields_param: Optional[List],
@@ -724,13 +738,22 @@ def _project_overlay_fields(
 
     Live overlay tables use suffixed slot columns (e.g. EffectTriggerSpell_1)
     while the registry maps C names (EffectTriggerSpell) - try the base and
-    the _1.._5 variants.
+    the _1.._5 variants. Locale family fields (name[0..15]) additionally
+    try the live <base>_Lang_<token> column for their slot; if the WotLK
+    base differs from the C name (SpellName[0] lives in Name_Lang_*), a
+    data-driven fallback scans the row for a <X>_Lang_<token> column whose
+    base X is a suffix of the requested base.
     """
     if not fields_param or not rows or not isinstance(rows[0], dict):
         return rows
-    available = set(rows[0].keys())
+    # Live overlay tables use the original WotLK SQL column style (e.g.
+    # `ID`, `Name`) while registry sql_columns may differ in case (`Id`),
+    # so column matching is case-insensitive.
+    available_ci: Dict[str, str] = {k.lower(): k for k in rows[0].keys()}
     fields_meta = (reg_entry or {}).get("fields", {})
-    selected: List[str] = []
+    # (output_key, live_column) pairs; output keys are the C field base
+    # names (locale slots collapsed), matching the DBC path's flat rows.
+    selected: List[Tuple[str, str]] = []
     for f in fields_param:
         info: Optional[Dict] = None
         if isinstance(f, str):
@@ -743,20 +766,52 @@ def _project_overlay_fields(
             info = fields_meta.get(str(f))
         base = (info.get("sql_column") or info.get("name") or str(f)) if info else str(f)
         cands = [base] + [f"{base}_{n}" for n in range(1, 6)]
-        cand = next((c for c in cands if c in available), None)
-        if cand is None:
+
+        slot_m = None
+        if info and info.get("name"):
+            slot_m = re.search(r"\[(\d+)\]$", info["name"])
+        if slot_m:
+            idx = int(slot_m.group(1))
+            if idx < len(_LOCALE_TOKENS):
+                cands.append(f"{base}_Lang_{_LOCALE_TOKENS[idx]}")
+
+        cand_ci = next((c for c in cands if c.lower() in available_ci), None)
+        if cand_ci is None and slot_m:
+            # WotLK base-name mismatch (C++ SpellName[0] -> column
+            # Name_Lang_*): find a live <X>_Lang_<token> column whose base
+            # X is a suffix of the requested base.
+            idx = int(slot_m.group(1))
+            if idx < len(_LOCALE_TOKENS):
+                suffix = f"_lang_{_LOCALE_TOKENS[idx]}".lower()
+                for col in available_ci.values():
+                    col_l = col.lower()
+                    if col_l.endswith(suffix):
+                        live_base = col_l[: -len(suffix)]
+                        if len(live_base) >= 3 and base.lower().endswith(live_base):
+                            cand_ci = col
+                            break
+        if cand_ci is None:
             return {
                 "error": (
                     f"Field '{base}' has no matching column in the overlay row. "
-                    f"Available columns (sample): {sorted(available)[:15]}"
+                    f"Available columns (sample): {sorted(available_ci.values())[:15]}"
                 ),
                 "isError": True,
             }
-        if cand not in selected:
-            selected.append(cand)
-    selected.append(next((c for c in ("ID", "Id") if c in available), ""))
-    selected = [c for c in selected if c]
-    return [{k: r[k] for k in selected if k in r} for r in rows]
+        cand = available_ci[cand_ci.lower()]
+        if info and info.get("name"):
+            out_key = re.sub(r"\[\d+\]$", "", info["name"])
+        else:
+            out_key = str(f)
+        if (out_key, cand) not in selected:
+            selected.append((out_key, cand))
+    id_col = next((k for k in available_ci.values() if k.lower() == "id"), "")
+    if id_col:
+        selected.append(("Id" if id_col.lower() == "id" else id_col, id_col))
+    return [
+        {out: r[col] for out, col in selected if col in r}
+        for r in rows
+    ]
 
 
 def _merge_dbc_sql(

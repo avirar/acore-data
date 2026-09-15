@@ -312,6 +312,77 @@ class TestExplainHelpers(unittest.TestCase):
         self.assertEqual(overrides, {})
 
 
+class TestProjectOverlayFields(unittest.TestCase):
+    """tools.query._project_overlay_fields: DBC+SQL overlay merge projection.
+
+    Live spell_dbc-style rows use WotLK SQL column style (ID,
+    Name_Lang_enUS) while users select C field names (Id, spellname).
+    """
+
+    ROW = {
+        "ID": 4051,
+        "BaseLevel": 30,
+        "Name_Lang_enUS": "Explosive Sheep Passive",
+        "Name_Lang_deDE": None,
+        "NameSubtext_Lang_enUS": "Sub",
+        "EffectTriggerSpell_1": 123,
+    }
+
+    def _entry(self):
+        return {
+            "fields": {
+                "0": {"name": "Id", "type": "uint32", "sql_column": "Id"},
+                "7": {"name": "BaseLevel", "type": "uint32", "sql_column": "BaseLevel"},
+                "136": {"name": "SpellName[0]", "type": "std::array<char const*,16>",
+                        "sql_column": "SpellName"},
+                "137": {"name": "SpellName[1]", "type": "std::array<char const*,16>",
+                        "sql_column": "SpellName"},
+                "152": {"name": "NameSubtext[0]", "type": "std::array<char const*,16>",
+                        "sql_column": "NameSubtext"},
+                "116": {"name": "EffectTriggerSpell[0]", "type": "uint32",
+                        "sql_column": "EffectTriggerSpell"},
+            }
+        }
+
+    def test_case_insensitive_pk(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], ["Id"], self._entry())
+        self.assertEqual(rows, [{"Id": 4051}])
+
+    def test_locale_family_enus(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], ["spellname"], self._entry())
+        self.assertEqual(rows, [{"Id": 4051, "SpellName": "Explosive Sheep Passive"}])
+
+    def test_locale_family_slot1(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], ["spellname[1]"], self._entry())
+        self.assertEqual(rows, [{"Id": 4051, "SpellName": None}])
+
+    def test_matching_locale_base(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], ["NameSubtext"], self._entry())
+        self.assertEqual(rows, [{"Id": 4051, "NameSubtext": "Sub"}])
+
+    def test_slot_suffixed_column(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], ["EffectTriggerSpell"], self._entry())
+        self.assertEqual(rows, [{"Id": 4051, "EffectTriggerSpell": 123}])
+
+    def test_missing_column_errors_with_sample(self):
+        from tools.query import _project_overlay_fields
+        out = _project_overlay_fields([dict(self.ROW)], ["NonexistentField"], self._entry())
+        self.assertIsInstance(out, dict)
+        self.assertTrue(out.get("isError"))
+        self.assertIn("NonexistentField", out["error"])
+        self.assertIn("ID", out["error"])
+
+    def test_no_fields_returns_rows(self):
+        from tools.query import _project_overlay_fields
+        rows = _project_overlay_fields([dict(self.ROW)], None, self._entry())
+        self.assertEqual(rows, [dict(self.ROW)])
+
+
 class TestPerDbCreds(unittest.TestCase):
     """core.database: per-database credential overrides (DB_AUTH_*/DB_CHAR_*).
 
