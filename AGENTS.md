@@ -116,9 +116,14 @@ the source-scanning index is `core/enum_index.py`. Do not merge/rename.
 - The DBC set is a reduced WotLK extraction: Map id 571 = "Northrend",
   id 0 = "Eastern Kingdoms"; not every high spell/item id exists in DBC
   (ids may only live in the SQL overlay — e.g. spell 4051).
-- **Registry audit** — `scripts/audit_registry.py` is the health gate. Run
-  `.venv/bin/python3 scripts/audit_registry.py --db` (add `--json out.json`
-  for machine output). Checks: dangling_refs, duplicate_identifiers (two
+ - **Registry audit** — `scripts/audit_registry.py` is the health gate. Run
+   `.venv/bin/python3 scripts/audit_registry.py --db` (add `--json out.json`
+   for machine output). **Exit code**: non-zero (1) when any structural
+   signal (dangling_refs, duplicate_identifiers, missing_data_source,
+   dbc_index_drift, sql_column_drift, coverage_gap) is non-zero — CI
+   (`.github/workflows/ci.yml`) relies on this without `--db`. The accepted
+   residuals (type_as_name, missing_cross_refs, optional_table_absent) never
+    fail the run. Checks: dangling_refs, duplicate_identifiers (two
   fields with the identical full name), type_as_name, missing_data_source,
   dbc_index_drift (registry index past the DBC/format field_count),
   sql_column_drift (field's sql_column absent from the live table — full
@@ -154,15 +159,15 @@ the source-scanning index is `core/enum_index.py`. Do not merge/rename.
 
 ## Tests
 
-- `tests/test_regression.py` — 26 tests, the rework's contract (shape,
+- `tests/test_regression.py` — 29 tests, the rework's contract (shape,
   strictness, links, protocol, registry audit, format parser).
-- `tests/test_integration.py` — 130+ tests (live DB + DBC; each test spawns
+- `tests/test_integration.py` — 110 tests (live DB + DBC; each test spawns
   the server via subprocess and needs ~10 s). One test class per tool, incl.
   TestConfigTool and TestEnumsTool (skip gracefully when the mod-playerbots /
   azerothcore source trees are absent) and `test_list_tools` (asserts the
   exact tool set — update it when adding a tool).
-- `tests/test_helpers.py` — 26 fast unit tests (no DB), incl. enum-index
-  parser coverage.
+- `tests/test_helpers.py` — 40 fast unit tests (no DB), incl. enum-index
+  parser coverage, per-DB credential precedence, and overlay projection.
 - No `npm`/build step; no lint config. Run all suites with:
   `.venv/bin/python3 -m pytest tests/ -q` (or the standalone runners).
 
