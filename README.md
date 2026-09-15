@@ -572,3 +572,10 @@ acore-data/
           └─► tools/terrain.py   Terrain queries + pathfinding
                                    (map/vmap/mmap, A* navmesh)
 ```
+
+## License
+
+GPL-2.0 (GNU General Public License, version 2) — see [LICENSE](LICENSE).
+This matches the license of the [AzerothCore](https://azerothcore.org/)
+server it serves. No AzerothCore code is bundled — the server reads your
+own install's DBC files, terrain data and SQL schema at runtime.

@@ -21,9 +21,9 @@ DBC file, SQL table, store variable) and traverse to the others.
   `/root/azerothcore-wotlk/env/dist/etc/worldserver.conf` when unset.
   Auto-detection parses all three `*DatabaseInfo` lines (Login/World/
   Character): World is the base connection, differing Login/Character lines
-  become per-DB credential overrides (shared-DB topologies, e.g. a realm
-  machine whose `acore_auth` lives on another host — `REDACTED-LAN-HOST`
-  reaches its shared auth DB on `.233` this way). `acore_playerbots` is not
+   become per-DB credential overrides (shared-DB topologies, e.g. a realm
+   machine whose `acore_auth` lives on another host in the LAN reaches
+   its shared auth DB this way). `acore_playerbots` is not
   in worldserver.conf and rides the base (world) connection. Explicit
   `DB_*` env vars still disable auto-detection entirely (single connection
   for all DBs) — but per-DB env overrides `DB_AUTH_*` / `DB_CHAR_*`
