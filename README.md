@@ -420,6 +420,22 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | .venv/bin/py
 
 This project ships a first-class pi bridge at `.pi/extensions/acore-data.ts`. pi loads it automatically and registers **all** of the server's tools (fetched live via `tools/list`, so every current and future tool is available) as native pi tools. It hardcodes **no** paths or credentials — it inherits the ambient environment and the server self-configures (DBC path defaults + DB creds auto-detected from `worldserver.conf`). The project root is auto-located (in order): `ACORE_DATA_ROOT` env, pi's cwd, the extension's own symlink-resolved location (so a global `~/.pi/agent/extensions/acore-data.ts` symlink works from any cwd), then `~/acore-data`. To use a non-default project root or a non-default AzerothCore layout, export the relevant vars (`ACORE_DATA_ROOT`, `DB_*`, `DBC_PATH`, …) in pi's environment.
 
+### Windows
+
+Fully supported (the server, tests, and pi bridge all run under PowerShell / Git Bash):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe server.py
+```
+
+- The venv interpreter is `.venv\Scripts\python.exe` (POSIX: `.venv/bin/python3`, `setup.sh` is the POSIX twin). The pi bridge picks the right one automatically.
+- The `ACORE_*`/`DB_*` **defaults point at `/root/azerothcore-wotlk`**, so on Windows set them explicitly (e.g. a machine-local `env.local.ps1`, kept gitignored) — e.g. `ACORE_DBC_PATH=C:\GIT\azerothcore-wotlk\env\dist\bin\dbc`.
+- `worldserver.conf` auto-detection only helps if a conf exists locally; dev checkouts usually don't have one, so explicit `DB_HOST`/`DB_USER`/`DB_PASSWORD` pointing at the realm's MySQL (LAN or localhost) is the normal setup.
+- Client data layout is the same as Linux: `env\dist\bin\{dbc,maps,vmaps,mmaps}`. Populate via `./acore.sh client-data` (Git Bash, from the AzerothCore checkout) or copy the directory from the realm machine.
+- Test note: the DB-free suites run as-is; one `test_helpers` test (chmod-000 inaccessible parent) skips on Windows because POSIX mode bits are no-ops there.
+
 ## Design boundaries
 
 This is a **local agent tool for a single AzerothCore WotLK install**: one process, stdio JSON-RPC, reading local DBC/terrain files and the local (or realm-shared) MySQL. It is deliberately not a service, and the following are non-goals rather than gaps:
