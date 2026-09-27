@@ -498,6 +498,19 @@ Output-size baselines (for LLM context budgeting):
 .venv/bin/python3 scripts/capture_output_sizes.py --compare /tmp/before /tmp/after
 ```
 
+Path export (for external viewers such as Noggit; no database needed):
+
+```bash
+.venv/bin/python3 scripts/path_export.py --map 0 \
+    --start -9464 64 55 --end -8832 628 100 --output /tmp/path.json
+```
+
+Outputs an `acore-path/1` JSON pack: `smooth_path` (server `.mmap path`
+equivalent), `poly_path` (A* polygon centers), endpoints, distance, path type.
+`--mode smooth|straight|raycast`, `--unit player|creature|flying`,
+`--no-normalize`, `--max-nodes/--max-polys/--max-points`, `--pretty`.
+Errors are emitted as `{"error": ...}` with exit code 1.
+
 ## Project Structure
 
 ```
@@ -563,6 +576,7 @@ acore-data/
 ├── scripts/
 │   ├── audit_registry.py        # Registry health gate (CI: structural signals must be 0)
 │   ├── capture_output_sizes.py  # LLM context-budget output baselines + diff
+│   ├── path_export.py           # Standalone path pack export (acore-path/1 JSON)
 │   ├── source_crossrefs.py      # FK heuristic cross-reference discovery
 │   └── archive/                 # One-off registry migrations (idempotent no-ops)
 │
