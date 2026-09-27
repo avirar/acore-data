@@ -296,8 +296,8 @@ class PathGenerator:
             build_shortcut = False
             water_path = False
             if self.liquid is not None:
-                ls = self.liquid(start_pos[0], start_pos[1], start_pos[2])
-                le = self.liquid(end_pos[0], end_pos[1], end_pos[2])
+                ls = self._liquid_status(start_pos[0], start_pos[1], start_pos[2])
+                le = self._liquid_status(end_pos[0], end_pos[1], end_pos[2])
                 start_under_end_in = (ls == MAP_LIQUID_UNDER_WATER and
                                       (le & MAP_LIQUID_STATUS_IN_CONTACT) != 0)
                 start_in_end_under = ((ls & MAP_LIQUID_STATUS_IN_CONTACT) != 0 and
@@ -599,13 +599,18 @@ class PathGenerator:
             normalized.append((point[0], point[1], z))
         self._path_points = normalized
 
+    def _liquid_status(self, x, y, z) -> int:
+        liquid = self.liquid(x, y, z)
+        status = getattr(liquid, "status", liquid)
+        return int(status)
+
     def _get_nav_terrain(self, x, y, z):
         from core.terrain.detour.filter import (
             NAV_GROUND, NAV_MAGMA, NAV_WATER,
         )
         if self.liquid is None:
             return NAV_GROUND
-        status = self.liquid(x, y, z)
+        status = self._liquid_status(x, y, z)
         if status == MAP_LIQUID_NO_WATER:
             return NAV_GROUND
         return NAV_WATER
