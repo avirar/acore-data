@@ -5,6 +5,7 @@ These tests don't require a live database connection.
 Run with: python3 tests/test_helpers.py (or pytest)
 """
 
+import importlib.util
 import os
 import sys
 import tempfile
@@ -14,6 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tools.query import _build_sql_filter_clause, _resolve_sql_column, _escape_like_pattern
+
+_PATH_EXPORT = Path(__file__).resolve().parent.parent / "scripts" / "path_export.py"
+_spec = importlib.util.spec_from_file_location("path_export", _PATH_EXPORT)
+path_export = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(path_export)
 
 
 class TestEscapeLikePattern(unittest.TestCase):
@@ -650,6 +656,116 @@ class TestTerrainParsers(unittest.TestCase):
         self.assertIsNotNone(s)
         self.assertAlmostEqual(s, 0.5, places=6)
         self.assertAlmostEqual(t, 0.5, places=6)
+
+
+class _FakePoly:
+    def __init__(self, verts, is_offmesh=False):
+        self.verts = verts
+        self.is_offmesh = is_offmesh
+
+
+class _FakeTile:
+    def __init__(self, vertices):
+        self.data = type("Data", (), {"vertices": vertices})
+
+
+class _FakeNav:
+    def __init__(self, polys):
+        self._polys = polys
+
+    def poly(self, ref):
+        return self._polys.get(ref, (None, None))
+
+
+class _FakePath:
+    path_type = 0x01
+    path_points = [(0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (2.0, 0.0, 0.0)]
+    poly_refs = [7]
+    start_position = (0.0, 0.0, 0.0)
+    end_position = (2.0, 0.0, 0.0)
+    actual_end_position = (2.0, 0.0, 0.0)
+    path_length = 2.0
+
+
+class TestPathExport(unittest.TestCase):
+    """scripts/path_export.py pure helpers (no DB, no client data)."""
+
+    def test_poly_centers_convert_detour_to_world(self):
+        tile = _FakeTile([(10.0, 20.0, 30.0), (12.0, 22.0, 32.0)])
+        nav = _FakeNav({7: (tile, _FakePoly([0, 1]))})
+        centers = path_export.poly_centers(nav, [7])
+        # detour (x, y, z) -> world (z, x, y)
+        self.assertEqual(centers, [(31.0, 11.0, 21.0)])
+
+    def test_poly_centers_skips_offmesh_and_missing(self):
+        tile = _FakeTile([(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)])
+        nav = _FakeNav({
+            1: (tile, _FakePoly([0, 1], is_offmesh=True)),
+            2: (None, None),
+            3: (tile, _FakePoly([])),
+        })
+        self.assertEqual(path_export.poly_centers(nav, [1, 2, 3]), [])
+
+    def test_build_payload_shape(self):
+        tile = _FakeTile([(0.0, 0.0, 0.0), (0.0, 0.0, 2.0), (0.0, 2.0, 0.0)])
+        nav = _FakeNav({7: (tile, _FakePoly([0, 1, 2]))})
+        payload = path_export.build_payload(0, "smooth", "player", _FakePath(), nav)
+        self.assertEqual(payload["format"], "acore-path/1")
+        self.assertEqual(payload["map"], 0)
+        self.assertTrue(payload["found"])
+        self.assertFalse(payload["partial"])
+        self.assertEqual(payload["point_count"], 3)
+        self.assertEqual(len(payload["smooth_path"]), 3)
+        self.assertEqual(len(payload["poly_path"]), 1)
+        self.assertEqual(payload["smooth_path"][0], {"x": 0.0, "y": 0.0, "z": 0.0})
+        self.assertNotIn("points_truncated", payload)
+
+    def test_build_payload_limit_truncates(self):
+        payload = path_export.build_payload(
+            0, "smooth", "player", _FakePath(), None, limit=2
+        )
+        self.assertEqual(len(payload["smooth_path"]), 2)
+        self.assertTrue(payload["points_truncated"])
+        self.assertEqual(payload["poly_path"], [])
+
+    def test_flying_payload_is_shortcut(self):
+        payload = path_export._flying_payload(0, "flying", (0.0, 0.0, 0.0), (3.0, 4.0, 0.0), 0)
+        self.assertTrue(payload["found"])
+        self.assertEqual(payload["point_count"], 2)
+        self.assertEqual(payload["distance"], 5.0)
+        self.assertEqual(payload["smooth_path"][-1], {"x": 3.0, "y": 4.0, "z": 0.0})
+
+
+class TestPathGeneratorLiquidStatus(unittest.TestCase):
+    """The liquid callback may return a status object (MapResolver) or an int."""
+
+    def _generator(self, liquid):
+        from core.terrain.path_generator import PathGenerator
+        pg = PathGenerator.__new__(PathGenerator)
+        pg.liquid = liquid
+        return pg
+
+    def test_liquid_status_object_is_unwrapped(self):
+        from core.terrain.path_generator import MAP_LIQUID_UNDER_WATER
+        liquid = lambda x, y, z: type("L", (), {"status": MAP_LIQUID_UNDER_WATER})()
+        pg = self._generator(liquid)
+        self.assertEqual(pg._liquid_status(0.0, 0.0, 0.0), MAP_LIQUID_UNDER_WATER)
+
+    def test_liquid_status_int_passthrough(self):
+        pg = self._generator(lambda x, y, z: 0x04)
+        self.assertEqual(pg._liquid_status(0.0, 0.0, 0.0), 0x04)
+
+    def test_get_nav_terrain_uses_wrapped_status(self):
+        from core.terrain.detour import NAV_GROUND, NAV_WATER
+        from core.terrain.path_generator import MAP_LIQUID_UNDER_WATER
+        object_liquid = self._generator(
+            lambda x, y, z: type("L", (), {"status": 0x00})()
+        )
+        self.assertEqual(object_liquid._get_nav_terrain(0.0, 0.0, 0.0), NAV_GROUND)
+        water_liquid = self._generator(
+            lambda x, y, z: type("L", (), {"status": MAP_LIQUID_UNDER_WATER})()
+        )
+        self.assertEqual(water_liquid._get_nav_terrain(0.0, 0.0, 0.0), NAV_WATER)
 
 
 if __name__ == "__main__":
