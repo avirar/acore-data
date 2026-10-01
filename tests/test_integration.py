@@ -540,6 +540,89 @@ class TestConditionResolution(unittest.TestCase):
         })
         self.assertNotIn("error", result)
 
+    def _resolved_entries(self, result):
+        """Get the resolved-field dict keyed by (stable) row key."""
+        return result.get("metadata", {}).get("$resolved_fields", {})
+
+    def test_composite_row_key_is_stable(self):
+        """conditions has a composite PK; row keys must not be Python object ids."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 1, "SourceEntry": 2794, "ConditionTypeOrReference": 6},
+            "resolve": True,
+            "limit": 2,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected resolved rows")
+        for key in resolved:
+            self.assertNotIn("0x", key, "row key must not be a Python object id")
+            self.assertIn("|", key, "row key should be the composite PK")
+
+    def test_loot_source_resolves_creature_and_item(self):
+        """CREATURE_LOOT (1) resolves SourceGroup->creature and SourceEntry->item."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 1, "SourceEntry": 2794, "ConditionTypeOrReference": 6},
+            "resolve": True,
+            "limit": 3,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected resolved loot conditions")
+        for data in resolved.values():
+            src = data.get("source_entry", {})
+            self.assertEqual(src.get("type"), "loot")
+            self.assertEqual(src.get("loot_template", {}).get("type"), "creature_template")
+            self.assertIn("creature_template [", src.get("loot_template", {}).get("name") or "")
+            self.assertIn("item_template [", src.get("item", {}).get("name") or "")
+
+    def test_team_condition_decodes_faction(self):
+        """CONDITION_TEAM (6) value 469 decodes to ALLIANCE."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"ConditionTypeOrReference": 6, "ConditionValue1": 469},
+            "resolve": True,
+            "limit": 3,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected TEAM conditions")
+        for data in resolved.values():
+            team = data.get("condition_values", {}).get("team", {})
+            self.assertEqual(team.get("name"), "ALLIANCE")
+
+    def test_skill_condition_decodes_skillline(self):
+        """CONDITION_SKILL (7) resolves Value1 to a SkillLine name."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"ConditionTypeOrReference": 7},
+            "resolve": True,
+            "limit": 3,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected SKILL conditions")
+        for data in resolved.values():
+            skill = data.get("condition_values", {}).get("skill", {})
+            self.assertIn("SkillLine [", skill.get("name") or "")
+
+    def test_active_event_condition_decodes_game_event(self):
+        """CONDITION_ACTIVE_EVENT (12) resolves Value1 to a game_event description."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"ConditionTypeOrReference": 12},
+            "resolve": True,
+            "limit": 3,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected ACTIVE_EVENT conditions")
+        for data in resolved.values():
+            ev = data.get("condition_values", {}).get("game_event", {})
+            self.assertIn("game_event [", ev.get("name") or "")
+
+    def test_unit_in_combat_type_named(self):
+        """CONDITION_UNIT_IN_COMBAT (106) must have an enum name, not UNKNOWN."""
+        # 106 is an AC-custom condition; just verify the name table has it
+        from core.enums import _CONDITION_TYPE_NAMES
+        self.assertEqual(_CONDITION_TYPE_NAMES.get(106), "UNIT_IN_COMBAT")
+
 
 class TestSmartScriptResolution(unittest.TestCase):
     """Test smart_scripts triple-polymorphic resolution."""
@@ -1075,6 +1158,30 @@ class TestDbversionTool(unittest.TestCase):
         self.assertEqual(r["mod_playerbots_installed"], pb["installed"])
         # on this install the mod DB is present
         self.assertTrue(pb["installed"])
+
+
+class TestRefsTool(unittest.TestCase):
+    """refs tool: reverse reference lookup (live DB)."""
+
+    def test_finds_items_using_spell(self):
+        # Spell Penetration 23 (42056) is on three wearable items.
+        r = call_tool("refs", {"name": "Spell", "id": 42056, "source": "ItemTemplate"})
+        self.assertNotIn("isError", r)
+        tables = {row["table"] for row in r["result"]}
+        self.assertIn("item_template", tables)
+        entries = {row["rows"][0].get("entry") for row in r["result"] if row["table"] == "item_template"}
+        # At least the known spell-pen shoulders/trinket must be found.
+        self.assertTrue(entries & {28726, 30884, 35065})
+
+    def test_unknown_datastore_errors(self):
+        r = call_tool("refs", {"name": "NoSuchStore", "id": 1})
+        self.assertTrue(r.get("isError"))
+
+    def test_scanned_empty_reporting(self):
+        # Physical flat armor-pen aura (40230) is not on any SQL table.
+        r = call_tool("refs", {"name": "Spell", "id": 40230, "source": "ItemTemplate"})
+        self.assertEqual(r["result"], [])
+        self.assertTrue(any("ItemTemplate" in x for x in r["scanned_empty"]))
 
 
 class TestTravelTool(unittest.TestCase):

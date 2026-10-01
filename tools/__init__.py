@@ -1,7 +1,7 @@
 """
 Tool modules for acore-data MCP server.
 
-Twelve tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, config, enums, sql, terrain
+Thirteen tools: query, lookup, list, spawns, dbversion, encounter, travel, explain, config, enums, sql, terrain, refs
 """
 import os
 
@@ -17,6 +17,7 @@ from tools import config as config_tool
 from tools import enums as enums_tool
 from tools import sql as sql_tool
 from tools import terrain as terrain_tool
+from tools import refs as refs_tool
 
 
 # SQL tool mode: full (default), readonly, disabled
@@ -42,6 +43,7 @@ def get_tool_schemas() -> list:
         config_tool.get_schema(),
         enums_tool.get_schema(),
         terrain_tool.get_schema(),
+        refs_tool.get_schema(),
     ]
 
     # Only include sql tool if not disabled

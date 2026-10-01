@@ -1,6 +1,6 @@
 # acore-data
 
-MCP server providing unified query access to **475 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and C++ enum decoding. Exposes twelve tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `enums`, `sql`, `terrain`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
+MCP server providing unified query access to **475 AzerothCore game datastores** — DBC binary files, SQL tables, SQL overlays, and auxiliary stores. Plus terrain/pathfinding queries against MMap navmesh data, creature spawn analysis, database state audit, encounter rollups, record digests, mod configuration lookup, and C++ enum decoding. Exposes thirteen tools (`query`, `lookup`, `list`, `spawns`, `dbversion`, `encounter`, `travel`, `explain`, `config`, `enums`, `sql`, `terrain`, `refs`) over the JSON-RPC based [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Overview
 
@@ -370,7 +370,7 @@ In addition to generic registry-driven resolution, these tables have dedicated r
 | `gameobject_template` | `resolvers/gameobject.py` | type-aware `data[0-19]` annotation (lockId, lootId, spellId …) |
 | `smart_scripts` | `resolvers/smart_scripts.py` | EVENT_ID/ACTION_ID/TARGET_ID → enum names + value meaning |
 | `quest_template` | `resolvers/quest.py` | starter/ender NPCs, POIs, quest chain (prev/next/breadcrumb) |
-| `conditions` | `resolvers/condition.py` | polymorphic SourceType → entity name, ConditionType (~49 types: AURA, QUEST, ITEM, ALIVE, CLASS, etc.), TYPEID/GENDER/RACE enums |
+| `conditions` | `resolvers/condition.py` | polymorphic SourceType → entity name (incl. loot templates: SourceGroup→creature/GO/item template, SourceEntry→item), ConditionType enum + value decoding (AURA, QUEST, ITEM, TEAM, REPUTATION_RANK, SKILL, ZONEID, ACHIEVEMENT, WORLD_STATE, ACTIVE_EVENT, INSTANCE_INFO, UNIT_STATE, RELATION_TO, STAND_STATE, etc.), TYPEID/GENDER/RACE enums, stable composite row key |
 | `achievement_criteria_data` | `resolvers/achievement_criteria.py` | CriterionType-specific field interpretation |
 | `item_template` | `resolvers/item.py` | loot template for openable items (`Flags & 0x04`) |
 | `Spell` (DBC) | `resolvers/spell.py` | cast conditions from `conditions` table with full enum resolution |

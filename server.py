@@ -232,6 +232,10 @@ class AcoreDataServer:
             from tools import terrain as terrain_tool
             return terrain_tool.terrain_tools(self)
 
+        elif name == "refs":
+            from tools import refs as refs_tool
+            return refs_tool.refs_tools(self)
+
         else:
             return {
                 "error": f"Unknown tool: {name}",

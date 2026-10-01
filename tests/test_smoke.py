@@ -22,7 +22,7 @@ _ENV = {**os.environ, "PYTHONPATH": _WORKDIR}
 
 EXPECTED_TOOLS = {
     "query", "lookup", "list", "spawns", "dbversion", "encounter",
-    "travel", "explain", "config", "enums", "terrain", "sql",
+    "travel", "explain", "config", "enums", "terrain", "sql", "refs",
 }
 
 

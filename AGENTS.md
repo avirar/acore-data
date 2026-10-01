@@ -81,9 +81,9 @@ DBC file, SQL table, store variable) and traverse to the others.
   `EffectTriggerSpell_1`), compaction and single-record shaping. Errors
   report per source (`DBC Spell.dbc: ... | SQL overlay spell_dbc: ...`).
 
-## Composed tools (7 of the 12) — opt-in inputs, clean degradation
+## Composed tools (8 of the 13) — opt-in inputs, clean degradation
 
-Beyond `query`/`lookup`/`list`/`sql`/`terrain`, seven read-only composed
+Beyond `query`/`lookup`/`list`/`sql`/`terrain`, eight read-only composed
 tools answer recurring multi-step questions in one call (each has an
 integration test class; the exact tool set is asserted by `test_list_tools`):
 
@@ -112,6 +112,11 @@ integration test class; the exact tool set is asserted by `test_list_tools`):
   scans the source tree once (~1,044 enums / 17.7k members) and resolves
   magic numbers (`Mechanics 17 → MECHANIC_POLYMORPH`). `ACORE_SRC_ROOT`
   override.
+- `refs(name, id, source, limit)` — data-level reverse lookup: which rows in
+  other SQL tables reference a record, using the registry's `referenced_by`
+  metadata (e.g. `refs(name='Spell', id=40230)` lists the items/enchants/
+  procs that use that spell). Reports matches, scanned-empty tables, and
+  skipped (DBC-backed) sources.
 
 The mod-playerbots and C++ source trees are OPTIONAL: absence of either is a
 clean per-tool error (naming the env var to set), never a server failure —

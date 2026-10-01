@@ -10,9 +10,11 @@ from typing import Any, Dict, List, Optional
 
 from ..enums import (
     _SOURCE_TYPE_NAMES, _CONDITION_TYPE_NAMES, _TYPEID_NAMES, _TYPEMASK_NAMES,
-    _CLASS_NAMES, _RACE_NAMES, _GENDER_NAMES,
+    _CLASS_NAMES, _RACE_NAMES, _GENDER_NAMES, _TEAM_NAMES, _REP_RANK_NAMES,
+    _DRUNKEN_STATE_NAMES, _RELATION_TYPE_NAMES, _STAND_STATE_NAMES,
+    _PET_TYPE_NAMES, _INSTANCE_INFO_NAMES, _UNIT_STATE_NAMES, _AURA_TYPE_NAMES,
 )
-from .ref_utils import resolve_dbc_ref, resolve_sql_ref
+from .ref_utils import resolve_dbc_ref, resolve_sql_ref, _get_persistent, _set_persistent, _active_cache
 
 # Comparison type enum lookup (from ConditionMgr.h)
 _COMP_TYPES = {0: ">=", 1: "<=", 2: "==", 3: "!="}
@@ -51,11 +53,52 @@ _ERROR_TYPE_NAMES = {
 
 
 def _get_row_pk(row: Dict) -> str:
-    """Get primary key value from row."""
+    """Get primary key value from row.
+
+    `conditions` has a composite primary key (no single `entry`/`id` column), so
+    fall back to a stable composite key built from its key columns.
+    """
     for pk in ["entry", "ID", "Id", "id", "guid"]:
-        if pk in row:
+        if pk in row and row[pk] is not None:
             return row[pk]
+    comp = [
+        row.get("SourceTypeOrReferenceId"),
+        row.get("SourceGroup"),
+        row.get("SourceEntry"),
+        row.get("SourceId"),
+        row.get("ElseGroup"),
+        row.get("ConditionTypeOrReference"),
+        row.get("ConditionTarget"),
+        row.get("ConditionValue1"),
+        row.get("ConditionValue2"),
+        row.get("ConditionValue3"),
+    ]
+    if any(v is not None for v in comp):
+        return "|".join("" if v is None else str(v) for v in comp)
     return str(id(row))
+
+
+def _resolve_game_event(server, event_id: int) -> Optional[str]:
+    """Resolve a game_event id to its description (persistent + per-request cached)."""
+    key = f"sql:game_event:{event_id}:eventEntry"
+    cached = _get_persistent(key)
+    if cached is not None:
+        return cached
+    if _active_cache is not None and key in _active_cache:
+        return _active_cache[key]
+    rows, _ = server.database._query_database(
+        "SELECT eventEntry, description FROM game_event WHERE eventEntry = %s",
+        params=(event_id,),
+    )
+    if rows:
+        desc = rows[0].get("description")
+        result = f"game_event [{desc}]" if desc else f"game_event [{event_id}]"
+    else:
+        result = f"game_event [{event_id}] (not found)"
+    _set_persistent(key, result)
+    if _active_cache is not None:
+        _active_cache[key] = result
+    return result
 
 
 def _collect_condition_ids(rows):
@@ -107,6 +150,28 @@ def _collect_condition_ids(rows):
                 ids[("item_template", "entry")].add(value2)
             elif type_id in (5, 6):  # GAMEOBJECT or DYNAMICOBJECT
                 ids[("gameobject_template", "entry")].add(value2)
+
+        # Loot-template sources (1-12, 28): SourceEntry = loot item, SourceGroup = template key
+        if source_type in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 28):
+            if source_entry:
+                ids[("item_template", "entry")].add(source_entry)
+            if source_type in (1, 8, 11) and source_group:
+                ids[("creature_template", "entry")].add(source_group)
+            elif source_type in (2, 5, 7, 9) and source_group:
+                ids[("item_template", "entry")].add(source_group)
+            elif source_type == 4 and source_group:
+                ids[("gameobject_template", "entry")].add(source_group)
+
+        # NPC_VENDOR (23): SourceGroup = creature entry, SourceEntry = item
+        if source_type == 23:
+            if source_group:
+                ids[("creature_template", "entry")].add(source_group)
+            if source_entry:
+                ids[("item_template", "entry")].add(source_entry)
+
+        # Active game event (12)
+        if condition_type == 12 and value1:
+            ids[("game_event", "eventEntry")].add(value1)
 
     return dict(ids)
 
@@ -180,14 +245,14 @@ def resolve_condition_fields(
             if resolved_source:
                 entry_resolved["source_entry"] = resolved_source
 
-        # --- Resolve ConditionValue1-3 based on ConditionType ---
-        if cond_value1 and "sql" in allowed:
-            resolved_values = _resolve_condition_values(server, condition_type, cond_value1, cond_value2, cond_value3)
-            if resolved_values:
-                entry_resolved["condition_values"] = resolved_values
-
-        # Also resolve types that don't need SQL but still have meaningful output (ALIVE, CLASS, RACE, GENDER)
-        elif not cond_value1 and condition_type in (36, 15, 16, 20):
+        # Resolve condition values for every type we can decode (value may legitimately be 0)
+        _RESOLVABLE_CONDITION_TYPES = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+            19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+            35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+            101, 102, 103, 106,
+        }
+        if "sql" in allowed and condition_type in _RESOLVABLE_CONDITION_TYPES:
             resolved_values = _resolve_condition_values(server, condition_type, cond_value1, cond_value2, cond_value3)
             if resolved_values:
                 entry_resolved["condition_values"] = resolved_values
@@ -260,6 +325,47 @@ def _resolve_condition_source(server, source_type: int, source_entry: int, sourc
     if source_type in (16, 29):
         name = resolve_sql_ref(server, "creature_template", source_entry, "entry")
         return {"type": "creature", "id": source_entry, "name": name}
+
+    # NPC_VENDOR (23): SourceGroup = creature entry, SourceEntry = item
+    if source_type == 23:
+        return {
+            "type": "npc_vendor",
+            "vendor": {
+                "type": "creature",
+                "id": source_group,
+                "name": resolve_sql_ref(server, "creature_template", source_group, "entry") if source_group else None,
+            },
+            "item": {
+                "id": source_entry,
+                "name": resolve_sql_ref(server, "item_template", source_entry, "entry") if source_entry else None,
+            },
+        }
+
+    # Loot-template sources (1-12, 28): SourceGroup = template key, SourceEntry = loot item
+    if source_type in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 28):
+        group = None
+        if source_type in (1, 8, 11):  # creature-keyed loot
+            group = {"type": "creature_template", "id": source_group,
+                     "name": resolve_sql_ref(server, "creature_template", source_group, "entry") if source_group else None}
+        elif source_type in (2, 5, 7, 9):  # item-keyed loot
+            group = {"type": "item_template", "id": source_group,
+                     "name": resolve_sql_ref(server, "item_template", source_group, "entry") if source_group else None}
+        elif source_type == 4:  # gameobject-keyed loot
+            group = {"type": "gameobject_template", "id": source_group,
+                     "name": resolve_sql_ref(server, "gameobject_template", source_group, "entry") if source_group else None}
+        elif source_type == 3:  # fishing area
+            group = {"type": "area", "id": source_group,
+                     "name": resolve_dbc_ref(server, "AreaTable", source_group) if source_group else None}
+        elif source_type == 12:  # spell loot
+            group = {"type": "spell", "id": source_group,
+                     "name": resolve_dbc_ref(server, "Spell", source_group) if source_group else None}
+        elif source_group:  # 6 MAIL, 10 REFERENCE, 28 PLAYER — raw template id
+            group = {"type": "loot_template", "id": source_group}
+        return {
+            "type": "loot",
+            "loot_template": group,
+            "item": {"id": source_entry, "name": resolve_sql_ref(server, "item_template", source_entry, "entry")} if source_entry else None,
+        }
 
     return None
 
@@ -404,5 +510,118 @@ def _resolve_condition_values(
     # --- ALIVE status check (NegativeCondition=1 means must be dead) ---
     elif condition_type == 36:
         result["status"] = "alive" if not value1 else "dead"
+
+    # --- Zone / area ---
+    elif condition_type == 4:  # ZONEID
+        result["zone"] = {"id": value1, "name": resolve_dbc_ref(server, "AreaTable", value1)}
+
+    # --- Reputation rank ---
+    elif condition_type == 5:  # REPUTATION_RANK
+        result["reputation"] = {
+            "faction": {"id": value1, "name": resolve_dbc_ref(server, "Faction", value1)},
+            "rank": {"raw": int(value2), "name": _REP_RANK_NAMES.get(int(value2), f"RANK({value2})")},
+        }
+
+    # --- Team / faction ---
+    elif condition_type == 6:  # TEAM
+        result["team"] = {"raw": int(value1), "name": _TEAM_NAMES.get(int(value1), f"TEAM({value1})")}
+
+    # --- Skill ---
+    elif condition_type == 7:  # SKILL
+        result["skill"] = {
+            "id": value1, "name": resolve_dbc_ref(server, "SkillLine", value1),
+            "min_value": int(value2),
+        }
+
+    # --- Drunken state ---
+    elif condition_type == 10:  # DRUNKENSTATE
+        result["drunken_state"] = {"raw": int(value1), "name": _DRUNKEN_STATE_NAMES.get(int(value1), f"STATE({value1})")}
+
+    # --- World state ---
+    elif condition_type == 11:  # WORLD_STATE
+        result["world_state"] = {"index": int(value1), "value": int(value2)}
+
+    # --- Active game event ---
+    elif condition_type == 12:  # ACTIVE_EVENT
+        result["game_event"] = {"id": value1, "name": _resolve_game_event(server, value1)}
+
+    # --- Instance info ---
+    elif condition_type == 13:  # INSTANCE_INFO
+        result["instance_info"] = {
+            "data_type": {"raw": int(value1), "name": _INSTANCE_INFO_NAMES.get(int(value1), f"INFO({value1})")},
+            "comparison": _COMP_TYPES.get(int(value2), f"RAW({value2})"),
+            "value": int(value3),
+        }
+
+    # --- Achievement (17) / Realm achievement (39) ---
+    elif condition_type in (17, 39):
+        result["achievement"] = {
+            "id": value1,
+            "name": resolve_dbc_ref(server, "Achievement", value1),
+            "realm": condition_type == 39,
+        }
+
+    # --- Title ---
+    elif condition_type == 18:  # TITLE
+        result["title"] = {"id": value1, "name": resolve_dbc_ref(server, "CharTitles", value1)}
+
+    # --- Unit state bitmask ---
+    elif condition_type == 21:  # UNIT_STATE
+        bits = [name for bit, name in _UNIT_STATE_NAMES.items() if int(value1) & bit]
+        result["unit_state"] = {"raw": int(value1), "states": bits}
+
+    # --- Relation to target ---
+    elif condition_type == 33:  # RELATION_TO
+        result["relation_to"] = {
+            "target": int(value1),
+            "relation": {"raw": int(value2), "name": _RELATION_TYPE_NAMES.get(int(value2), f"RELATION({value2})")},
+        }
+
+    # --- Reaction to target ---
+    elif condition_type == 34:  # REACTION_TO
+        result["reaction_to"] = {
+            "target": int(value1),
+            "rank": {"raw": int(value2), "name": _REP_RANK_NAMES.get(int(value2), f"RANK({value2})")},
+        }
+
+    # --- In water ---
+    elif condition_type == 40:  # IN_WATER
+        result["in_water"] = bool(value1)
+
+    # --- Terrain swap ---
+    elif condition_type == 41:  # TERRAIN_SWAP
+        result["terrain_swap_id"] = int(value1)
+
+    # --- Stand state ---
+    elif condition_type == 42:  # STAND_STATE
+        result["stand_state"] = {"raw": int(value1), "name": _STAND_STATE_NAMES.get(int(value1), f"STATE({value1})")}
+
+    # --- Charmed ---
+    elif condition_type == 44:  # CHARMED
+        result["charmed"] = bool(value1)
+
+    # --- Pet type ---
+    elif condition_type == 45:  # PET_TYPE
+        result["pet_type"] = {"raw": int(value1), "name": _PET_TYPE_NAMES.get(int(value1), f"PET({value1})")}
+
+    # --- Taxi ---
+    elif condition_type == 46:  # TAXI
+        result["taxi"] = bool(value1)
+
+    # --- Difficulty id ---
+    elif condition_type == 49:  # DIFFICULTY_ID
+        result["difficulty_id"] = int(value1)
+
+    # --- AC custom: HAS_AURA_TYPE ---
+    elif condition_type == 102:
+        result["aura_type"] = {"raw": int(value1), "name": _AURA_TYPE_NAMES.get(int(value1), f"SPELL_AURA({value1})")}
+
+    # --- AC custom: WORLD_SCRIPT ---
+    elif condition_type == 103:
+        result["world_script_id"] = int(value1)
+
+    # --- AC custom: UNIT_IN_COMBAT ---
+    elif condition_type == 106:
+        result["in_combat"] = bool(value1)
 
     return result if result else None
