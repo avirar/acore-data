@@ -13,6 +13,7 @@ from ..enums import (
     _CLASS_NAMES, _RACE_NAMES, _GENDER_NAMES, _TEAM_NAMES, _REP_RANK_NAMES,
     _DRUNKEN_STATE_NAMES, _RELATION_TYPE_NAMES, _STAND_STATE_NAMES,
     _PET_TYPE_NAMES, _INSTANCE_INFO_NAMES, _UNIT_STATE_NAMES, _AURA_TYPE_NAMES,
+    _CONDITION_TARGET_NAMES,
 )
 from .ref_utils import resolve_dbc_ref, resolve_sql_ref, _get_persistent, _set_persistent, _active_cache
 
@@ -227,6 +228,14 @@ def resolve_condition_fields(
         entry_resolved = {
             "source_type_name": _SOURCE_TYPE_NAMES.get(source_type, f"UNKNOWN({source_type})"),
             "condition_type_name": _CONDITION_TYPE_NAMES.get(condition_type, f"UNKNOWN({condition_type})"),
+        }
+
+        # Which of the up-to-3 condition targets the values refer to
+        # (spell sources: 0 = caster, 1 = spell target).
+        cond_target = row.get("ConditionTarget", 0) or 0
+        entry_resolved["condition_target"] = {
+            "raw": int(cond_target),
+            "name": _CONDITION_TARGET_NAMES.get(int(cond_target), f"TARGET({cond_target})"),
         }
 
         # Handle reference templates (negative values)

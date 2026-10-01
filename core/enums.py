@@ -42,6 +42,10 @@ _SOURCE_TYPE_NAMES = {
     30: "OBJECT_VISIBILITY",
 }
 
+# ConditionTarget (ConditionMgr.h) — which of the up-to-3 condition targets a condition's
+# fields/values refer to. For spell sources (13/17/24): 0 = caster, 1 = spell target.
+_CONDITION_TARGET_NAMES = {0: "caster", 1: "target", 2: "target2"}
+
 _CONDITION_TYPE_NAMES = {
     0:  "NONE",
     1:  "AURA",

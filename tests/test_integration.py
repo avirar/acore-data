@@ -623,6 +623,21 @@ class TestConditionResolution(unittest.TestCase):
         from core.enums import _CONDITION_TYPE_NAMES
         self.assertEqual(_CONDITION_TYPE_NAMES.get(106), "UNIT_IN_COMBAT")
 
+    def test_condition_target_annotation(self):
+        """ConditionTarget=1 on a spell condition should annotate as 'target'."""
+        result = call_query({
+            "name": "conditions",
+            "filter": {"SourceTypeOrReferenceId": 17, "SourceEntry": 6509, "ConditionTypeOrReference": 36},
+            "resolve": True,
+            "limit": 3,
+        })
+        resolved = self._resolved_entries(result)
+        self.assertTrue(resolved, "expected spell conditions for 6509")
+        for data in resolved.values():
+            ct = data.get("condition_target", {})
+            self.assertEqual(ct.get("name"), "target")
+            self.assertEqual(ct.get("raw"), 1)
+
 
 class TestSmartScriptResolution(unittest.TestCase):
     """Test smart_scripts triple-polymorphic resolution."""
@@ -1102,6 +1117,22 @@ class TestSpellResolution(unittest.TestCase):
         resolved = self._spell_resolved(result)
         entry = resolved.get("118", {})
         self.assertNotIn("conditions", entry, "Spell without conditions should not have 'conditions' key")
+
+    def test_spell_condition_target_vs_caster_annotation(self):
+        """Spell 6509 (Gore Bladder) has a NOT_ALIVE condition on the TARGET (dead target)."""
+        result = call_query({
+            "name": "Spell",
+            "id": 6509,
+            "resolve": True,
+        })
+        self.assertNotIn("error", result)
+        entry = self._spell_resolved(result).get("6509", {})
+        reqs = entry.get("conditions", {}).get("requirements", [])
+        self.assertTrue(reqs, "Spell 6509 should have conditions")
+        alive = [c for c in reqs if c.get("type") == "NOT_ALIVE"]
+        self.assertTrue(alive, "Spell 6509 should have a NOT_ALIVE condition (dead target)")
+        self.assertEqual(alive[0].get("condition_target"), "target")
+        self.assertIn("condition_target", reqs[0], "every condition requirement should carry condition_target")
 
     def test_spell_no_resolve_skips_conditions(self):
         """resolve=False should not fetch or attach conditions."""

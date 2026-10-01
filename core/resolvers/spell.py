@@ -71,7 +71,7 @@ def _fetch_spell_conditions(server, spell_ids: list) -> Dict[int, list]:
 
 def _format_condition_row(server, cond: Dict) -> Dict:
     """Format a single condition row using shared resolution from condition.py."""
-    from ..enums import _CONDITION_TYPE_NAMES
+    from ..enums import _CONDITION_TYPE_NAMES, _CONDITION_TARGET_NAMES
     from .condition import (
         _ERROR_TYPE_NAMES,
         _resolve_condition_source,
@@ -88,10 +88,12 @@ def _format_condition_row(server, cond: Dict) -> Dict:
     neg_cond = cond.get("NegativeCondition", 0) or 0
     error_type = cond.get("ErrorType", 0) or 0
     else_group = cond.get("ElseGroup", 0) or 0
+    cond_target = cond.get("ConditionTarget", 0) or 0
 
     entry = {
         "source": _SOURCE_TYPE_NAMES.get(source_type, f"UNKNOWN({source_type})"),
         "type": _CONDITION_TYPE_NAMES.get(condition_type, f"UNKNOWN({condition_type})"),
+        "condition_target": _CONDITION_TARGET_NAMES.get(int(cond_target), f"TARGET({cond_target})"),
         "raw_values": {"v1": value1, "v2": value2, "v3": value3},
     }
 
