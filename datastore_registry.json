@@ -558,6 +558,14 @@
         {
           "source": "WorldMapOverlayEntry",
           "field": "areatableID[0..3]"
+        },
+        {
+          "source": "AreaPOIEntry",
+          "field": "zoneId"
+        },
+        {
+          "source": "CreatureData",
+          "field": "areaId, zoneId"
         }
       ]
     },
@@ -773,7 +781,13 @@
           "sql_column": "worldState",
           "notes": "-"
         }
-      }
+      },
+      "referenced_by": [
+        {
+          "source": "GossipMenuItems",
+          "field": "ActionPoiID"
+        }
+      ]
     },
     "AuctionHouseEntry": {
       "category": "dbc_backed",
@@ -1677,6 +1691,10 @@
         {
           "source": "Quest",
           "field": "RewardTitleId"
+        },
+        {
+          "source": "AchievementReward",
+          "field": "titleId"
         }
       ]
     },
@@ -2137,7 +2155,21 @@
           "notes": "-"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "CreatureData",
+          "field": "displayid"
+        },
+        {
+          "source": "CreatureDisplayInfoEntry",
+          "field": "ExtendedDisplayInfoID"
+        },
+        {
+          "source": "DestructibleModelDataEntry",
+          "field": "DamagedDisplayId, DestroyedDisplayId, RebuildingDisplayId, SmokeDisplayId"
+        }
+      ]
     },
     "CreatureDisplayInfoExtraEntry": {
       "category": "dbc_backed",
@@ -2429,6 +2461,10 @@
         {
           "source": "CreatureModelInfo",
           "field": "modelid_other_gender"
+        },
+        {
+          "source": "CreatureModelDataEntry",
+          "field": "BloodID"
         }
       ]
     },
@@ -3117,6 +3153,14 @@
         {
           "source": "QuestRequestItems",
           "field": "EmoteOnComplete, EmoteOnIncomplete"
+        },
+        {
+          "source": "BroadcastText",
+          "field": "EmotesID"
+        },
+        {
+          "source": "EmotesTextEntry",
+          "field": "textid"
         }
       ]
     },
@@ -3251,7 +3295,13 @@
         }
       },
       "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
-      "is_leaf": true
+      "is_leaf": true,
+      "referenced_by": [
+        {
+          "source": "EmotesTextSoundEntry",
+          "field": "EmotesTextId"
+        }
+      ]
     },
     "EmotesTextSoundEntry": {
       "category": "dbc_backed",
@@ -3389,6 +3439,10 @@
         {
           "source": "QuestTemplateAddon",
           "field": "RequiredMaxRepFaction, RequiredMinRepFaction"
+        },
+        {
+          "source": "AchievementEntry",
+          "field": "requiredFaction"
         }
       ],
       "fields": {
@@ -3771,6 +3825,10 @@
         {
           "source": "ItemTemplate",
           "field": "GemProperties"
+        },
+        {
+          "source": "SpellItemEnchantmentEntry",
+          "field": "GemID"
         }
       ]
     },
@@ -4576,10 +4634,6 @@
           "field": "item"
         },
         {
-          "source": "CreatureLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "CreatureQuestItem",
           "field": "uint32"
         },
@@ -4588,32 +4642,16 @@
           "field": "ItemId"
         },
         {
-          "source": "DisenchantLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "EquipmentInfo",
           "field": "ItemEntry[0]"
-        },
-        {
-          "source": "FishingLootTemplate",
-          "field": "Item"
         },
         {
           "source": "GameObjectQuestItem",
           "field": "uint32"
         },
         {
-          "source": "GameobjectLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "ItemInstance",
           "field": "itemEntry"
-        },
-        {
-          "source": "ItemLootTemplate",
-          "field": "Item"
         },
         {
           "source": "ItemSetEntry",
@@ -4624,32 +4662,16 @@
           "field": "ItemId"
         },
         {
-          "source": "MailLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "MailServerTemplateItems",
           "field": "item"
-        },
-        {
-          "source": "MillingLootTemplate",
-          "field": "Item"
         },
         {
           "source": "NPCVendorEntry",
           "field": "Item"
         },
         {
-          "source": "PickpocketingLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "PlayerInfo",
           "field": "From playercreateinfo_item"
-        },
-        {
-          "source": "PlayerLootTemplate",
-          "field": "Item"
         },
         {
           "source": "PlayerbotsEquipCache",
@@ -4664,28 +4686,16 @@
           "field": "item"
         },
         {
-          "source": "ProspectingLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "RecoveryItem",
           "field": "ItemEntry"
         },
         {
-          "source": "ReferenceLootTemplate",
-          "field": "Item"
-        },
-        {
-          "source": "SkinningLootTemplate",
-          "field": "Item"
-        },
-        {
-          "source": "SpellLootTemplate",
-          "field": "Item"
-        },
-        {
           "source": "VendorItem",
           "field": "item"
+        },
+        {
+          "source": "ItemExtendedCostEntry",
+          "field": "reqitem[0..4]"
         }
       ]
     },
@@ -4742,6 +4752,14 @@
         {
           "source": "Corpse",
           "field": "displayId"
+        },
+        {
+          "source": "ItemEntry",
+          "field": "DisplayInfoID"
+        },
+        {
+          "source": "ItemTemplate",
+          "field": "DisplayInfoID"
         }
       ]
     },
@@ -6792,6 +6810,14 @@
         {
           "source": "QuestPOI",
           "field": "uint32"
+        },
+        {
+          "source": "AchievementEntry",
+          "field": "mapID"
+        },
+        {
+          "source": "SpawnGroupTemplateData",
+          "field": "mapid"
         }
       ]
     },
@@ -7920,6 +7946,14 @@
         {
           "source": "QuestTemplateAddon",
           "field": "RequiredSkillID"
+        },
+        {
+          "source": "ItemSetEntry",
+          "field": "required_skill_id"
+        },
+        {
+          "source": "SpellItemEnchantmentEntry",
+          "field": "requiredSkill"
         }
       ]
     },
@@ -8216,6 +8250,10 @@
         {
           "source": "SpellVisualEntry",
           "field": "AnimEventSoundID"
+        },
+        {
+          "source": "EmotesTextSoundEntry",
+          "field": "SoundId"
         }
       ]
     },
@@ -8403,6 +8441,14 @@
         {
           "source": "TrainerSpell",
           "field": "SpellId"
+        },
+        {
+          "source": "ItemSetEntry",
+          "field": "items_to_triggerspell[0..7]"
+        },
+        {
+          "source": "SpellShapeshiftFormEntry",
+          "field": "stanceSpell[0..7]"
         }
       ],
       "fields": {
@@ -11599,6 +11645,14 @@
         {
           "source": "VehicleEntry",
           "field": "m_seatID[0..7]"
+        },
+        {
+          "source": "VehicleAccessory",
+          "field": "seat_id"
+        },
+        {
+          "source": "VehicleSeatAddon",
+          "field": "SeatEntry"
         }
       ]
     },
@@ -11864,6 +11918,14 @@
         {
           "source": "QuestRelations",
           "field": "uint32"
+        },
+        {
+          "source": "CreatureData",
+          "field": "id"
+        },
+        {
+          "source": "TaxiNodesEntry",
+          "field": "MountCreatureID[0]"
         }
       ],
       "fields": {
@@ -13415,6 +13477,62 @@
         {
           "source": "PlayerFactionchangeItems",
           "field": "alliance_id, horde_id"
+        },
+        {
+          "source": "CreatureLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "DisenchantLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "FishingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "GameobjectLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "ItemLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "MailLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "MillingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "PickpocketingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "PlayerLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "PlayerbotsBisGear",
+          "field": "item_id"
+        },
+        {
+          "source": "ProspectingLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "ReferenceLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "SkinningLootTemplate",
+          "field": "Item"
+        },
+        {
+          "source": "SpellLootTemplate",
+          "field": "Item"
         }
       ],
       "fields": {
@@ -14043,6 +14161,10 @@
         {
           "source": "QuestTemplateAddon",
           "field": "BreadcrumbForQuestId, NextQuestID, PrevQuestID"
+        },
+        {
+          "source": "LfgReward",
+          "field": "firstQuest, otherQuest"
         }
       ],
       "fields": {
@@ -14890,7 +15012,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "PageText",
+          "field": "NextPage"
+        }
+      ]
     },
     "GossipText": {
       "category": "sql_objectmgr",
@@ -15487,7 +15615,17 @@
           "reference_column": "ID"
         }
       },
-      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets"
+      "reference_notes": "Has ID-like fields that may reference other tables; requires source code inspection to resolve targets",
+      "referenced_by": [
+        {
+          "source": "GossipMenuItems",
+          "field": "ActionMenuID, MenuID"
+        },
+        {
+          "source": "GossipMenus",
+          "field": "MenuID"
+        }
+      ]
     },
     "GossipMenuItems": {
       "category": "sql_objectmgr",
@@ -15599,6 +15737,10 @@
         {
           "source": "CreatureTemplate",
           "field": "GossipMenuId"
+        },
+        {
+          "source": "GossipMenuItems",
+          "field": "OptionID"
         }
       ]
     },
@@ -17466,7 +17608,13 @@
         }
       },
       "is_leaf": true,
-      "reference_notes": null
+      "reference_notes": null,
+      "referenced_by": [
+        {
+          "source": "CreatureData",
+          "field": "spawnGroupId"
+        }
+      ]
     },
     "PlayerTotemModel": {
       "category": "sql_objectmgr",
@@ -18654,6 +18802,10 @@
         },
         {
           "source": "GameEventSave",
+          "field": "eventEntry"
+        },
+        {
+          "source": "GameEventCreature",
           "field": "eventEntry"
         }
       ]
@@ -20859,9 +21011,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -21230,9 +21382,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -21414,9 +21566,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -21839,9 +21991,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -22113,9 +22265,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -22301,9 +22453,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -22366,9 +22518,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -22692,9 +22844,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -23035,9 +23187,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -23557,9 +23709,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -24210,9 +24362,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -24456,9 +24608,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -24666,9 +24818,9 @@
           "name": "Item",
           "type": "int32",
           "sql_column": "Item",
-          "references": "ItemEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "references": "ItemTemplate",
+          "reference_type": "sql_objectmgr",
+          "reference_column": "entry"
         },
         "2": {
           "name": "Reference",
@@ -27674,7 +27826,13 @@
       "loader_function": "",
       "store_variable": "",
       "header_file": "src/server/game/Entities/Player/Player.h",
-      "container_type": ""
+      "container_type": "",
+      "referenced_by": [
+        {
+          "source": "CharacterPet",
+          "field": "owner"
+        }
+      ]
     },
     "Corpse": {
       "category": "sql_auxiliary",
@@ -32112,7 +32270,21 @@
       "header_file": "",
       "container_type": "",
       "is_leaf": true,
-      "reference_notes": "RBAC: permission definitions (GM role names). permissionId in the other rbac_* tables references this id."
+      "reference_notes": "RBAC: permission definitions (GM role names). permissionId in the other rbac_* tables references this id.",
+      "referenced_by": [
+        {
+          "source": "RbacAccountPermissions",
+          "field": "permissionId"
+        },
+        {
+          "source": "RbacDefaultPermissions",
+          "field": "permissionId"
+        },
+        {
+          "source": "RbacLinkedPermissions",
+          "field": "linkedId"
+        }
+      ]
     },
     "RbacAccountPermissions": {
       "category": "sql_auxiliary",

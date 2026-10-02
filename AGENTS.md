@@ -115,7 +115,10 @@ integration test class; the exact tool set is asserted by `test_list_tools`):
 - `refs(name, id, source, limit)` — data-level reverse lookup: which rows in
   other SQL tables reference a record, using the registry's `referenced_by`
   metadata (e.g. `refs(name='Spell', id=40230)` lists the items/enchants/
-  procs that use that spell). Reports matches, scanned-empty tables, and
+  procs that use that spell). For item targets, loot sources (creature/GO/
+  skinning/etc. loot tables) are resolved both directly (`Item=id` with
+  `Reference=0`) and indirectly through shared `reference_loot_template`
+  entries (`Reference=…`). Reports matches, scanned-empty tables, and
   skipped (DBC-backed) sources.
 
 The mod-playerbots and C++ source trees are OPTIONAL: absence of either is a

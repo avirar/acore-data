@@ -1214,6 +1214,29 @@ class TestRefsTool(unittest.TestCase):
         self.assertEqual(r["result"], [])
         self.assertTrue(any("ItemTemplate" in x for x in r["scanned_empty"]))
 
+    def test_loot_direct_drop(self):
+        """Item 16332 (Thazz'ril's Pick) is a direct gameobject loot drop."""
+        r = call_tool("refs", {"name": "ItemTemplate", "id": 16332})
+        self.assertNotIn("isError", r)
+        tables = {row["table"]: row for row in r["result"]}
+        self.assertIn("gameobject_loot_template", tables)
+        go_row = tables["gameobject_loot_template"]
+        self.assertEqual(go_row.get("matched_columns"), ["Item"])
+        self.assertEqual(go_row["rows"][0].get("Item"), 16332)
+
+    def test_loot_reference_indirection(self):
+        """Item 5773 lives in a shared reference_loot_template; the indirect
+        creature droppers are resolved through the Reference column."""
+        r = call_tool("refs", {"name": "ItemTemplate", "id": 5773})
+        self.assertNotIn("isError", r)
+        tables = {row["table"]: row for row in r["result"]}
+        self.assertIn("reference_loot_template", tables)
+        self.assertIn("creature_loot_template", tables)
+        creature_row = tables["creature_loot_template"]
+        self.assertEqual(creature_row.get("matched_columns"), ["Reference"])
+        self.assertIn("reference_loot_template(Item=5773)", creature_row.get("via", ""))
+        self.assertGreaterEqual(creature_row["count"], 3)
+
 
 class TestTravelTool(unittest.TestCase):
     """travel tool: mod-playerbots travel graph (live DB)."""
