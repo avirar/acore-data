@@ -118,6 +118,76 @@ def _map_to_real_columns(candidates: List[str], schema_columns: List[str]) -> Li
     return out
 
 
+def _expand_dbc_field_spec(source_entry: Dict, field_spec: str) -> List[int]:
+    """Expand a `referenced_by` field spec into DBC field indices (by C name).
+
+    Mirrors `_expand_field_spec` but resolves against the datastore's own
+    field names instead of SQL columns: `RankID[0..4]`, `spells[0..7]`,
+    plain names and comma lists all work.
+    """
+    fields = source_entry.get("fields", {})
+    name_to_idx: Dict[str, int] = {}
+    for fkey, finfo in fields.items():
+        if not isinstance(finfo, dict):
+            continue
+        name = finfo.get("name", "")
+        if name:
+            name_to_idx[name] = int(fkey)
+            name_to_idx[name.lower()] = int(fkey)
+
+    out: List[int] = []
+    for part in field_spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\[(\d+)\.\.(\d+)\]$", part)
+        if m:
+            base, start, end = m.group(1), int(m.group(2)), int(m.group(3))
+            for i in range(start, end + 1):
+                idx = name_to_idx.get(f"{base}[{i}]")
+                if idx is not None and idx not in out:
+                    out.append(idx)
+            continue
+        idx = name_to_idx.get(part, name_to_idx.get(part.lower()))
+        if idx is not None and idx not in out:
+            out.append(idx)
+    return out
+
+
+def _scan_dbc_source(server, src_entry: Dict, matched_idx: List[int], target_value: int,
+                     limit: int) -> Optional[List[Dict[str, Any]]]:
+    """Scan a DBC-backed store for records whose annotated fields equal target_value.
+
+    Returns matching rows as compact dicts (ID + matched field name/value), or
+    None when the store cannot be loaded.
+    """
+    dbc_name = src_entry.get("dbc_name", "")
+    if not dbc_name:
+        return None
+    try:
+        reader = server._load_dbc(dbc_name)
+    except Exception:
+        return None
+
+    idx_to_name = {}
+    for fkey, finfo in src_entry.get("fields", {}).items():
+        if isinstance(finfo, dict):
+            idx_to_name[int(fkey)] = finfo.get("name", fkey)
+
+    rows: List[Dict[str, Any]] = []
+    for record in reader.records:
+        hits = [(idx, record.get(idx)) for idx in matched_idx if record.get(idx) == target_value]
+        if not hits:
+            continue
+        row: Dict[str, Any] = {"ID": record.get(0)}
+        for idx, value in hits:
+            row[idx_to_name.get(idx, str(idx))] = value
+        rows.append(row)
+        if len(rows) >= limit:
+            break
+    return rows
+
+
 def refs_tools(server) -> Dict[str, Any]:
     """Find rows referencing a given record via the registry's referenced_by metadata."""
     name = server.args.get("name")
@@ -172,6 +242,34 @@ def refs_tools(server) -> Dict[str, Any]:
                 continue
 
         category = src_entry.get("category", "")
+
+        # DBC-backed sources: scan the binary store's annotated fields directly.
+        if category.startswith("dbc_"):
+            matched_idx = _expand_dbc_field_spec(src_entry, rb["field"])
+            if not matched_idx:
+                skipped.append(f"{src_name}.{rb['field']}: no matching DBC fields")
+                continue
+            rows = _scan_dbc_source(server, src_entry, matched_idx, target_value, limit)
+            if rows is None:
+                skipped.append(f"{src_name}: DBC could not be loaded")
+                continue
+            if rows:
+                idx_to_name = {
+                    int(fkey): finfo.get("name", fkey)
+                    for fkey, finfo in src_entry.get("fields", {}).items()
+                    if isinstance(finfo, dict)
+                }
+                results.append({
+                    "source": src_name,
+                    "dbc": src_entry.get("dbc_name", src_name),
+                    "matched_fields": [idx_to_name.get(i, str(i)) for i in matched_idx],
+                    "count": len(rows),
+                    "rows": rows,
+                })
+            else:
+                scanned_empty.append(f"{src_name}({src_entry.get('dbc_name', src_name)})")
+            continue
+
         if not sql_table or not category.startswith("sql_"):
             skipped.append(f"{src_name}: not a SQL table (DBC-backed, skipped)")
             continue

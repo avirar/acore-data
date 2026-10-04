@@ -5464,121 +5464,121 @@
           "name": "spells[0]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "36": {
           "name": "spells[1]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "37": {
           "name": "spells[2]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "38": {
           "name": "spells[3]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "39": {
           "name": "spells[4]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "40": {
           "name": "spells[5]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "41": {
           "name": "spells[6]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "42": {
           "name": "spells[7]",
           "type": "uint32",
           "sql_column": "spells",
-          "notes": "-"
+          "notes": "-",
+          "references": "SpellEntry",
+          "reference_type": "dbc_backed",
+          "reference_column": "ID"
         },
         "43": {
           "name": "items_to_triggerspell[0]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "44": {
           "name": "items_to_triggerspell[1]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "45": {
           "name": "items_to_triggerspell[2]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "46": {
           "name": "items_to_triggerspell[3]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "47": {
           "name": "items_to_triggerspell[4]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "48": {
           "name": "items_to_triggerspell[5]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "49": {
           "name": "items_to_triggerspell[6]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "50": {
           "name": "items_to_triggerspell[7]",
           "type": "uint32",
           "sql_column": "items_to_triggerspell",
-          "notes": "-",
-          "references": "SpellEntry",
-          "reference_type": "dbc_backed",
-          "reference_column": "ID"
+          "notes": "-"
         },
         "51": {
           "name": "required_skill_id",
@@ -8444,11 +8444,15 @@
         },
         {
           "source": "ItemSetEntry",
-          "field": "items_to_triggerspell[0..7]"
+          "field": "spells[0..7]"
         },
         {
           "source": "SpellShapeshiftFormEntry",
           "field": "stanceSpell[0..7]"
+        },
+        {
+          "source": "TalentEntry",
+          "field": "RankID[0..4]"
         }
       ],
       "fields": {
@@ -10799,7 +10803,7 @@
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
           "notes": "-",
-          "references": "TalentEntry",
+          "references": "SpellEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
@@ -10808,7 +10812,7 @@
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
           "notes": "-",
-          "references": "TalentEntry",
+          "references": "SpellEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
@@ -10817,7 +10821,7 @@
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
           "notes": "-",
-          "references": "TalentEntry",
+          "references": "SpellEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
@@ -10826,7 +10830,7 @@
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
           "notes": "-",
-          "references": "TalentEntry",
+          "references": "SpellEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },
@@ -10835,7 +10839,7 @@
           "type": "std::array<uint32,5>",
           "sql_column": "RankID",
           "notes": "-",
-          "references": "TalentEntry",
+          "references": "SpellEntry",
           "reference_type": "dbc_backed",
           "reference_column": "ID"
         },

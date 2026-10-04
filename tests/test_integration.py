@@ -1656,6 +1656,42 @@ class TestTerrainTool(unittest.TestCase):
         self.assertIn("position", r["valid_subcommands"])
 
 
+class TestRefsDbcSources(unittest.TestCase):
+    """`refs` must scan DBC-backed referencing sources, not just SQL tables."""
+
+    def test_refs_finds_talent_rank_spell(self):
+        # Spell 12281 is RankID[0] of talent 123 (Sweeping Strikes).
+        r = call_tool("refs", {"name": "Spell", "id": 12281})
+        talent_hits = [x for x in r["result"] if x["source"] == "TalentEntry"]
+        self.assertTrue(talent_hits, f"no TalentEntry hit in {r['result']}")
+        hit = talent_hits[0]
+        self.assertIn("RankID[0]", hit["matched_fields"])
+        self.assertEqual(hit["rows"][0]["ID"], 123)
+        self.assertEqual(hit["rows"][0]["RankID[0]"], 12281)
+
+    def test_refs_finds_item_set_bonus_spell(self):
+        # Spell 60173 is the 2-piece bonus of set 787 (Dreadnaught Plate).
+        r = call_tool("refs", {"name": "Spell", "id": 60173})
+        set_hits = [x for x in r["result"] if x["source"] == "ItemSetEntry"]
+        self.assertTrue(set_hits, f"no ItemSetEntry hit in {r['result']}")
+        hit = set_hits[0]
+        self.assertIn("spells[0]", hit["matched_fields"])
+        self.assertEqual(hit["rows"][0]["ID"], 787)
+        self.assertEqual(hit["rows"][0]["spells[0]"], 60173)
+
+    def test_refs_itemset_thresholds_are_not_spell_refs(self):
+        # items_to_triggerspell holds counts (2/4), not spell ids: the registry
+        # must not annotate it as a SpellEntry reference.
+        from core.api import open_store
+
+        item_set = open_store("ItemSet")
+        fields = item_set.entry["fields"]
+        spells_ref = [f for f in fields.values() if f.get("name") == "spells[0]"]
+        threshold_ref = [f for f in fields.values() if f.get("name") == "items_to_triggerspell[0]"]
+        self.assertEqual(spells_ref[0].get("references"), "SpellEntry")
+        self.assertNotIn("references", threshold_ref[0])
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
