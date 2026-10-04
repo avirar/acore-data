@@ -560,6 +560,8 @@ acore-data/
 │   ├── config.py                # mod-playerbots conf index (settings + C++ call sites)
 │   └── enums.py                 # C++ enum decoder (magic numbers → MECHANIC_POLYMORPH …)
 │
+├── core/api.py                  # Scripting facade (open_store/sql) - see docs/scripting.md
+│
 ├── scripts/
 │   ├── audit_registry.py        # Registry health gate (CI: structural signals must be 0)
 │   ├── capture_output_sizes.py  # LLM context-budget output baselines + diff
@@ -567,8 +569,9 @@ acore-data/
 │   └── archive/                 # One-off registry migrations (idempotent no-ops)
 │
 ├── generators/                  # Registry generation tooling (docs/datastores is the
-│   ├── generate_registry.py     # human reference; --write regenerates the registry)
+│   ├── generate_registry.py     # human reference; --write regenerates the registry
 │   ├── generate_supplementary.py
+│   ├── patch_known_refs.py      # Fix known-wrong annotations (Talent RankID, ItemSet spells)
 │   └── … (cross-ref / annotation generators)
 │
 ├── evals/
@@ -586,13 +589,15 @@ acore-data/
 │   ├── test_regression.py       # Rework contract: shape, strictness, links, protocol, audit
 │   └── test_integration.py      # Integration tests (live DB + DBC)
 │
-└── docs/datastores/             # Technical reference for AzerothCore datastore internals
-    ├── README.md                # Overview of DBC pipeline, SQL overlay, format strings
-    ├── dbc-backed-stores.md
-    ├── sql-objectmgr-stores.md
-    ├── sql-manager-stores.md
-    ├── sql-auxiliary-stores.md
-    └── cross-reference.md
+└── docs/
+    ├── scripting.md             # Bulk local scripting: core.api, venv, refs-vs-field traps
+    └── datastores/              # Technical reference for AzerothCore datastore internals
+        ├── README.md            # Overview of DBC pipeline, SQL overlay, format strings
+        ├── dbc-backed-stores.md
+        ├── sql-objectmgr-stores.md
+        ├── sql-manager-stores.md
+        ├── sql-auxiliary-stores.md
+        └── cross-reference.md
 ```
 
 ## How It Works

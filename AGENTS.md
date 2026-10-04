@@ -59,6 +59,20 @@ DBC file, SQL table, store variable) and traverse to the others.
   `~/.pi/agent/extensions/acore-data.ts` symlink) → `~/acore-data`, each
   validated by the presence of `server.py`. Override with `ACORE_DATA_ROOT`.
 
+## Scripting / bulk work
+
+- For bulk local work (census, coverage, joins over thousands of rows) use
+  `core/api.py` (`open_store`, `sql`) - NOT ad-hoc DBC loaders. See
+  `docs/scripting.md`. Always run scripts with `.venv/bin/python3`.
+- `refs` reverse-scans annotated SQL **and DBC** sources, so prefer it over
+  guessing cross-links. If a reverse lookup comes up empty or wrong, check the
+  field annotation first (`Store.entry["fields"][...]["references"]`).
+- Known-wrong annotations get fixed in `generators/patch_known_refs.py`
+  (currently TalentEntry.RankID[] -> SpellEntry, ItemSetEntry.spells[] ->
+  SpellEntry, items_to_triggerspell[] = counts). Re-run it whenever a
+  regeneration reintroduces the old name-similarity heuristics, then
+  `generators/generate_referenced_by.py`.
+
 ## Tool semantics (post rework, branch fix/mcp-ergonomics)
 
 - `query` returns **flat `{name: value}` rows** by default. `id`/`row_index`

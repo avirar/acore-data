@@ -1692,6 +1692,23 @@ class TestRefsDbcSources(unittest.TestCase):
         self.assertNotIn("references", threshold_ref[0])
 
 
+class TestScriptingApi(unittest.TestCase):
+    """core.api.Store mirrors the MCP query result shape."""
+
+    def test_open_store_fields_and_rows(self):
+        from core.api import open_store
+
+        talents = open_store("Talent")
+        self.assertEqual(talents.struct_name, "TalentEntry")
+        self.assertEqual(talents.index("TalentTab"), 1)
+        row = talents.by_id(123)
+        self.assertEqual(row["TalentTab"], 161)
+        self.assertEqual(row["RankID[0]"], 12281)
+        hits = talents.find(limit=3, **{"RankID[0]": 12281})
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]["TalentID"], 123)
+
+
 if __name__ == "__main__":
     # Run from acore-data directory
     unittest.main(verbosity=2)
