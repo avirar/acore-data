@@ -584,7 +584,7 @@ Each entry includes:
 ## EmotesTextSoundEntry
 
 - **DBC File:** EmotesTextSound.dbc
-- **SQL Table:** emotetextsound_dbc
+- **SQL Table:** emotestextsound_dbc
 - **Store:** `sEmotesTextSoundStore` (`DBCStorage<EmotesTextSoundEntry>`)
 - **Format:** `EmotesTextSoundEntryfmt`
 

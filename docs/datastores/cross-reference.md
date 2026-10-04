@@ -322,7 +322,7 @@ Quick lookup indices for all datastores. See also:
 | durabilityquality_dbc | DurabilityQualityEntry | DurabilityQuality.dbc |
 | emotes_dbc | EmotesEntry | Emotes.dbc |
 | emotestext_dbc | EmotesTextEntry | EmotesText.dbc |
-| emotetextsound_dbc | EmotesTextSoundEntry | EmotesTextSound.dbc |
+| emotestextsound_dbc | EmotesTextSoundEntry | EmotesTextSound.dbc |
 | faction_dbc | FactionEntry | Faction.dbc |
 | factiontemplate_dbc | FactionTemplateEntry | FactionTemplate.dbc |
 | gameobjectartkit_dbc | GameObjectArtKitEntry | GameObjectArtKit.dbc |
@@ -872,7 +872,7 @@ Quick lookup indices for all datastores. See also:
 | DurabilityQuality.dbc | DurabilityQualityEntry | durabilityquality_dbc | sDurabilityQualityStore |
 | Emotes.dbc | EmotesEntry | emotes_dbc | sEmotesStore |
 | EmotesText.dbc | EmotesTextEntry | emotestext_dbc | sEmotesTextStore |
-| EmotesTextSound.dbc | EmotesTextSoundEntry | emotetextsound_dbc | sEmotesTextSoundStore |
+| EmotesTextSound.dbc | EmotesTextSoundEntry | emotestextsound_dbc | sEmotesTextSoundStore |
 | Faction.dbc | FactionEntry | faction_dbc | sFactionStore |
 | FactionTemplate.dbc | FactionTemplateEntry | factiontemplate_dbc | sFactionTemplateStore |
 | GameObjectArtKit.dbc | GameObjectArtKitEntry | gameobjectartkit_dbc | sGameObjectArtKitStore |

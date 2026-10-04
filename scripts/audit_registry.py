@@ -266,6 +266,7 @@ def main():
                     "chat_filter", "creature_multispawn", "spawn_group", "spell_cone",
                     "creature_text_options", "creature_text_option_sets",
                     "auctionhousebot_professionitems",  # mod-ah-bot table
+                    "emotetextsound_dbc",  # stray empty duplicate of emotestextsound_dbc
                 }
                 registered_tables = {
                     (e.get("sql_table") or "").lower()
