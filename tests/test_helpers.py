@@ -565,7 +565,8 @@ class TestTerrainParsers(unittest.TestCase):
         cls.paths = get_data_paths()
 
     def _require(self, path, label):
-        if not Path(path).exists():
+        from core.paths import safe_exists
+        if not safe_exists(path):
             self.skipTest(f"{label} not present ({path})")
 
     def test_navmesh_params(self):
