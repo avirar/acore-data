@@ -314,7 +314,7 @@ class PathGenerator:
                 self._type = PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH
                 self._add_far_from_poly_flags(start_far, end_far)
                 return
-            closest = self.nav.closest_point_on_poly(end_poly, end_point)
+            closest, _pos_over = self.nav.closest_point_on_poly(end_poly, end_point)
             if closest is not None:
                 end_point = closest
                 self._actual_end_position = _world_point(end_point)
