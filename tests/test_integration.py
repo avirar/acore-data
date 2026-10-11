@@ -44,7 +44,7 @@ def call_query(args):
     return json.loads(r["result"]["content"][0]["text"])
 
 
-def call_tool(name, args):
+def call_tool(name, args, timeout=TIMEOUT):
     """Call any tool and return parsed result."""
     payload = {
         "jsonrpc": "2.0",
@@ -56,7 +56,7 @@ def call_tool(name, args):
         [sys.executable, SERVER_SCRIPT],
         input=json.dumps(payload),
         capture_output=True,
-        timeout=TIMEOUT,
+        timeout=timeout,
         text=True,
         cwd=_WORKDIR,
         env=_ENV,
@@ -1654,6 +1654,59 @@ class TestTerrainTool(unittest.TestCase):
         self.assertIn("error", r)
         self.assertIn("pathfind", r["valid_subcommands"])
         self.assertIn("position", r["valid_subcommands"])
+
+    def test_area_map_black_temple_illidan(self):
+        import tempfile
+        out = os.path.join(tempfile.mkdtemp(prefix="area_map_"), "illidan.svg")
+        r = call_tool("terrain", {
+            "subcommand": "area_map", "mapId": 564,
+            "x1": 600, "y1": 200, "x2": 800, "y2": 400,
+            "z": 354.0, "z_band": 25.0,
+            "out": out,
+            "paths": [{"from": [748.2, 365.6, 354.2],
+                       "to": [705.73, 304.99, 353.92], "label": "entry"}],
+            "rays": [{"from": [705.73, 304.99, 353.92],
+                      "to": [748.2, 365.6, 354.2]}],
+        }, timeout=120)
+        self.assertNotIn("error", r)
+        self.assertEqual(r["map_name"], "Black Temple")
+        self.assertEqual(r["bounds"],
+                         {"x1": 600.0, "y1": 200.0, "x2": 800.0, "y2": 400.0})
+        self.assertGreater(r["counts"]["polys_drawn"], 20)
+        self.assertGreaterEqual(r["counts"]["creatures"], 1)
+        self.assertGreaterEqual(r["counts"]["triggers"], 1)
+        self.assertGreater(r["counts"]["polys_total"],
+                           r["counts"]["polys_drawn"])  # z filter worked
+        self.assertEqual(r["counts"]["paths"], 1)
+        self.assertEqual(r["counts"]["rays"], 1)
+        self.assertTrue(os.path.isfile(r["out"]))
+        svg = open(r["out"], encoding="utf-8").read()
+        self.assertIn("Illidan Stormrage (22917)", svg)
+        self.assertIn("world boss", svg)          # resolved rank
+        self.assertIn("705.7, 305.0, 353.9", svg)  # xyz coords in label
+        self.assertIn("<polyline", svg)
+        self.assertIn('#38a169', svg)  # clear LOS ray
+        self.assertIn("floor height", svg)  # legend column
+
+    def test_pathfind_far_offmesh_endpoint_is_tool_result(self):
+        # endpoint ~100y above the street (>7y off-mesh) exercises the
+        # far-from-poly branch: must return a tool result, not a -32000 error
+        r = call_tool("terrain", {
+            "subcommand": "pathfind", "mapId": 0,
+            "x1": -8832.0, "y1": 628.0, "z1": 94.0,
+            "x2": -8832.0, "y2": 628.0, "z2": 200.0,
+        }, timeout=60)
+        self.assertIn("found", r)
+        self.assertNotIn("error", r)
+
+    def test_area_map_span_cap_is_tool_error(self):
+        r = call_tool("terrain", {
+            "subcommand": "area_map", "mapId": 564,
+            "x1": 0, "y1": 0, "x2": 5000, "y2": 5000,
+            "max_span": 100,
+        }, timeout=30)
+        self.assertTrue(r.get("isError"))
+        self.assertIn("max_span", r["error"])
 
 
 class TestRefsDbcSources(unittest.TestCase):

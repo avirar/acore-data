@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from core.enums import GO_TYPE_NAMES
 from core.paths import safe_is_dir
 from core.terrain import coords
 from core.terrain.detour import (
@@ -430,6 +431,307 @@ def _cmd_raycast(server, map_id: int, x1: float, y1: float, z1: float,
 
 
 # ---------------------------------------------------------------------------
+# area map (SVG export)
+# ---------------------------------------------------------------------------
+
+_TRIGGER_PATTERNS = ("world trigger", "invisible stalker", "trigger")
+_GO_DECOR_TYPES = {5, 7}  # GENERIC / CHAIR benches & seats: clutter, not walls
+_CREATURE_RANK_NAMES = {0: "normal", 1: "elite", 2: "rare elite",
+                        3: "world boss", 4: "rare"}
+
+
+def _coords_sub(x: float, y: float, z: float) -> str:
+    return f"{x:.1f}, {y:.1f}, {z:.1f}"
+
+
+def _area_map_query(server, sql: str, params: list):
+    rows, err = server.database._query_database(sql, db_name="acore_world",
+                                                params=params)
+    if err:
+        return None, err
+    return (rows or []), None
+
+
+def _is_trigger_name(name: str) -> bool:
+    n = (name or "").lower()
+    return any(p in n for p in _TRIGGER_PATTERNS)
+
+
+def _parse_endpoint(value, what: str) -> tuple:
+    if (isinstance(value, (list, tuple)) and len(value) == 3 and
+            all(isinstance(v, (int, float)) for v in value)):
+        return tuple(float(v) for v in value)
+    raise ValueError(f"{what} must be [x, y, z] numbers, got: {value!r}")
+
+
+def _map_name(server, map_id: int) -> str:
+    try:
+        return _get_resolver(server, map_id).map_name()
+    except Exception:
+        return str(map_id)
+
+
+def _cmd_area_map(server, map_id: int, args: dict) -> dict:
+    """Render an obstacle-aware SVG map of a region: navmesh mesh, labeled
+    spawn points, navmesh paths and LOS rays."""
+    import hashlib
+    import tempfile
+    from core.terrain.area_map import (
+        AreaMapError,
+        Bounds,
+        DEFAULT_MAX_POLYS,
+        DEFAULT_MAX_SPAN,
+        DEFAULT_Z_BAND,
+        collect_mesh,
+        render_svg,
+    )
+
+    nav = _get_navmesh(map_id)
+    if not nav.has_navmesh:
+        return {"error": f"No navmesh data for map {map_id}", "isError": True}
+
+    warnings: List[str] = []
+    z = float(args["z"]) if args.get("z") is not None else None
+    z_band = float(args.get("z_band", DEFAULT_Z_BAND))
+
+    # ---- bounds -----------------------------------------------------------
+    max_span = float(args.get("max_span", DEFAULT_MAX_SPAN))
+    pad = float(args.get("padding", 25.0))
+    bounds: Optional[Bounds] = None
+    if all(args.get(k) is not None for k in ("x1", "y1", "x2", "y2")):
+        bounds = Bounds(
+            min(float(args["x1"]), float(args["x2"])),
+            min(float(args["y1"]), float(args["y2"])),
+            max(float(args["x1"]), float(args["x2"])),
+            max(float(args["y1"]), float(args["y2"])),
+        )
+    elif args.get("centerX") is not None and args.get("centerY") is not None:
+        size = float(args.get("size", 200.0))
+        if size <= 0:
+            raise ValueError("size must be > 0")
+        cx, cy = float(args["centerX"]), float(args["centerY"])
+        bounds = Bounds(cx - size / 2.0, cy - size / 2.0,
+                        cx + size / 2.0, cy + size / 2.0)
+
+    sql_failed = False
+    if bounds is None:
+        spans = []
+        for table in ("creature", "gameobject"):
+            rows, err = _area_map_query(
+                server,
+                f"SELECT MIN(position_x) AS minx, MAX(position_x) AS maxx, "
+                f"MIN(position_y) AS miny, MAX(position_y) AS maxy "
+                f"FROM {table} WHERE map = %s",
+                [map_id],
+            )
+            if err:
+                sql_failed = True
+                continue
+            row = rows[0] if rows else None
+            if row and row.get("minx") is not None:
+                spans.append((float(row["minx"]), float(row["miny"]),
+                              float(row["maxx"]), float(row["maxy"])))
+        if not spans:
+            if sql_failed:
+                return {"error": "SQL unavailable and no explicit bounds given; "
+                                "pass x1/y1/x2/y2 or centerX/centerY/size",
+                        "isError": True}
+            return {"error": f"No spawns found on map {map_id} to auto-fit "
+                             f"bounds; pass x1/y1/x2/y2 or "
+                             f"centerX/centerY/size",
+                    "isError": True}
+        bounds = Bounds(min(s[0] for s in spans) - pad,
+                        min(s[1] for s in spans) - pad,
+                        max(s[2] for s in spans) + pad,
+                        max(s[3] for s in spans) + pad)
+    if bounds.span_x > max_span or bounds.span_y > max_span:
+        return {"error": f"area_map: bounds span {bounds.span_x:.0f}x"
+                         f"{bounds.span_y:.0f}yd exceeds max_span="
+                         f"{max_span:.0f}; shrink the region or raise max_span",
+                "isError": True}
+
+    # ---- points from SQL (degrade to mesh-only when the DB is down) --------
+    points_mode = str(args.get("points_mode", "named")).lower()
+    if points_mode not in ("named", "all", "none"):
+        raise ValueError("points_mode must be 'named', 'all' or 'none'")
+    go_mode = str(args.get("gameobjects", "key")).lower()
+    if go_mode not in ("key", "all", "none"):
+        raise ValueError("gameobjects must be 'key', 'all' or 'none'")
+    show_triggers = bool(args.get("triggers", True))
+
+    points: List[Dict[str, Any]] = []
+    counts = {"creatures": 0, "gameobjects": 0, "triggers": 0}
+    bbox_sql = ("position_x BETWEEN %s AND %s AND position_y BETWEEN %s AND %s")
+    bbox_params = [bounds.minx, bounds.maxx, bounds.miny, bounds.maxy]
+
+    if points_mode != "none":
+        rows, err = _area_map_query(
+            server,
+            "SELECT c.id AS entry, ct.name, ct.`rank` AS cr_rank, "
+            "ct.minlevel, ct.maxlevel, "
+            "c.position_x AS x, c.position_y AS y, c.position_z AS z "
+            "FROM creature c JOIN creature_template ct ON c.id = ct.entry "
+            f"WHERE c.map = %s AND {bbox_sql}",
+            [map_id] + bbox_params,
+        )
+        if err:
+            warnings.append(f"SQL unavailable, creature points omitted: {err}")
+            sql_failed = True
+        else:
+            for row in rows:
+                pz = float(row["z"])
+                if z is not None and abs(pz - z) > z_band:
+                    continue
+                name = row.get("name") or f"creature {row['entry']}"
+                if _is_trigger_name(name):
+                    if show_triggers:
+                        points.append({
+                            "x": float(row["x"]), "y": float(row["y"]), "z": pz,
+                            "label": f"{name} ({row['entry']})",
+                            "sub": _coords_sub(float(row["x"]),
+                                               float(row["y"]), pz),
+                            "kind": "trigger"})
+                        counts["triggers"] += 1
+                    continue
+                if points_mode == "named" and not int(row.get("cr_rank") or 0):
+                    continue
+                rank = int(row.get("cr_rank") or 0)
+                minl = int(row.get("minlevel") or 0)
+                maxl = int(row.get("maxlevel") or 0)
+                lvl = (f"L{minl}-{maxl}" if minl and minl != maxl
+                       else f"L{maxl}")
+                points.append({
+                    "x": float(row["x"]), "y": float(row["y"]), "z": pz,
+                    "label": f"{name} ({row['entry']})",
+                    "sub": f"{_CREATURE_RANK_NAMES.get(rank, str(rank))}, "
+                           f"{lvl} · {_coords_sub(float(row['x']), float(row['y']), pz)}",
+                    "kind": "creature"})
+                counts["creatures"] += 1
+
+    if go_mode != "none":
+        type_filter = f"AND gt.type NOT IN ({','.join(str(t) for t in sorted(_GO_DECOR_TYPES))})" \
+            if go_mode == "key" else ""
+        rows, err = _area_map_query(
+            server,
+            "SELECT g.id AS entry, gt.name, gt.type AS got_type, "
+            "g.position_x AS x, g.position_y AS y, g.position_z AS z "
+            "FROM gameobject g JOIN gameobject_template gt ON g.id = gt.entry "
+            f"WHERE g.map = %s AND {bbox_sql} {type_filter}",
+            [map_id] + bbox_params,
+        )
+        if err:
+            warnings.append(f"SQL unavailable, gameobject points omitted: {err}")
+            sql_failed = True
+        else:
+            for row in rows:
+                pz = float(row["z"])
+                if z is not None and abs(pz - z) > z_band:
+                    continue
+                name = row.get("name") or f"gameobject {row['entry']}"
+                go_type = int(row.get("got_type") or 0)
+                sub = (f"{GO_TYPE_NAMES.get(go_type, f'type{go_type}').lower()}"
+                       f" · {_coords_sub(float(row['x']), float(row['y']), pz)}")
+                points.append({
+                    "x": float(row["x"]), "y": float(row["y"]), "z": pz,
+                    "label": f"{name} ({row['entry']})",
+                    "sub": sub,
+                    "kind": "gameobject"})
+                counts["gameobjects"] += 1
+
+    # ---- paths + LOS rays ---------------------------------------------------
+    paths: List[Dict[str, Any]] = []
+    for i, spec in enumerate(args.get("paths") or []):
+        if not isinstance(spec, dict):
+            raise ValueError(f"paths[{i}] must be an object with from/to")
+        fx, fy, fz = _parse_endpoint(spec.get("from"), f"paths[{i}].from")
+        tx, ty, tz = _parse_endpoint(spec.get("to"), f"paths[{i}].to")
+        mode = str(spec.get("mode") or "smooth").lower()
+        label = spec.get("label") or f"path {i + 1}"
+        try:
+            pf = _cmd_pathfind(server, map_id, fx, fy, fz, tx, ty, tz,
+                               {"mode": mode, "limit": 4000})
+        except (ValueError, IndexError) as e:
+            warnings.append(f"{label}: pathfind failed: {e}")
+            continue
+        if pf.get("error"):
+            warnings.append(f"{label}: {pf['error']}")
+            continue
+        paths.append({
+            "label": label,
+            "ok": bool(pf.get("found")),
+            "distance": pf.get("distance"),
+            "points": [(p["x"], p["y"], p["z"]) for p in pf.get("points", [])],
+        })
+
+    rays: List[Dict[str, Any]] = []
+    for i, spec in enumerate(args.get("rays") or []):
+        if not isinstance(spec, dict):
+            raise ValueError(f"rays[{i}] must be an object with from/to")
+        fx, fy, fz = _parse_endpoint(spec.get("from"), f"rays[{i}].from")
+        tx, ty, tz = _parse_endpoint(spec.get("to"), f"rays[{i}].to")
+        los = _cmd_los(server, map_id, fx, fy, fz, tx, ty, tz)
+        rays.append({"x1": fx, "y1": fy, "z1": fz,
+                     "x2": tx, "y2": ty, "z2": tz,
+                     "visible": bool(los.get("visible")),
+                     "label": spec.get("label") or f"ray {i + 1}"})
+
+    # ---- render + write ------------------------------------------------------
+    try:
+        mesh = collect_mesh(nav, bounds,
+                            max_polys=int(args.get("max_polys",
+                                                   DEFAULT_MAX_POLYS)),
+                            z=z, z_band=z_band)
+        svg = render_svg(
+            map_id, _map_name(server, map_id), bounds, mesh, points,
+            paths, rays,
+            mesh_style=str(args.get("mesh_style", "height")).lower(),
+            scale=float(args.get("scale", 4.0)),
+            grid=float(args.get("grid", 50.0)),
+            labels=bool(args.get("labels", True)),
+            label_limit=int(args.get("label_limit", 60)),
+        )
+    except AreaMapError as e:
+        return {"error": str(e), "isError": True}
+
+    out = args.get("out")
+    if not out:
+        out_dir = Path(tempfile.gettempdir()) / "acore-area-maps"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        slug = hashlib.sha1(
+            f"{map_id}:{bounds.minx}:{bounds.miny}:{bounds.maxx}:"
+            f"{bounds.maxy}".encode()
+        ).hexdigest()[:10]
+        out = str(out_dir / f"{map_id:03d}_{slug}.svg")
+    Path(out).write_text(svg, encoding="utf-8")
+
+    counts["paths"] = len(paths)
+    counts["rays"] = len(rays)
+    counts["polys_drawn"] = len(mesh["polys"])
+    counts["polys_total"] = mesh["poly_total"]
+    counts["offmesh"] = len(mesh["offmesh"])
+    counts["tiles"] = mesh["tile_count"]
+
+    payload: Dict[str, Any] = {
+        "map_id": map_id,
+        "map_name": _map_name(server, map_id),
+        "bounds": {"x1": bounds.minx, "y1": bounds.miny,
+                   "x2": bounds.maxx, "y2": bounds.maxy},
+        "out": str(out),
+        "bytes": len(svg.encode("utf-8")),
+        "counts": counts,
+        "warnings": warnings,
+        "metadata": {
+            "note": "static collision only - dynamic game objects/transports "
+                    "are not in the offline navmesh",
+            **({"z_filter": {"z": z, "band": z_band}} if z is not None else {}),
+        },
+    }
+    if args.get("inline"):
+        payload["svg"] = svg
+    return payload
+
+
+# ---------------------------------------------------------------------------
 # pathfinding
 # ---------------------------------------------------------------------------
 
@@ -776,11 +1078,14 @@ def terrain_tools(server) -> dict:
             float(args["x2"]), float(args["y2"]), float(args["z2"]),
             float(args.get("modify_dist", 0.0)),
         )
+    if subcommand == "area_map":
+        _check_coord(args, ["mapId"])
+        return _cmd_area_map(server, _resolve_map_id(server, args["mapId"]), args)
 
     valid = [
         "list_maps", "list_tiles", "height", "position", "liquid", "area",
         "coord", "tile_info", "vmap_info", "tile_stats", "map_info",
-        "pathfind", "los", "raycast",
+        "pathfind", "los", "raycast", "area_map",
     ]
     return {"error": f"Unknown subcommand: {subcommand}", "valid_subcommands": valid}
 
@@ -796,7 +1101,10 @@ def get_schema() -> dict:
             "indoors/outdoors, nearest navmesh poly), liquid, area, coord, "
             "tile_info, vmap_info, tile_stats, map_info, "
             "pathfind (server '.mmap path' semantics; modes smooth|straight|"
-            "raycast, uncapped by default), los, raycast."
+            "raycast, uncapped by default), los, raycast, "
+            "area_map (obstacle-aware SVG map of a region: navmesh mesh, "
+            "labeled creature/gameobject/trigger points, path polylines, "
+            "LOS rays)."
         ),
         "inputSchema": {
             "type": "object",
@@ -806,7 +1114,7 @@ def get_schema() -> dict:
                     "enum": [
                         "list_maps", "list_tiles", "height", "position", "liquid",
                         "area", "coord", "tile_info", "vmap_info", "tile_stats",
-                        "map_info", "pathfind", "los", "raycast",
+                        "map_info", "pathfind", "los", "raycast", "area_map",
                     ],
                     "description": "Terrain subcommand to execute.",
                 },
@@ -894,6 +1202,142 @@ def get_schema() -> dict:
                 "include_mmap": {
                     "type": "boolean",
                     "description": "Position only: include nearest navmesh poly info (default true).",
+                },
+                "centerX": {
+                    "type": "number",
+                    "description": "area_map only: bounds center X (with centerY/size).",
+                },
+                "centerY": {
+                    "type": "number",
+                    "description": "area_map only: bounds center Y (with centerX/size).",
+                },
+                "size": {
+                    "type": "number",
+                    "description": "area_map only: square bounds side in yards (default 200).",
+                },
+                "padding": {
+                    "type": "number",
+                    "description": "area_map only: yards added around auto-fitted bounds (default 25).",
+                },
+                "z": {
+                    "type": "number",
+                    "description": "area_map only: filter mesh/points to one dungeon floor "
+                                   "(polys within z +- z_band); recommended in multi-floor "
+                                   "instances.",
+                },
+                "z_band": {
+                    "type": "number",
+                    "description": "area_map only: half-height of the z filter band "
+                                   "(default 25 yards).",
+                },
+                "points_mode": {
+                    "type": "string",
+                    "enum": ["named", "all", "none"],
+                    "description": "area_map only: creature points; 'named' = rank > 0 "
+                                   "plus triggers (default), 'all', 'none'.",
+                },
+                "gameobjects": {
+                    "type": "string",
+                    "enum": ["key", "all", "none"],
+                    "description": "area_map only: GO points; 'key' excludes decor types "
+                                   "GENERIC/CHAIR (default), 'all', 'none'.",
+                },
+                "triggers": {
+                    "type": "boolean",
+                    "description": "area_map only: include World Trigger / Invisible Stalker "
+                                   "spawn points (default true).",
+                },
+                "labels": {
+                    "type": "boolean",
+                    "description": "area_map only: draw name labels (default true).",
+                },
+                "label_limit": {
+                    "type": "number",
+                    "description": "area_map only: max labeled points, in creature > "
+                                   "gameobject > trigger order (default 60).",
+                },
+                "mesh_style": {
+                    "type": "string",
+                    "enum": ["height", "outline", "wire"],
+                    "description": "area_map only: 'height' = fills colored by floor Z "
+                                   "(default), 'outline' = white fills, 'wire' = no fills.",
+                },
+                "scale": {
+                    "type": "number",
+                    "description": "area_map only: SVG pixels per yard (default 4, "
+                                   "shrunk to fit the 6000px canvas cap).",
+                },
+                "grid": {
+                    "type": "number",
+                    "description": "area_map only: grid/tick spacing in yards (default 50, "
+                                   "0 disables).",
+                },
+                "out": {
+                    "type": "string",
+                    "description": "area_map only: SVG output path (default "
+                                   "<tempdir>/acore-area-maps/<map>_<hash>.svg).",
+                },
+                "inline": {
+                    "type": "boolean",
+                    "description": "area_map only: also return the SVG string in the "
+                                   "response (default false).",
+                },
+                "max_span": {
+                    "type": "number",
+                    "description": "area_map only: max bounds span per axis in yards "
+                                   "(default 3000).",
+                },
+                "max_polys": {
+                    "type": "number",
+                    "description": "area_map only: max navmesh polys to draw (default "
+                                   "40000).",
+                },
+                "paths": {
+                    "type": "array",
+                    "description": "area_map only: navmesh path polylines to draw.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "from": {
+                                "type": "array", "items": {"type": "number"},
+                                "minItems": 3, "maxItems": 3,
+                                "description": "[x, y, z] start.",
+                            },
+                            "to": {
+                                "type": "array", "items": {"type": "number"},
+                                "minItems": 3, "maxItems": 3,
+                                "description": "[x, y, z] end.",
+                            },
+                            "mode": {
+                                "type": "string",
+                                "description": "pathfind mode (default smooth).",
+                            },
+                            "label": {"type": "string"},
+                        },
+                        "required": ["from", "to"],
+                    },
+                },
+                "rays": {
+                    "type": "array",
+                    "description": "area_map only: LOS rays to draw (green = clear, "
+                                   "orange = blocked).",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "from": {
+                                "type": "array", "items": {"type": "number"},
+                                "minItems": 3, "maxItems": 3,
+                                "description": "[x, y, z] start.",
+                            },
+                            "to": {
+                                "type": "array", "items": {"type": "number"},
+                                "minItems": 3, "maxItems": 3,
+                                "description": "[x, y, z] end.",
+                            },
+                            "label": {"type": "string"},
+                        },
+                        "required": ["from", "to"],
+                    },
                 },
             },
             "required": ["subcommand"],

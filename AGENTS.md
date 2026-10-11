@@ -161,6 +161,15 @@ aligned with the AzerothCore sources rather than with convenience shortcuts.
   74 polys (148 with `MOD_PLAYERBOTS`); pass `max_nodes`/`max_polys`/
   `max_points` to reproduce partial server paths. Unreachable endpoints make
   an uncapped A* exhaust the reachable component (can take minutes).
+- `area_map` renders an obstacle-aware SVG of a region from the navmesh
+  (`core/terrain/area_map.py`, DB-free renderer): height-bucketed poly fills,
+  off-mesh connections as dotted lines, creature/GO/trigger points resolved
+  via the `encounter`-style template joins (rank/level/GO type + xyz on a
+  second label line), plus `pathfind` polylines and `los` rays. Frame is
+  north-up (+X = north, +Y = west); pass `z` in multi-floor instances (poly
+  avg-z ± `z_band` filter). Writes only to the explicit `out` path (default
+  under `<tempdir>/acore-area-maps/`) — the only acore-data tool that writes
+  a file.
 - Two mmap tile frames exist: **file names** use world grid coords
   `{map}{gx:02}{gy:02}.mmtile`, while the Detour mesh header `x/y` are derived
   from `dtNavMeshParams.orig` (`dtNavMesh::calcTileLoc`). `detour/navmesh.py`

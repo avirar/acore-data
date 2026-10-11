@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 import unittest.mock
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -651,6 +652,126 @@ class TestTerrainParsers(unittest.TestCase):
         self.assertIsNotNone(s)
         self.assertAlmostEqual(s, 0.5, places=6)
         self.assertAlmostEqual(t, 0.5, places=6)
+
+    def test_area_map_collect_mesh_and_render(self):
+        from core.terrain.area_map import Bounds, collect_mesh, render_svg
+        from core.terrain.detour import NavMesh
+        self._require(Path(self.paths["mmaps"]) / "0004830.mmtile", "mmaps")
+        nav = NavMesh(0, self.paths["mmaps"])
+        bounds = Bounds(-8870.0, 590.0, -8790.0, 660.0)
+        mesh = collect_mesh(nav, bounds, z=94.0, z_band=15.0)
+        self.assertGreater(len(mesh["polys"]), 10)
+        # Stormwind street level, not the ADT floor ~59.5 or rooftops
+        self.assertGreater(mesh["zmin"], 80.0)
+        self.assertLess(mesh["zmax"], 120.0)
+        svg = render_svg(0, "Eastern Kingdoms", bounds, mesh, [], [], [])
+        root = ET.fromstring(svg)
+        self.assertTrue(root.tag.endswith("}svg"))
+
+
+class TestAreaMapRenderer(unittest.TestCase):
+    """core.terrain.area_map SVG renderer (pure, no client data needed)."""
+
+    MESH = {
+        "polys": [
+            ([(0.0, 0.0, 10.0), (10.0, 0.0, 10.0), (10.0, 10.0, 20.0),
+              (0.0, 10.0, 15.0)], 13.75),
+            ([(10.0, 0.0, 40.0), (20.0, 0.0, 40.0), (20.0, 10.0, 45.0),
+              (10.0, 10.0, 40.0)], 41.25),
+        ],
+        "offmesh": [((5.0, 5.0), (8.0, 5.0))],
+        "zmin": 13.75,
+        "zmax": 41.25,
+        "tile_count": 1,
+        "poly_total": 2,
+    }
+
+    def _render(self, **kw):
+        from core.terrain.area_map import Bounds, render_svg
+        bounds = kw.pop("bounds", Bounds(0.0, 0.0, 20.0, 10.0))
+        return render_svg(0, "Test", bounds, self.MESH,
+                          kw.pop("points", []), kw.pop("paths", []),
+                          kw.pop("rays", []), **kw)
+
+    def test_svg_is_wellformed(self):
+        root = ET.fromstring(self._render())
+        self.assertTrue(root.tag.endswith("}svg"))
+        self.assertIsNotNone(root.get("width"))
+        self.assertIsNotNone(root.get("height"))
+
+    def test_north_up_plus_x_is_up(self):
+        from core.terrain.area_map import _PAD_T
+        points = [
+            {"x": 1.0, "y": 5.0, "z": 0.0, "label": "south", "kind": "creature"},
+            {"x": 19.0, "y": 5.0, "z": 0.0, "label": "north", "kind": "creature"},
+        ]
+        root = ET.fromstring(self._render(points=points))
+        # default scale 2: bounds 20x10yd -> 40px tall frame starting at _PAD_T
+        frame_lo, frame_hi = _PAD_T, _PAD_T + 20.0 * 2.0
+        ys = sorted(float(c.get("cy")) for c in
+                    root.iter("{http://www.w3.org/2000/svg}circle")
+                    if frame_lo <= float(c.get("cy")) <= frame_hi)
+        # north point (larger world X) must sit higher (smaller screen y)
+        self.assertEqual(len(ys), 2)
+        self.assertLess(ys[0], ys[1])
+
+    def test_east_right_minus_y_is_right(self):
+        from core.terrain.area_map import _PAD_L, _PAD_T
+        points = [
+            {"x": 10.0, "y": 1.0, "z": 0.0, "label": "east", "kind": "creature"},
+            {"x": 10.0, "y": 9.0, "z": 0.0, "label": "west", "kind": "creature"},
+        ]
+        root = ET.fromstring(self._render(points=points))
+        frame_lo, frame_hi = _PAD_T, _PAD_T + 20.0 * 2.0
+        cxs = sorted(float(c.get("cx")) for c in
+                     root.iter("{http://www.w3.org/2000/svg}circle")
+                     if frame_lo <= float(c.get("cy")) <= frame_hi
+                     and float(c.get("cx")) >= _PAD_L)
+        # east point (smaller world Y) must sit further right (larger screen x)
+        self.assertEqual(len(cxs), 2)
+        self.assertGreater(cxs[1], cxs[0])
+
+    def test_labels_escaped_and_budgeted(self):
+        points = [
+            {"x": 5.0, "y": 2.0, "z": 0.0, "label": "Door <&>", "kind": "creature"},
+            {"x": 15.0, "y": 8.0, "z": 0.0, "label": "two", "kind": "creature"},
+        ]
+        svg = self._render(points=points, label_limit=1)
+        self.assertIn("Door &lt;&amp;&gt;", svg)
+        self.assertNotIn("Door <&>", svg)
+        self.assertNotIn(">two<", svg)
+
+    def test_sub_line_rendered(self):
+        points = [
+            {"x": 5.0, "y": 5.0, "z": 0.0, "label": "Illidan (22917)",
+             "sub": "world boss, L73 · 705.7, 305.0, 353.9",
+             "kind": "creature"},
+        ]
+        svg = self._render(points=points)
+        self.assertIn("world boss, L73 · 705.7, 305.0, 353.9", svg)
+
+    def test_offmesh_and_height_buckets_drawn(self):
+        svg = self._render()
+        self.assertEqual(svg.count('stroke-dasharray="2,3"'), 1)
+        self.assertEqual(svg.count('fill-opacity="0.88"'), 2)  # 2 height buckets
+
+    def test_wire_style_has_no_fills(self):
+        svg = self._render(mesh_style="wire")
+        self.assertNotIn('fill-opacity="0.88"', svg)
+
+    def test_bad_style_and_zero_span_raise(self):
+        from core.terrain.area_map import AreaMapError, Bounds
+        with self.assertRaises(AreaMapError):
+            self._render(mesh_style="bogus")
+        with self.assertRaises(AreaMapError):
+            self._render(bounds=Bounds(5.0, 5.0, 5.0, 9.0))
+
+    def test_height_ramp_monotonic(self):
+        from core.terrain.area_map import height_color, height_level
+        self.assertNotEqual(height_color(0.0), height_color(1.0))
+        self.assertEqual(height_level(10.0, 0.0, 100.0), 1)
+        self.assertEqual(height_level(100.0, 0.0, 100.0), 15)
+        self.assertEqual(height_level(5.0, 5.0, 5.0), 0)
 
 
 if __name__ == "__main__":

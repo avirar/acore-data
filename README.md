@@ -280,7 +280,7 @@ GM command (uncapped by default).
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subcommand` | string | **Required.** One of: `list_maps`, `list_tiles`, `height`, `position`, `liquid`, `area`, `coord`, `tile_info`, `vmap_info`, `tile_stats`, `map_info`, `pathfind`, `los`, `raycast`. |
+| `subcommand` | string | **Required.** One of: `list_maps`, `list_tiles`, `height`, `position`, `liquid`, `area`, `coord`, `tile_info`, `vmap_info`, `tile_stats`, `map_info`, `pathfind`, `los`, `raycast`, `area_map`. |
 | `mapId` | string or number | Map ID (numeric) or name (e.g. `"Eastern Kingdoms"`, `"571"`). |
 | `x`, `y`, `z` | number | World coordinates (required by subcommand). |
 | `orientation` | number | Optional orientation echoed by `position`. |
@@ -298,6 +298,15 @@ GM command (uncapped by default).
 | `ignore_m2` | boolean | `los` only: ignore M2 doodad collision. |
 | `modify_dist` | number | `raycast` only: offset applied to the hit point. |
 | `include_mmap` | boolean | `position` only: include nearest navmesh poly (default `true`). |
+| `x1`, `y1`, `x2`, `y2` / `centerX`, `centerY`, `size` | number | `area_map` only: region bounds (corners, or center + square side; omitted = auto-fit the map's spawns + `padding`). |
+| `z`, `z_band` | number | `area_map` only: keep mesh/points within z ± band (default band 25y) — multi-floor instances stack in XY. |
+| `points_mode` | string | `area_map` only: `named` (rank > 0 + triggers, default), `all`, `none`. |
+| `gameobjects` | string | `area_map` only: `key` (excludes GENERIC/CHAIR decor, default), `all`, `none`. |
+| `triggers` | boolean | `area_map` only: include World Trigger / Invisible Stalker spawns (default `true`). |
+| `mesh_style` | string | `area_map` only: `height` (height-colored fills, default), `outline`, `wire`. |
+| `scale`, `grid`, `labels`, `label_limit` | number/boolean | `area_map` only: px per yard (default 4), grid spacing (default 50y), name labels (default `true`, capped at 60). |
+| `paths`, `rays` | array | `area_map` only: `[{from: [x,y,z], to: [x,y,z], label?}]` — navmesh path polylines / LOS rays drawn on the map. |
+| `out`, `inline` | string/boolean | `area_map` only: SVG output path (default `<tempdir>/acore-area-maps/…`) and whether to also return the SVG text. |
 
 **Subcommands:**
 
@@ -317,6 +326,7 @@ GM command (uncapped by default).
 | `pathfind` | Server-style path between two points (smooth/straight/raycast, uncapped) |
 | `los` | Static line of sight between two points (vmap geometry) |
 | `raycast` | First vmap hit position along a segment (`GetObjectHitPos`) |
+| `area_map` | Obstacle-aware SVG map of a region: navmesh mesh, labeled creature/GO/trigger points (rank, level, type, xyz), path polylines, LOS rays |
 
 **Pathfinding:**
 
@@ -346,6 +356,13 @@ terrain(subcommand="tile_stats", mapId=571, tileX=23, tileY=24)
 terrain(subcommand="pathfind", mapId=571, x1=4683, y1=3824, z1=355, x2=4538, y2=3230, z2=403)
 → {"found": true, "distance": 649.0, "raw_path_length": 38, "smooth_path_length": 3,
    "smooth_path": [{"x": 4683, "y": 3824, "z": 355}, {"x": 4528, "y": 3244, "z": 357}, {"x": 4538, "y": 3230, "z": 403}]}
+
+terrain(subcommand="area_map", mapId=564, x1=600, y1=200, x2=800, y2=400, z=354,
+        paths=[{"from": [748.2, 365.6, 354.2], "to": [705.73, 304.99, 353.92]}],
+        rays=[{"from": [705.73, 304.99, 353.92], "to": [748.2, 365.6, 354.2]}],
+        out="/tmp/illidan.svg")
+→ {"bounds": {…}, "out": "/tmp/illidan.svg", "bytes": 40211,
+   "counts": {"polys_drawn": 244, "creatures": 2, "gameobjects": 2, "triggers": 12, "paths": 1, "rays": 1}, …}
 ```
 
 **Cross-tile pathfinding** works automatically: tiles are loaded on-demand as the A* search expands, and external edges (`DT_EXT_LINK`) are resolved by finding matching polygons in neighbor tiles via BV-tree search. Long-distance paths (2000+ yards) across many tiles are supported.
